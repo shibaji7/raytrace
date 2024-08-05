@@ -1,0 +1,30 @@
+{
+    "verbose": true,
+    "project_name": "NSF_Eclipse_2017_Mask",
+    "max_ground_range_km": 4000,
+    "number_of_ground_step_km": 200,
+    "start_height_km": 100,
+    "end_height_km": 500,
+    "height_incriment_km": 1,
+    "scale": "log",
+    "kind": "linear",
+    "frequency": 10.5,
+    "start_elevation": 5,
+    "end_elevation": 60,
+    "elevation_inctiment": 0.1,
+    "nhops": 1,
+    "rise_time_sec": 60,
+    "threshold": 1e-5,
+    "radius_earth": 6371,
+    "iri_param": {
+        "step_sec": 600,
+        "run_it": 36,
+        "start_mask_time": 11
+    },
+    "base_eclipse_folder": "datasets/eclipse_path/",
+    "tmp_sd_folder": "tmp/",
+    "eclipse_shadow": true,
+    "sd_file_type": "fitacf",
+    "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
+    "project_save_location": "outputs/"
+}

@@ -25,7 +25,7 @@ import cartopy
 import matplotlib.ticker as mticker
 import utils
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
-from sdcarto import SDCarto
+from sd_carto import SDCarto
 ## from sd_carto import SDCarto
 
 
@@ -125,7 +125,8 @@ class Fan(object):
             va="center",
             transform=ax.transAxes,
         )
-        if self.overlay_eclipse: ax.overaly_eclipse_path(lineWidth=0.2)
+        if self.overlay_eclipse:
+            ax.overaly_eclipse_path(lineWidth=0.2)
         if self.terminator:
             from cartopy.feature.nightshade import Nightshade
 

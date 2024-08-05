@@ -14,6 +14,7 @@ __status__ = "Research"
 
 import aacgmv2
 import cartopy
+import eclipse
 import matplotlib.pyplot as plt
 import numpy
 import numpy as np
@@ -23,7 +24,6 @@ from cartopy.mpl.geoaxes import GeoAxes
 from descartes import PolygonPatch
 from matplotlib.projections import register_projection
 from shapely.geometry import LineString, MultiLineString, Polygon, mapping
-import eclipse
 
 
 class SDCarto(GeoAxes):

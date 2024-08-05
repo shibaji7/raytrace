@@ -249,24 +249,25 @@ class Radar(object):
 
 if __name__ == "__main__":
     import json
+
     fname = "cfg/rt2D.json"
     with open(fname, "r") as f:
         cfg = json.load(f, object_hook=lambda x: SimpleNamespace(**x))
-    dates = [dt.datetime(2024,4,8), dt.datetime(2024,4,9)]
+    dates = [dt.datetime(2024, 4, 8), dt.datetime(2024, 4, 9)]
     Radar("bks", dates, cfg)
     Radar("fhe", dates, cfg)
     Radar("fhw", dates, cfg)
     Radar("kap", dates, cfg)
     Radar("gbr", dates, cfg)
-    dates = [dt.datetime(2017,8,21), dt.datetime(2017,8,22)]
+    dates = [dt.datetime(2017, 8, 21), dt.datetime(2017, 8, 22)]
     Radar("fhe", dates, cfg)
     Radar("fhw", dates, cfg)
     Radar("cve", dates, cfg)
     Radar("cvw", dates, cfg)
-    dates = [dt.datetime(2023,10,14), dt.datetime(2023,10,15)]
+    dates = [dt.datetime(2023, 10, 14), dt.datetime(2023, 10, 15)]
     Radar("fhe", dates, cfg)
     Radar("fhw", dates, cfg)
     Radar("cve", dates, cfg)
     Radar("cvw", dates, cfg)
-    dates = [dt.datetime(2021,12,4), dt.datetime(2021,12,5)]
+    dates = [dt.datetime(2021, 12, 4), dt.datetime(2021, 12, 5)]
     Radar("fir", dates, cfg)

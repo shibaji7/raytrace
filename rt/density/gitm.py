@@ -5,6 +5,7 @@ import xarray as xr
 from loguru import logger
 from scipy import io
 from scipy.io import savemat
+import utils
 
 
 class GITM(object):
@@ -13,7 +14,6 @@ class GITM(object):
         cfg,
         event,
         file_path,
-        param="dene",
     ):
         self.cfg = cfg
         self.file_name = file_path
@@ -41,7 +41,7 @@ class GITM(object):
             "SigP",
             "time",
         ]
-        file = os.path.join(self.folder, self.file_name)
+        file = self.file_name
         logger.info(f"Load files -> {file}")
         ds = xr.open_dataset(file, drop_variables=drop_vars)
         self.store["time"] = [
@@ -120,102 +120,3 @@ class GITM(object):
             self.dataset[self.file_dates[i]] = D
             logger.info(f"Loading file: {f}")
         return
-
-    def fetch_dataset(self, time, latlim, lonlim):
-        """
-        Fetch data by lat/lon limits
-        """
-        i = np.argmin([np.abs((t - time).total_seconds()) for t in self.file_dates])
-        D = self.dataset[self.file_dates[i]]
-        glat = (D["lat1"] * 180 / np.pi)[:, 0]
-        glon = (D["lon1"][0, :] * 180) / np.pi
-        idx = np.logical_and(glon >= lonlim[0], glon <= lonlim[1])
-        idy = np.logical_and(glat >= latlim[0], glat <= latlim[1])
-        galt = np.squeeze(D[self.param]) / 1e3
-        out = D[self.param][:, idx, :][:, :, idy]
-        return out
-
-    def fetch_dataset_by_locations(self, time, lats, lons, alts):
-        """
-        Fetch data by lat/lon limits
-        """
-        n = len(lats)
-        i = np.argmin([np.abs((t - time).total_seconds()) for t in self.file_dates])
-        logger.info(f"Time: {self.file_dates[i]}")
-        D = self.dataset[self.file_dates[i]]
-        glat = (D["lat1"] * 180 / np.pi)[:, 0]
-        glon = (D["lon1"][0, :] * 180) / np.pi
-        galt = D["alt1"][:, 0, 0] / 1e3
-        out, ix = np.zeros((len(alts), n)) * np.nan, 0
-        for lat, lon in zip(lats, lons):
-            lon = np.mod(360 + lon, 360)
-            idx = np.argmin(np.abs(glon - lon))
-            idy = np.argmin(np.abs(glat - lat))
-            o = D[self.param][:, idx, idy]
-            out[:, ix] = (
-                utils.interpolate_by_altitude(
-                    galt, alts, o, self.cfg.scale, self.cfg.kind, method="extp"
-                )
-                * 1e-6
-            )
-            ix += 1
-        self.param, self.alts = out, galt
-        return out, galt
-
-    @staticmethod
-    def create_object(
-        cfg,
-        year=2017,
-        folder="dataset/GITM/20170821/",
-        param="eden",
-        time=dt.datetime(2017, 8, 21, 17, 30),
-        lats=[],
-        lons=[],
-        alts=[],
-        to_file=None,
-        prev=False,
-    ):
-        mobj = {}
-        gitm = GITM(cfg, year, folder, param)
-        mobj["ne"], _ = gitm.fetch_dataset_by_locations(time, lats, lons, alts)
-        if to_file:
-            savemat(to_file, mobj)
-        return gitm
-
-    @staticmethod
-    def create_density_files(
-        cfg,
-        year=2017,
-        folder="dataset/GITM/20170821/",
-        param="eden",
-        time=dt.datetime(2017, 8, 21, 17, 30),
-        lats=[],
-        lons=[],
-        alts=[],
-        to_file=None,
-        prev=None,
-    ):
-        gitm = GITM.create_object(
-            cfg,
-            year,
-            folder,
-            param,
-            time,
-            lats,
-            lons,
-            alts,
-            to_file,
-        )
-        if prev:
-            GITM.create_object(
-                cfg,
-                year,
-                folder,
-                param,
-                time - dt.timedelta(minutes=30),
-                lats,
-                lons,
-                alts,
-                prev,
-            )
-        return gitm

@@ -18,7 +18,6 @@ class GITM(object):
         self.cfg = cfg
         self.file_name = file_path
         self.event = event
-        self.param = param
         self.load_nc_dataset()
         return
 
@@ -101,22 +100,3 @@ class GITM(object):
         if to_file:
             savemat(to_file, dict(ne=self.param))
         return out, galt
-
-    def load_dataset(self):
-        """
-        Load all dataset available
-        """
-        files = np.array(sorted(glob.glob(f"{self.folder}*.sav")))
-        self.file_dates = np.array(
-            [
-                dt.datetime.strptime(os.path.split(i)[1][7:-4], "%y%m%d_%H%M%S")
-                for i in files
-            ]
-        )
-        self.dataset = {}
-        for i, f in enumerate(files):
-            self.file_dates[i] = self.file_dates[i].replace(year=self.year)
-            D = io.readsav(f)
-            self.dataset[self.file_dates[i]] = D
-            logger.info(f"Loading file: {f}")
-        return

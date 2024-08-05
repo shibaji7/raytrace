@@ -1,0 +1,70 @@
+1. Create a directory (eg C:\pharlap) to place the downloaded pharlap.zip file
+   and extract the software
+
+2. Define the environment variable DIR_MODELS_REF_DAT to point to the reference 
+   data files. These files live in the 'dat' subdirectory (eg C:\pharlap\dat). 
+   There are two ways to set the environment variable. Either...
+
+   a. Put the following command in your matlab startup file:
+
+           setenv('DIR_MODELS_REF_DAT', '<path to data>')
+
+      where <path to data> is the directory where the reference data lives
+      (e.g. ~/pharlap/dat or C:\pharlap\dat)
+
+      Note for Parallel Computing Toolbox users: This method sometimes won't
+      pass the environent variable through to the parallel workers. Use the
+      alternate method below. 
+ 
+   OR...
+ 
+   b. Set the environment variable at the system level. 
+       	 (i)  Windows 10: Open control panel, search for "environment variable",
+                          click on the resultant link, click New and enter the
+                          details
+         (ii) Linux / Mac OSX : edit your .bash_profile appropriately 
+
+3. On Windows systems the Intel Fortran redistributable libraries are required
+   to be installed. Refer to RELEASE_NOTES.txt for information on the
+   required version. The libraries available from here:
+   
+     https://software.intel.com/en-us/articles/intelr-composer-redistributable-libraries-by-version
+
+4. On Mac OS Catelina and later systems: 
+   a. open a terminal 
+   b. navigate to the directory which contains the mex (e.g. "cd ~/pharlap/mex")
+   c. run the command "xattr -d com.apple.quarantine *.*" 
+
+5. Start matlab and add the installation directory (e.g. C:\pharlap) to the path. 
+   Make sure that you include the subdirectories!
+
+6. At the Matlab prompt type:
+     "help pharlap" to obtain top-level help and a list of routines. 
+     "help <routine>" to obtain help on a specific routine
+
+7. Example code resides in the directory :
+        <pharlap install dir>/src/matlab/examples
+
+8. PHaRLAP may not run with a different version of Matlab from that which it
+   was compiled. See RELEASE_NOTES.txt for details on the version of Matlab
+   to use with PHaRLAP.
+   
+9. Note that if Matlab is run over a network on a different node to where
+   PHaRLAP is installed then routines which rely on the reference data (e.g. the
+   ionospheric, geomagnetic and ground scattering loss models) may run
+   substantially slower.
+    
+If you have any problems contact:
+
+Dr Manuel Cervera
+High Frequency Radar Branch
+Intelligence, Surveillance and Space Division
+Defence Science and Technology Group
+Bld 200, Third Avenue, PO Box 1500, Edinburgh, SA 5111
+Australia
+
+email:  manuel.cervera@dst.defence.gov.au
+Phone:	+61 8 738 97163
+Fax:	+61 8 738 96673
+Mobile:	+61 0413 842 043
+

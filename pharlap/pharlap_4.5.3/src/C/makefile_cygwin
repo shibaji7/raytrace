@@ -1,0 +1,87 @@
+CC := gcc
+OBJS = raytrace-2d_matlab_wrapper.o raytrace-2d-sp_matlab_wrapper.o raytrace-3d_matlab_wrapper.o raytrace-3d-sp_matlab_wrapper.o irreg_strength_matlab_wrapper.o dop_spread_eq_matlab_wrapper.o iri2007_matlab_wrapper.o igrf2007_matlab_wrapper.o iri2012_matlab_wrapper.o igrf2011_matlab_wrapper.o iri2016_matlab_wrapper.o igrf2016_matlab_wrapper.o iri2020_matlab_wrapper.o igrf2020_matlab_wrapper.o ground_bs_loss_matlab_wrapper.o ground_fs_loss_matlab_wrapper.o abso_bg_matlab_wrapper.o nrlmsise00_matlab_wrapper.o check_ref_data.o stepmemcpyd.o
+LINK := "/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 14.0/Intel Fortran/Microsoft Files/VC/Bin/link.exe"
+LINKFLAGS := /DLL /EXPORT:mexFunction /MAP /NOLOGO /nodefaultlib:libcmt 
+NULLSTRING :=
+ifeq (${MATLAB_VERSION}, ${NULLSTRING})
+  MATLAB_VERSION := R2020a
+endif
+ifeq (${TARGET_ARCH}, ia32)           # Win 32
+  CFLAGS := -m32 -O2 -DWIN32
+  LINKFLAGS := ${LINKFLAGS} /MACHINE:x86
+  MEXINCLUDE := "/cygdrive/c/Program Files (x86)/MATLAB/R2015b/extern/include"
+  MEXLIBPATH := "C:\Program Files (x86)\MATLAB\R2015b\extern\lib\win32\microsoft"
+  MEXEXT := mexw32
+else                                  # Win 64
+  CFLAGS := -m64 -O2 -DWIN64
+  LINKFLAGS := ${LINKFLAGS} /MACHINE:x64
+  MEXINCLUDE := "/cygdrive/c/Program Files/MATLAB/${MATLAB_VERSION}/extern/include"
+  MEXLIBPATH := "C:\Program Files\MATLAB\${MATLAB_VERSION}\extern\lib\win64\microsoft"
+  MEXEXT := mexw64
+endif
+PHARLAP_LIB_PATH = ../../lib/win
+
+.SUFFIXES : .o .c
+
+pharlap : raytrace_2d raytrace_2d_sp raytrace_3d raytrace_3d_sp irreg_strength dop_spread_eq iri2007 igrf2007 iri2012 igrf2011 iri2016 igrf2016 iri2020 igrf2020 ground_bs_loss ground_fs_loss abso_bg nrlmsise00
+
+build_objs : ${OBJS}
+
+.c.o :
+	${CC} ${CFLAGS} -I${MEXINCLUDE} -c $<
+
+raytrace_2d : build_objs
+	${LINK} ${LINKFLAGS} raytrace-2d_matlab_wrapper.o stepmemcpyd.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libpropagation.lib libmaths.lib /OUT:raytrace_2d.${MEXEXT}
+
+raytrace_2d_sp : build_objs
+	${LINK} ${LINKFLAGS} raytrace-2d-sp_matlab_wrapper.o stepmemcpyd.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib  /LIBPATH:${PHARLAP_LIB_PATH} libpropagation.lib libmaths.lib /OUT:raytrace_2d_sp.${MEXEXT}
+
+raytrace_3d: build_objs
+	${LINK} ${LINKFLAGS} raytrace-3d_matlab_wrapper.o stepmemcpyd.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libpropagation.lib libmaths.lib /OUT:raytrace_3d.${MEXEXT}
+
+raytrace_3d_sp: build_objs
+	${LINK} ${LINKFLAGS} raytrace-3d-sp_matlab_wrapper.o stepmemcpyd.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libpropagation.lib libmaths.lib /OUT:raytrace_3d_sp.${MEXEXT}
+
+irreg_strength: build_objs
+	${LINK} ${LINKFLAGS} irreg_strength_matlab_wrapper.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libpropagation.lib libiri2016.lib /OUT:irreg_strength.${MEXEXT}
+
+dop_spread_eq: build_objs
+	${LINK} ${LINKFLAGS} dop_spread_eq_matlab_wrapper.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libpropagation.lib libiri2016.lib /OUT:dop_spread_eq.${MEXEXT}
+
+iri2007: build_objs
+	${LINK} ${LINKFLAGS} iri2007_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libiri2007.lib /OUT:iri2007.${MEXEXT}
+
+igrf2007: build_objs
+	${LINK} ${LINKFLAGS} igrf2007_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libiri2007.lib libmaths.lib /OUT:igrf2007.${MEXEXT}
+
+iri2012: build_objs
+	${LINK} ${LINKFLAGS} iri2012_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libiri2012.lib /OUT:iri2012.${MEXEXT}
+
+igrf2011: build_objs
+	${LINK} ${LINKFLAGS} igrf2011_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libiri2012.lib libmaths.lib /OUT:igrf2011.${MEXEXT}
+
+iri2016: build_objs
+	${LINK} ${LINKFLAGS} iri2016_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libiri2016.lib /OUT:iri2016.${MEXEXT}
+
+igrf2016: build_objs
+	${LINK} ${LINKFLAGS} igrf2016_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libiri2016.lib libmaths.lib /OUT:igrf2016.${MEXEXT}
+
+iri2020: build_objs
+	${LINK} ${LINKFLAGS} iri2020_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libiri2020.lib /OUT:iri2020.${MEXEXT}
+
+igrf2020: build_objs
+	${LINK} ${LINKFLAGS} igrf2020_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libiri2020.lib libmaths.lib /OUT:igrf2020.${MEXEXT}
+
+nrlmsise00: build_objs
+	${LINK} ${LINKFLAGS} nrlmsise00_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libiri2016.lib libmaths.lib /OUT:nrlmsise00.${MEXEXT}
+
+ground_bs_loss: build_objs
+	${LINK} ${LINKFLAGS} ground_bs_loss_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libpropagation.lib /OUT:ground_bs_loss.${MEXEXT}
+
+ground_fs_loss: build_objs
+	${LINK} ${LINKFLAGS} ground_fs_loss_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libpropagation.lib /OUT:ground_fs_loss.${MEXEXT}
+
+abso_bg: build_objs
+	${LINK} ${LINKFLAGS} abso_bg_matlab_wrapper.o check_ref_data.o /LIBPATH:${MEXLIBPATH} libmx.lib libmex.lib /LIBPATH:${PHARLAP_LIB_PATH} libpropagation.lib libmaths.lib libiri2016.lib /OUT:abso_bg.${MEXEXT}
+
+

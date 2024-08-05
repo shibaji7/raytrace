@@ -1,0 +1,13 @@
+PHaRLAP is "scientific research" software. It is recommended not to be used for
+operational purposes. The Defence Science and Technology Group (DST) of the
+Department of Defence, Commonwealth of Australia does not guarantee the results
+from PHaRLAP. The use of PHaRLAP is provided on an “as is” basis and DST make no
+representation and give no warranty of any kind, either expressed or implied
+including fitness for a particular purpose. The entire risk as to the quality
+and performance of the program is with you. You indemnify and hold harmless DST
+and any of its contractors and subcontractors against any costs, including any
+claims for costs made by any person arising from your possession or use of the
+program, or breach of this licence, or any related matter, including costs
+resulting from any products or processes based on or resulting from your use of
+the program.  If you choose to request a copy of the software or download the
+software you are also agreeing DST’s terms of use.

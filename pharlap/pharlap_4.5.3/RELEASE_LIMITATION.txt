@@ -1,0 +1,7 @@
+PHaRLAP is software created by the Defence Science and Technology Group (DST) of
+Department of Defence, Commonwealth of Australia. The release of PHaRLAP is
+strictly controlled. PHaRLAP is not to be redistributed, under any circumstance,
+to third parties, without DST’s expressed written permission. Third parties are
+to directly request a copy of PHaRLAP via the website 
+https://www.dst.defence.gov.au/partner-with-us/access-our-technology
+

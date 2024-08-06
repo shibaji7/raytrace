@@ -1,8 +1,11 @@
+import datetime as dt
+
 import eclipse
 import iricore
 import numpy as np
+from dateutil import parser as dparser
 from loguru import logger
-from scipy.io import savemat
+from scipy.io import loadmat, savemat
 
 
 class IRI2d(object):
@@ -10,12 +13,13 @@ class IRI2d(object):
     def __init__(
         self,
         cfg,
-        event,
+        event: dt.datetime,
     ):
         self.cfg = cfg
         self.event = event
-        self.iri_version = self.cfg.iri_version
-
+        self.iri_version = self.cfg.iri_param.iri_version
+        if self.cfg.iri_param.eclipse:
+            self.start_mask_time = dparser.isoparse(self.cfg.iri_param.start_mask_time)
         return
 
     def load_eclipse(self):
@@ -35,32 +39,37 @@ class IRI2d(object):
         oclt = np.nan_to_num(oclt)
         p = 1.0 - oclt
         logger.info(f"Min/max value P: {np.nanmax(p)}/{np.nanmin(p)}")
-        self.param_val = self.param_val * p
+        self.param = self.param * p
         return
 
     def fetch_dataset(
         self,
-        time,
+        time: dt.datetime,
         lats,
         lons,
         alts,
-        to_file=None,
+        to_file: str = None,
     ):
         self.lats, self.alts, self.lons = (lats, alts, lons)
         self.time = time
-        iri_version = iri_version if iri_version else self.iri_version
         self.param = np.zeros((len(self.alts), len(self.lats)))
+        alt_range = [alts[0], alts[-1], alts[1] - alts[0]]
         for i in range(len(self.lats)):
             iriout = iricore.iri(
                 self.time,
-                self.alt_range,
+                alt_range,
                 self.lats[i],
                 self.lons[i],
-                iri_version,
+                self.iri_version,
             )
-            self.param_val[:, i] = iriout.edens * 1e-6
-        if self.cfg.eclipse and self.time>=self.cfg.start_mask_time: 
+            self.param[:, i] = iriout.edens * 1e-6
+        if self.cfg.iri_param.eclipse and self.time >= self.start_mask_time:
             self.load_eclipse()
         if to_file:
             savemat(to_file, dict(ne=self.param))
-        return self.param_val, self.alts
+        return self.param, self.alts
+
+    def load_from_file(self, to_file: str):
+        logger.info(f"Load from file {to_file.split('/')[-1]}")
+        self.param = loadmat(to_file)["ne"]
+        return self.param

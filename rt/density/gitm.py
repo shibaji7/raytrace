@@ -4,18 +4,17 @@ import numpy as np
 import utils
 import xarray as xr
 from loguru import logger
-from scipy.io import savemat
+from scipy.io import savemat, loadmat
 
 
-class GITM(object):
+class GITM2d(object):
     def __init__(
         self,
         cfg,
         event,
-        file_path,
     ):
         self.cfg = cfg
-        self.file_name = file_path
+        self.file_name = self.cfg.density_file_location
         self.event = event
         self.load_nc_dataset()
         return
@@ -99,3 +98,8 @@ class GITM(object):
         if to_file:
             savemat(to_file, dict(ne=self.param))
         return out, galt
+
+    def load_from_file(self, to_file: str):
+        logger.info(f"Load from file {to_file.split('/')[-1]}")
+        self.param = loadmat(to_file)["ne"]
+        return self.param

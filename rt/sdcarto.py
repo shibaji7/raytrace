@@ -365,10 +365,16 @@ class SDCarto(GeoAxes):
         return
 
     def overaly_eclipse_path(
-        self, tx=cartopy.crs.PlateCarree(), zorder=1, lineWidth=0.8, ls="--", year=None
+        self,
+        cfg_file,
+        tx=cartopy.crs.PlateCarree(),
+        zorder=1,
+        lineWidth=0.8,
+        ls="--",
+        year=None,
     ):
         year = year if year else self.plot_date.year
-        o = eclipse.read_eclispe_path(year)
+        o = eclipse.read_eclispe_path(year, cfg_file)
         keys, colors = ["C", "N", "S"], ["k", "r", "r"]
         for k, c in zip(keys, colors):
             xy = self.projection.transform_points(tx, o["Lon" + k], o["Lat" + k])

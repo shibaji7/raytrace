@@ -34,8 +34,8 @@ irregs_flag = 1;
 kp = 0;
 
 %% load data
-load(char(strcat('../../', dic, '/bearing.mat')))
-load(char(strcat('../../', dic, '/', compose('%02d',UT(4)), '.', compose('%02d',UT(5)), '.mat')))
+load(char(strcat('../', dic, '/bearing.mat')))
+load(char(strcat('../', dic, '/', compose('%02d',UT(4)), '.', compose('%02d',UT(5)), '.mat')))
 
 %% initialize IRI grid
 clear iri_options
@@ -62,6 +62,6 @@ freqs = freq.*ones(size(elevs));
 		radius_earth, irregs_flag, iono_en_grid, iono_en_grid_5, ...
 		collision_freq, start_height, height_inc, range_inc, irreg);
 
-cd ../../;
+cd ../;
 save(fname, "ray_data", "ray_path_data");
 toc

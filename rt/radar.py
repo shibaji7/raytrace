@@ -17,6 +17,11 @@ from loguru import logger
 from tqdm import tqdm
 
 
+def get_beams(rad):
+    hdw = pydarn.read_hdw_file(rad)
+    return np.arange(hdw.beams)
+
+
 class Radar(object):
 
     def __init__(

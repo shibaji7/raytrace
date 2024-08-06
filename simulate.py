@@ -12,6 +12,7 @@ __email__ = "shibaji7@vt.edu"
 __status__ = "Research"
 
 import argparse
+import concurrent.futures
 import datetime as dt
 import json
 import os
@@ -33,21 +34,19 @@ class RadarSimulation(object):
         start_time: dt.datetime = None,
         rad: str = None,
         beam: int = 0,
-        method: str = None,
         time_window: int = 240,
         time_gaps: int = 5,
-        eclipse_start_time: dt.datetime = None,
-        cfg_file: str = "cfg/rt2D.json",
+        cfg_file: str = "cfg/rt2d.json",
+        parallel: bool = True,
     ) -> None:
         self.model = model
-        self.method = method
         self.rad = rad
         self.beam = beam
         self.time_gaps = time_gaps
         self.time_window = time_window
         self.start_time = start_time
         self.cfg_file = cfg_file
-        self.eclipse_start_time = eclipse_start_time
+        self.parallel = parallel
         self.read_params_2D()
         self.base_output_folder = os.path.join(
             self.cfg.project_save_location, self.cfg.project_name
@@ -121,7 +120,8 @@ class RadarSimulation(object):
             lay_eclipse=None,
         )
         ax = fan.add_axes()
-        ax.overaly_eclipse_path(self.cfg_file, year=self.start_time.year)
+        if self.cfg.iri_param.eclipse:
+            ax.overaly_eclipse_path(self.cfg_file, year=self.start_time.year)
         fan.generate_fov(self.rad, [], ax=ax, beams=[self.beam])
         fan.save(
             filepath=utils.get_folder(
@@ -137,106 +137,105 @@ class RadarSimulation(object):
 
     def run_2d_simulation(self):
         logger.info(f"Inside {self.model.upper()} Simulation...")
-        import plots
-        from iri import IRI2d
         from gitm import GITM2d
-        from rt2d import RadarBeam2dTrace
+        from iri import IRI2d
+        from waccm import WACCMX2d
 
         if self.model == "iri":
-            model = IRI2d(self.cfg, self.start_time)
+            self.eden_model = IRI2d(self.cfg, self.start_time)
         elif self.model == "gitm":
-            model = GITM2d(self.cfg, self.start_time)
+            self.eden_model = GITM2d(self.cfg, self.start_time)
+        elif self.model == "waccm":
+            self.eden_model = WACCMX2d(self.cfg, self.start_time)
         else:
             raise ValueError(
                 "Currently supporting following methods: iri, gitm, waccm-x, and wamipe"
             )
-        for d in range(int(args.time_window / args.time_gaps)):
-            event = self.start_time + dt.timedelta(minutes=d * args.time_gaps)
-            logger.info(f"Load e-Density for, {event}")
-            rto = RadarBeam2dTrace(
-                event,
-                self.rad,
-                self.beam,
-                self.cfg,
-                self.model,
-                self.base_output_folder,
-            )
-
-            # Load all the electron density
-            if not os.path.exists(rto.edensity_file):
-                eden, _ = model.fetch_dataset(
-                    event,
-                    rto.bearing_object["lat"],
-                    rto.bearing_object["lon"],
-                    rto.bearing_object["ht"],
-                    to_file=rto.edensity_file,
-                )
-            else:
-                eden = model.load_from_file(rto.edensity_file)
-
-            # Load and compile MATLAB - PHaRLAP
-            if not os.path.exists(rto.sim_fname):
-                rto.compile(eden)
-            else:
-                rto.load_rto(eden)
-
-            # Create RT figures
-            if not os.path.exists(rto.fig_name):
-                plots.plot_rays(
-                    rto.folder,
-                    rto.fig_name,
-                    rto,
-                    rf"{self.model.upper()} + {args.rad.upper()}/{str(args.beam)}, $f_0$={str(self.cfg.frequency)} MHz",
-                    maxground=self.cfg.max_ground_range_km,
-                    eclipse_time=args.eclipse_time,
-                )
+        events = [
+            self.start_time + dt.timedelta(minutes=d * self.time_gaps)
+            for d in range(int(self.time_window / self.time_gaps))
+        ]
+        if self.parallel:
+            with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+                _ = list(executor.map(self._run_rt_, events))
+        else:
+            for event in events:
+                logger.info(f"Load e-Density for, {event}")
+                self._run_rt_(event)
         return
 
+    def _run_rt_(self, event):
+        import plots
+        from rt2d import RadarBeam2dTrace
 
-def genererate_Fan(event, rad, tfreq, frame, model, param="v"):
-    sys.path.append("py/")
-    import cartopy
-    from fan import Fan
+        rto = RadarBeam2dTrace(
+            event,
+            self.rad,
+            self.beam,
+            self.cfg,
+            self.model,
+            self.base_output_folder,
+        )
 
-    folder = os.path.join("figures", event.strftime("%b%Y"))
-    os.makedirs(folder, exist_ok=True)
-    p_max, p_min = (10, -10) if param == "v" else (33, 0)
-    cmap = "Spectral" if param == "v" else "plasma"
-    label = "Velocity [m/s]" if param == "v" else "Power [dB]"
-    fig_title = rf"$f_0=${tfreq} MHz / {model.upper()}"
-    fan = Fan(
-        [rad],
-        event,
-        fig_title=fig_title,
-    )
-    fan.setup(
-        np.arange(-180, 180, 30),
-        np.arange(30, 70, 20),
-        extent=[-150, -80, 40, 90],
-        proj=cartopy.crs.Orthographic(-120, 45),
-    )
-    fan.generate_fov(
-        rad,
-        frame,
-        p_name=param,
-        p_max=p_max,
-        p_min=p_min,
-        cmap=cmap,
-        label=label,
-        lats=np.linspace(0, 90, num=90 * 2),
-    )
-    fan.save(f"{folder}/fan.{rad}-{date.strftime('%H%M')}.png")
-    fan.close()
-    return
+        # Load all the electron density
+        if not os.path.exists(rto.edensity_file):
+            eden, _ = self.eden_model.fetch_dataset(
+                event,
+                rto.bearing_object["lat"],
+                rto.bearing_object["lon"],
+                rto.bearing_object["ht"],
+                to_file=rto.edensity_file,
+            )
+        else:
+            eden = self.eden_model.load_from_file(rto.edensity_file)
+
+        # Load and compile MATLAB - PHaRLAP
+        if not os.path.exists(rto.sim_fname):
+            rto.compile(eden)
+        else:
+            rto.load_rto(eden)
+
+        # Create RT figures
+        if not os.path.exists(rto.fig_name):
+            plots.plot_rays(
+                rto.folder,
+                rto.fig_name,
+                rto,
+                rf"{self.model.upper()} + {self.rad.upper()}/{str(self.beam)}, $f_0$={str(self.cfg.frequency)} MHz",
+                maxground=self.cfg.max_ground_range_km,
+            )
+        return
+
+    def compute_doppler(self):
+        from doppler import Doppler
+
+        # Initialize Doppler object
+        self.dop = Doppler(
+            cfg=self.cfg,
+            start_time=self.start_time,
+            model=self.model,
+            radar=self.radar,
+            beam=self.beam,
+            del_time=self.time_gaps,
+            base=self.base_output_folder,
+        )
+        events = [
+            self.start_time + dt.timedelta(minutes=d * self.time_gaps)
+            for d in range(int(self.time_window / self.time_gaps))
+        ]
+        for now, prev in zip(events[1:], events[:-1]):
+            logger.info(
+                f"Compute doppler for, {now.strftime('%H:%M')}/{prev.strftime('%H:%M')}"
+            )
+            self.dop._compute_doppler_from_prev_time_(now, prev)
+
+        return
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-m", "--model", default="iri", help="Model name [wam/gitm/waccm/iri]"
-    )
-    parser.add_argument(
-        "-md", "--method", default="rt", help="Method rt/dop/fan/rti/movie"
     )
     parser.add_argument("-r", "--rad", default="cvw", help="Radar code (cvw)")
     parser.add_argument(
@@ -252,7 +251,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-tw",
         "--time_window",
-        default=5,
+        default=90,
         type=int,
         help="Time window to run the models (minutes)",
     )
@@ -264,33 +263,32 @@ if __name__ == "__main__":
         help="Time gaps to run the models (1-minutes)",
     )
     parser.add_argument(
-        "-et",
-        "--eclipse_time",
-        default=dt.datetime(2017, 8, 21, 16),
-        help="Event date for simulation [YYYY-mm-ddTHH:MM]",
-        type=dparser.isoparse,
-    )
-    parser.add_argument("-cd", "--clear_dop", default=0, type=int, help="clear doppler")
-    parser.add_argument(
         "-f", "--cfg_file", default="cfg/rt2d.json", help="Configuration file"
+    )
+    parser.add_argument(
+        "-md", "--method", default="rt", help="Method rt/dop/fan/rti/movie"
     )
     args = parser.parse_args()
     logger.info("\n Parameter list for simulation ")
     for k in vars(args).keys():
         print("     ", k, "->", str(vars(args)[k]))
-    rsim = RadarSimulation(
-        model=args.model,
-        start_time=args.event,
-        rad=args.rad,
-        beam=args.beam,
-        method=args.method,
-        time_window=args.time_window,
-        time_gaps=args.time_gaps,
-        eclipse_start_time=args.eclipse_time,
-        cfg_file=args.cfg_file,
-    )
-    rsim.gerenate_fov_plot()
-    rsim.run_2d_simulation()
+    if args.method == "rt":
+        import radar
+
+        beams = radar.get_beams(args.rad) if args.beam == -1 else [args.beam]
+        for beam in beams:
+            rsim = RadarSimulation(
+                model=args.model,
+                start_time=args.event,
+                rad=args.rad,
+                beam=beam,
+                time_window=args.time_window,
+                time_gaps=args.time_gaps,
+                cfg_file=args.cfg_file,
+            )
+            rsim.gerenate_fov_plot()
+            rsim.run_2d_simulation()
+            rsim.compute_doppler()
     # if args.method == "rt":
     #     sys.path.append("rt/")
     #     from rt2D import (

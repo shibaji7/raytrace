@@ -1,5 +1,3 @@
-
-
 class WAMIPE2d(object):
     def __init__(
         self,

@@ -1,6 +1,3 @@
-
-
-
 class GEMINI2d(object):
     def __init__(
         self,

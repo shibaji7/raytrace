@@ -1,8 +1,9 @@
-from loguru import logger
-import numpy as np
 import os
-import xarray as xr
+
+import numpy as np
 import utils
+import xarray as xr
+from loguru import logger
 from scipy.io import loadmat, savemat
 
 pconst = {
@@ -18,6 +19,7 @@ pconst = {
     "eps0": 1e-9 / (36 * np.pi),
     "R": 8.31,  # J mol^-1 K^-1
 }
+
 
 class WACCMX2d(object):
 
@@ -131,7 +133,7 @@ class WACCMX2d(object):
         self.param, self.alts = out, galt
         if to_file:
             savemat(to_file, dict(ne=self.param))
-        return out, galt    
+        return out, galt
 
     def load_from_file(self, to_file: str):
         logger.info(f"Load from file {to_file.split('/')[-1]}")

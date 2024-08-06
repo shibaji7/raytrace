@@ -25,8 +25,8 @@ import cartopy
 import matplotlib.ticker as mticker
 import utils
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
-from sd_carto import SDCarto
-## from sd_carto import SDCarto
+from sdcarto import SDCarto
+## from sdcarto import SDCarto
 
 
 class Fan(object):
@@ -61,7 +61,7 @@ class Fan(object):
         extent=[-160, -50, 30, 90],
         proj=None,
         terminator=True,
-        overlay_eclipse=False,
+        lay_eclipse=None,
     ):
         self.plt_lons = plt_lons
         self.plt_lats = plt_lats
@@ -69,7 +69,7 @@ class Fan(object):
         self.extent = extent
         self.proj = proj
         self.terminator = terminator
-        self.overlay_eclipse = overlay_eclipse
+        self.lay_eclipse = lay_eclipse
         return
 
     def add_axes(self):
@@ -125,11 +125,10 @@ class Fan(object):
             va="center",
             transform=ax.transAxes,
         )
-        if self.overlay_eclipse:
-            ax.overaly_eclipse_path(lineWidth=0.2)
+        if self.lay_eclipse:
+            ax.overaly_eclipse_path(self.lay_eclipse, lineWidth=0.2)
         if self.terminator:
             from cartopy.feature.nightshade import Nightshade
-
             ax.add_feature(Nightshade(self.date, alpha=1))
         return ax
 
@@ -183,7 +182,8 @@ class Fan(object):
                 )
                 for b in beams
             ]
-        ax.overlay_eclipse(lats, lons, alts)
+        if self.lay_eclipse:
+            ax.overlay_eclipse(lats, lons, alts)
         return
 
     def generate_fovs(self, fds, beams=[], laytec=False):

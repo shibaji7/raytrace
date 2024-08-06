@@ -1,11 +1,10 @@
 import datetime as dt
-import os
+
 import numpy as np
+import utils
 import xarray as xr
 from loguru import logger
-from scipy import io
 from scipy.io import savemat
-import utils
 
 
 class GITM(object):
@@ -69,7 +68,7 @@ class GITM(object):
         del ds
         return
 
-    def fetch_nc_dataset(
+    def fetch_dataset(
         self,
         time,
         lats,

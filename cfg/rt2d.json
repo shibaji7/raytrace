@@ -1,6 +1,7 @@
 {
     "verbose": true,
     "project_name": "NSF_Eclipse_2017_Mask",
+    "density_file_location": "",
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 200,
     "start_height_km": 100,
@@ -17,9 +18,9 @@
     "threshold": 1e-5,
     "radius_earth": 6371,
     "iri_param": {
-        "step_sec": 600,
-        "run_it": 36,
-        "start_mask_time": 11
+        "iri_version": 20,
+        "eclipse": true,
+        "start_mask_time": "2017-08-21T16"
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_sd_folder": "tmp/",

@@ -8,8 +8,8 @@ import utils
 from tqdm import tqdm
 
 
-def read_eclispe_path(year, path=None):
-    path = path if path else utils.read_params_2D().base_eclipse_folder
+def read_eclispe_path(year, cfg_file, path=None):
+    path = path if path else utils.read_params_2D(cfg_file).base_eclipse_folder
     fname = os.path.join(path, f"{year}.csv")
     LatC, LonC = [], []
     LatN, LonN = [], []

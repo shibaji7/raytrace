@@ -1,6 +1,6 @@
 {
     "verbose": true,
-    "project_name": "2017_IRI",
+    "project_name": "Eclipse_2017_IRI_Mask",
     "density_file_location": "",
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 200,
@@ -19,7 +19,7 @@
     "radius_earth": 6371,
     "iri_param": {
         "iri_version": 20,
-        "eclipse": false,
+        "eclipse": true,
         "start_mask_time": "2017-08-21T16"
     },
     "base_eclipse_folder": "datasets/eclipse_path/",

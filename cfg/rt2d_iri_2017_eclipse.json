@@ -1,6 +1,6 @@
 {
     "verbose": true,
-    "project_name": "2017_IRI",
+    "project_name": "Eclipse_2017_IRI",
     "density_file_location": "",
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 200,

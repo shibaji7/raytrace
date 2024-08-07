@@ -1,6 +1,6 @@
 {
     "verbose": true,
-    "project_name": "Eclipse_2017_IRI_Mask",
+    "project_name": "eclipse_2017_iri_mask",
     "density_file_location": "",
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 200,

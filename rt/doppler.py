@@ -35,7 +35,7 @@ class Doppler(object):
         model: str,
         radar: Radar,
         beam: int = 0,
-        del_time: int = 1, # Normalized based on this time inteval in minutes
+        del_time: int = 1,  # Normalized based on this time inteval in minutes
         base: str = "",
     ) -> None:
         self.cfg = cfg
@@ -78,9 +78,13 @@ class Doppler(object):
         dop_file = os.path.join(self.dop_folder, f"{now.strftime('%H%M')}.mat")
         if not os.path.exists(dop_file):
             for _, elv in enumerate(elvs):  # Loop for each rays
-                event_ray_path = event_ray.simulation[elv]["path_data"]  # Extract ray associated to elv
-                base_ray_path = base_ray.simulation[elv]["path_data"] # Extract baseline ray associated to elv
-                
+                event_ray_path = event_ray.simulation[elv][
+                    "path_data"
+                ]  # Extract ray associated to elv
+                base_ray_path = base_ray.simulation[elv][
+                    "path_data"
+                ]  # Extract baseline ray associated to elv
+
                 ray_label = (
                     event_ray.simulation[elv]["ray_data"]["ray_label"]
                     * base_ray.simulation[elv]["ray_data"]["ray_label"]
@@ -121,7 +125,9 @@ class Doppler(object):
     ):
         kconst, cconst, delt = 80.6, 3e8, self.del_time * 60
         # Compute change in height for event ray
-        d_height = np.diff(event_ray_path["height"], prepend=event_ray_path["height"][0])
+        d_height = np.diff(
+            event_ray_path["height"], prepend=event_ray_path["height"][0]
+        )
         # Compute change in electron density along the modified ray
         # Need to rethnik about how rays experiance change in Doppler
         # now we implemented as if modified rays observed a difference from
@@ -141,38 +147,38 @@ class Doppler(object):
             / np.cos(np.deg2rad(90.0 - elv))
         )
         # Compute total change in Doppler frequency for change in refractive index
-        frq_dne = np.trapz(np.array(d_frq_dne), np.array(event_ray_path["ground_range"]))
+        frq_dne = np.trapz(
+            np.array(d_frq_dne), np.array(event_ray_path["ground_range"])
+        )
         # Compute total change in Doppler frequency due to change in reflection height
         dh = (base_ray_path["height"].max() - event_ray_path["height"].max()) * 1e3
         frq_dh = (
             (-2.0 * frequency * 1e6 / cconst) * (dh / (delt)) * np.cos(np.deg2rad(elv))
         )
-        vel_dne = (
-            0.5
-            * frq_dne
-            * cconst
-            / (frequency * 1e6)
-        )
-        vel_dh = (
-            0.5
-            * frq_dh
-            * cconst
-            / (frequency * 1e6)
-        )
+        vel_dne = 0.5 * frq_dne * cconst / (frequency * 1e6)
+        vel_dh = 0.5 * frq_dh * cconst / (frequency * 1e6)
         ray_dop = dict(
             elv=elv,  # Elevation
             d_height=d_height.ravel(),  # Differential height
             event_ray_path_height=event_ray_path["height"].ravel(),  # Event ray height
-            event_ray_path_ground_range=event_ray_path["ground_range"].ravel(),  # Event ray ground range
-            d_frq_dne=d_frq_dne.ravel()[0],  # Doppler along the ray path due to refraction
-            frq_dne=frq_dne.ravel()[0],  # Total doppler along the ray path due to refraction
-            vel_dne=vel_dne.ravel()[0],  # Total velocity along the ray path due to refraction
+            event_ray_path_ground_range=event_ray_path[
+                "ground_range"
+            ].ravel(),  # Event ray ground range
+            d_frq_dne=d_frq_dne.ravel()[
+                0
+            ],  # Doppler along the ray path due to refraction
+            frq_dne=frq_dne.ravel()[
+                0
+            ],  # Total doppler along the ray path due to refraction
+            vel_dne=vel_dne.ravel()[
+                0
+            ],  # Total velocity along the ray path due to refraction
             frq_dh=frq_dh.ravel()[0],  # Total doppler at the peak due to reflection
             vel_dh=vel_dh.ravel()[0],  # Total velocity at the peak due to reflection
             geometric_distance=event_ray_path["geometric_distance"].tolist()[
                 -1
             ],  # Slant range distance
-            vel_tot=(vel_dh+vel_dne).ravel()[0] # Total cumulative velocity
+            vel_tot=(vel_dh + vel_dne).ravel()[0],  # Total cumulative velocity
         )
         return SimpleNamespace(**ray_dop)
 

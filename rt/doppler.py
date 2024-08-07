@@ -132,9 +132,9 @@ class Doppler(object):
         # Need to rethnik about how rays experiance change in Doppler
         # now we implemented as if modified rays observed a difference from
         # baseline.
-        d_ne = 10 ** base_ne_fn(
+        d_ne = 10 ** event_ne_fn(
             event_ray_path["ground_range"], event_ray_path["height"], grid=False
-        ) - 10 ** event_ne_fn(
+        ) - 10 ** base_ne_fn(
             event_ray_path["ground_range"], event_ray_path["height"], grid=False
         )
         # Delete all interaction below 50 km (parameterize by config)
@@ -151,7 +151,7 @@ class Doppler(object):
             np.array(d_frq_dne), np.array(event_ray_path["ground_range"])
         )
         # Compute total change in Doppler frequency due to change in reflection height
-        dh = (base_ray_path["height"].max() - event_ray_path["height"].max()) * 1e3
+        dh = (event_ray_path["height"].max() - base_ray_path["height"].max()) * 1e3
         frq_dh = (
             (-2.0 * frequency * 1e6 / cconst) * (dh / (delt)) * np.cos(np.deg2rad(elv))
         )
@@ -243,9 +243,9 @@ class Doppler(object):
         return records
 
     @staticmethod
-    def fetch_by_beam(event, rad, model, beam, frange=180, rsep=45):
-        folder = utils.get_folder(rad, beam, event, model, True)
-        folder = os.path.join("/".join(folder.split("/")[:-1]), "Doppler")
+    def fetch_by_beam(event, rad, model, beam, base, frange=180, rsep=45):
+        folder = utils.get_folder(rad, beam, event, model, base)
+        folder = os.path.join(folder, "Doppler")
         files = glob.glob(folder + "/*.mat")
         records = []
         for file in files:
@@ -253,7 +253,6 @@ class Doppler(object):
             for ray in doppler["doppler"]["rays"]:
                 ray = utils._todict_(ray)
                 srange = ray["geometric_distance"]
-                vel_tot = ray["vel_dne"] + ray["vel_dh"]
                 gate = int((srange - frange) / rsep)
                 records.append(
                     dict(
@@ -261,7 +260,7 @@ class Doppler(object):
                         srange=srange,
                         bmnum=beam,
                         slist=gate,
-                        vel_tot=vel_tot,
+                        vel_tot=ray["vel_tot"],
                         frq_dne=ray["frq_dne"],
                         vel_dne=ray["vel_dne"],
                         frq_dh=ray["frq_dh"],

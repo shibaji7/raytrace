@@ -27,5 +27,7 @@
     "eclipse_shadow": true,
     "sd_file_type": "fitacf",
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
-    "project_save_location": "outputs/"
+    "project_save_location": "outputs/",
+    "frange": 180,
+    "rsep": 45
 }

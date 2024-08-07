@@ -37,6 +37,7 @@ class RadarSimulation(object):
         time_window: int = 240,
         time_gaps: int = 5,
         cfg_file: str = "cfg/rt2d.json",
+        worker: int = 6,
         parallel: bool = True,
     ) -> None:
         self.model = model
@@ -46,6 +47,7 @@ class RadarSimulation(object):
         self.time_window = time_window
         self.start_time = start_time
         self.cfg_file = cfg_file
+        self.worker = worker
         self.parallel = parallel
         self.read_params_2D()
         self.base_output_folder = os.path.join(
@@ -156,7 +158,9 @@ class RadarSimulation(object):
             for d in range(int(self.time_window / self.time_gaps))
         ]
         if self.parallel:
-            with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+            with concurrent.futures.ProcessPoolExecutor(
+                max_workers=self.worker
+            ) as executor:
                 _ = list(executor.map(self._run_rt_, events))
         else:
             for event in events:
@@ -207,7 +211,9 @@ class RadarSimulation(object):
         return
 
     def compute_doppler(self):
+        import utils
         from doppler import Doppler
+        from rti import RangeTimeIntervalPlot
 
         # Initialize Doppler object
         self.dop = Doppler(
@@ -229,6 +235,33 @@ class RadarSimulation(object):
             )
             self.dop._compute_doppler_from_prev_time_(now, prev)
 
+        fig_title = f"Model: {self.model.upper()} / {self.rad.upper()}-{'%02d'%self.beam}, {self.cfg.frequency} MHz"
+        rtint = RangeTimeIntervalPlot(
+            100, [events[0], events[-1]], self.rad, fig_title=fig_title, num_subplots=1
+        )
+        records = Doppler.fetch_by_beam(
+            self.start_time,
+            self.rad,
+            self.model,
+            self.beam,
+            self.base_output_folder,
+            frange=self.cfg.frange,
+            rsep=self.cfg.rsep,
+        )
+        rtint.addParamPlot(
+            records, self.beam, title="", zparam="vel_tot", lay_eclipse=True
+        )
+        rtint.save(
+            filepath=utils.get_folder(
+                self.rad,
+                self.beam,
+                self.start_time,
+                self.model,
+                self.base_output_folder,
+            )
+            + "/rti.png"
+        )
+        rtint.close()
         return
 
 
@@ -240,6 +273,9 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--rad", default="cvw", help="Radar code (cvw)")
     parser.add_argument(
         "-bm", "--beam", default=7, type=int, help="Radar beam (default 7)"
+    )
+    parser.add_argument(
+        "-w", "--worker", default=6, type=int, help="Worker numbers [6]"
     )
     parser.add_argument(
         "-ev",
@@ -285,6 +321,7 @@ if __name__ == "__main__":
                 time_window=args.time_window,
                 time_gaps=args.time_gaps,
                 cfg_file=args.cfg_file,
+                worker=args.worker,
             )
             rsim.gerenate_fov_plot()
             rsim.run_2d_simulation()

@@ -123,7 +123,7 @@ class Doppler(object):
         base_ray_path,
         frequency,
     ):
-        kconst, cconst, delt = 80.6, 3e8, self.del_time * 60
+        kconst, cconst, delt = 80.6, 3e8, self.del_time * self.cfg.rise_time_sec
         # Compute change in height for event ray
         d_height = np.diff(
             event_ray_path["height"], prepend=event_ray_path["height"][0]

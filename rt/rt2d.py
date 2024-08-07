@@ -84,9 +84,6 @@ class RadarBeam2dTrace(object):
         fname = self.folder + f"/bearing.mat"
         lat, lon = (self.radar.hdw.geographic.lat, self.radar.hdw.geographic.lon)
         p = (lat, lon)
-        dist = np.linspace(
-            0, self.cfg.max_ground_range_km, self.cfg.number_of_ground_step_km
-        )
         _, bearing = utils.calculate_bearing(
             lat,
             lon,
@@ -100,6 +97,11 @@ class RadarBeam2dTrace(object):
             self.radar.fov[1][: self.cfg.slant_gate_of_radar, self.beam],
         )
         dist = np.array([GC(p, (latx, lonx)).km for latx, lonx in zip(lats, lons)])
+        dist, lats, lons = (
+            np.insert(dist, 0, 0),
+            np.insert(lats, 0, lat),
+            np.insert(lons, 0, lon)
+        )
         bearing_object["dist"], bearing_object["lat"], bearing_object["lon"] = (
             dist,
             np.array(lats),

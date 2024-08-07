@@ -18,7 +18,7 @@ class IRI2d(object):
         self.cfg = cfg
         self.event = event
         self.iri_version = self.cfg.iri_param.iri_version
-        if self.cfg.iri_param.eclipse:
+        if self.cfg.event_type.eclipse:
             self.start_mask_time = dparser.isoparse(self.cfg.iri_param.start_mask_time)
         return
 
@@ -63,7 +63,7 @@ class IRI2d(object):
                 self.iri_version,
             )
             self.param[:, i] = iriout.edens * 1e-6
-        if self.cfg.iri_param.eclipse and self.time >= self.start_mask_time:
+        if self.cfg.event_type.eclipse and self.time >= self.start_mask_time:
             self.load_eclipse()
         if to_file:
             savemat(to_file, dict(ne=self.param))

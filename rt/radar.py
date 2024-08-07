@@ -39,7 +39,7 @@ class Radar(object):
         tqdm.pandas()
         self.__setup__()
         self.__fetch_data__()
-        if cfg.eclipse_shadow:
+        if cfg.event_type.eclipse:
             self.create_eclipse_shadow()
         return
 

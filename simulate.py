@@ -30,26 +30,23 @@ class RadarSimulation(object):
 
     def __init__(
         self,
-        model: str = None,
-        start_time: dt.datetime = None,
-        rad: str = None,
+        cfg_file: str,
         beam: int = 0,
-        time_window: int = 240,
-        time_gaps: int = 5,
-        cfg_file: str = "cfg/rt2d.json",
-        worker: int = 6,
-        parallel: bool = True,
     ) -> None:
-        self.model = model
-        self.rad = rad
-        self.beam = beam
-        self.time_gaps = time_gaps
-        self.time_window = time_window
-        self.start_time = start_time
         self.cfg_file = cfg_file
-        self.worker = worker
-        self.parallel = parallel
         self.read_params_2D()
+
+        self.model = self.cfg.model
+        self.rad = self.cfg.rad
+        self.beam = beam if beam is not None else self.cfg.beam
+        self.time_gaps = self.cfg.time_gaps
+        self.time_window = self.cfg.time_window
+        self.start_time = dparser.isoparse(self.cfg.event)
+        self.event_type = self.cfg.event_type
+        
+        self.worker = self.cfg.worker
+        self.parallel = self.cfg.worker > 0
+        
         self.base_output_folder = os.path.join(
             self.cfg.project_save_location, self.cfg.project_name
         )
@@ -122,7 +119,7 @@ class RadarSimulation(object):
             lay_eclipse=None,
         )
         ax = fan.add_axes()
-        if self.cfg.iri_param.eclipse:
+        if self.cfg.event_type.eclipse:
             ax.overaly_eclipse_path(self.cfg_file, year=self.start_time.year)
         fan.generate_fov(self.rad, [], ax=ax, beams=[self.beam])
         fan.save(
@@ -139,6 +136,7 @@ class RadarSimulation(object):
 
     def run_2d_simulation(self):
         logger.info(f"Inside {self.model.upper()} Simulation...")
+        from gemini import GEMINI2d
         from gitm import GITM2d
         from iri import IRI2d
         from waccm import WACCMX2d
@@ -149,14 +147,20 @@ class RadarSimulation(object):
             self.eden_model = GITM2d(self.cfg, self.start_time)
         elif self.model == "waccm":
             self.eden_model = WACCMX2d(self.cfg, self.start_time)
+        elif self.model == "gemini":
+            self.eden_model = GEMINI2d(self.cfg, self.start_time)
         else:
             raise ValueError(
                 "Currently supporting following methods: iri, gitm, waccm-x, and wamipe"
             )
-        events = [
-            self.start_time + dt.timedelta(minutes=d * self.time_gaps)
-            for d in range(int(self.time_window / self.time_gaps))
-        ]
+        events = (
+            self.eden_model.dates if self.model=="gemini" else [
+                self.start_time + dt.timedelta(minutes=d * self.time_gaps)
+                for d in range(int(self.time_window / self.time_gaps))
+            ]
+        )
+        if self.model == "gemini":
+            events = events[:self.cfg.time_window]
         if self.parallel:
             with concurrent.futures.ProcessPoolExecutor(
                 max_workers=self.worker
@@ -306,38 +310,11 @@ class RadarSimulation(object):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-m", "--model", default="iri", help="Model name [wam/gitm/waccm/iri]"
-    )
-    parser.add_argument("-r", "--rad", default="fhw", help="Radar code (fhw)")
-    parser.add_argument(
-        "-bm", "--beam", default=7, type=int, help="Radar beam (default 7)"
+        "-b", "--beam", default=7, help="Radar beam number", type=int
     )
     parser.add_argument(
-        "-w", "--worker", default=6, type=int, help="Worker numbers [6]"
-    )
-    parser.add_argument(
-        "-ev",
-        "--event",
-        default=dt.datetime(2017, 8, 21, 17),
-        help="Event date for simulation [YYYY-mm-ddTHH:MM]",
-        type=dparser.isoparse,
-    )
-    parser.add_argument(
-        "-tw",
-        "--time_window",
-        default=6,
-        type=int,
-        help="Time window to run the models (minutes)",
-    )
-    parser.add_argument(
-        "-tg",
-        "--time_gaps",
-        default=5,
-        type=int,
-        help="Time gaps to run the models (1-minutes)",
-    )
-    parser.add_argument(
-        "-f", "--cfg_file", default="cfg/rt2d.json", help="Configuration file"
+        "-f", "--cfg_file", default="cfg/rt2d_gemini_May2017_tid.json", 
+        help="Configuration file", type=str
     )
     parser.add_argument("-md", "--method", default="rt", help="Method rt/fan")
     args = parser.parse_args()
@@ -350,18 +327,12 @@ if __name__ == "__main__":
         beams = radar.get_beams(args.rad) if args.beam == -1 else [args.beam]
         for beam in beams:
             rsim = RadarSimulation(
-                model=args.model,
-                start_time=args.event,
-                rad=args.rad,
-                beam=beam,
-                time_window=args.time_window,
-                time_gaps=args.time_gaps,
-                cfg_file=args.cfg_file,
-                worker=args.worker,
+                args.cfg_file,
+                beam=beam
             )
             rsim.gerenate_fov_plot()
             rsim.run_2d_simulation()
-            rsim.compute_doppler()
+            #rsim.compute_doppler()
     if args.method == "fan":
         import radar
         from doppler import Doppler

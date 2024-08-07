@@ -20,6 +20,7 @@ from types import SimpleNamespace
 import cv2
 import numpy as np
 import scipy.io as spio
+import math
 from scipy.interpolate import interp1d
 
 
@@ -202,5 +203,14 @@ def setsize(size=8):
     return
 
 
-if __name__ == "__main__":
-    print(read_params_2D())
+def calculate_bearing(lat1, lon1, lat2, lon2):
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+
+    dlon = lon2 - lon1
+    y = math.sin(dlon) * math.cos(lat2)
+    x = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(
+        dlon
+    )
+    bearing = math.atan2(y, x)
+
+    return (math.degrees(bearing) + 360) % 360, math.degrees(bearing)

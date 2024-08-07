@@ -85,9 +85,9 @@ class Doppler(object):
                     "path_data"
                 ]  # Extract baseline ray associated to elv
 
-                ray_label = (
-                    event_ray.simulation[elv]["ray_data"]["ray_label"]
-                    * base_ray.simulation[elv]["ray_data"]["ray_label"]
+                event_ray_label, base_ray_label = (
+                    event_ray.simulation[elv]["ray_data"]["ray_label"],
+                    base_ray.simulation[elv]["ray_data"]["ray_label"],
                 )
                 # Compute change in electron density along the modified ray
                 # Need to rethnik about how rays experiance change in Doppler
@@ -96,7 +96,7 @@ class Doppler(object):
                 # rays, that will need to intepolate height and both rays equal points.
 
                 # Note that we do that only for rays reaching ground i.e., ray_label == 1
-                if ray_label == 1:
+                if (event_ray_label == 1) and (base_ray_label == 1):
                     ray_dop = self._solve_doppler_equation_(
                         elv,
                         event_ne_fn,
@@ -214,17 +214,16 @@ class Doppler(object):
         )
 
     @staticmethod
-    def fetch_by_scan_time(event, rad, model, beams, frange=180, rsep=45):
+    def fetch_by_scan_time(event, rad, model, beams, base, frange=180, rsep=45):
         records = []
         for beam in beams:
-            folder = utils.get_folder(rad, beam, event, model, True)
-            folder = os.path.join("/".join(folder.split("/")[:-1]), "Doppler")
+            folder = utils.get_folder(rad, beam, event, model, base)
+            folder = os.path.join(folder, "Doppler")
             file = os.path.join(folder, event.strftime("%H%M.mat"))
             doppler = utils.loadmatlabfiles(file)
             for ray in doppler["doppler"]["rays"]:
                 ray = utils._todict_(ray)
                 srange = ray["geometric_distance"]
-                vel_tot = ray["vel_dne"] + ray["vel_dh"]
                 gate = int((srange - frange) / rsep)
                 records.append(
                     dict(
@@ -232,9 +231,9 @@ class Doppler(object):
                         srange=srange,
                         bmnum=beam,
                         slist=gate,
-                        vel_tot=vel_tot,
+                        v=ray["vel_tot"],
                         frq_dne=ray["frq_dne"],
-                        v=ray["vel_dne"],
+                        vel_dne=ray["vel_dne"],
                         frq_dh=ray["frq_dh"],
                         vel_dh=ray["vel_dh"],
                     )

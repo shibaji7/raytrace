@@ -4,6 +4,7 @@
     "density_file_location": "",
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 200,
+    "slant_gate_of_radar": 75,
     "start_height_km": 100,
     "end_height_km": 500,
     "height_incriment_km": 1,

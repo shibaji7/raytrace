@@ -248,9 +248,10 @@ class RadarSimulation(object):
             frange=self.cfg.frange,
             rsep=self.cfg.rsep,
         )
-        rtint.addParamPlot(
-            records, self.beam, title="", zparam="vel_tot", lay_eclipse=True
-        )
+        if len(records) > 0:
+            rtint.addParamPlot(
+                records, self.beam, title="", zparam="vel_tot", lay_eclipse=True
+            )
         rtint.save(
             filepath=utils.get_folder(
                 self.rad,
@@ -264,13 +265,46 @@ class RadarSimulation(object):
         rtint.close()
         return
 
+    @staticmethod
+    def genererate_fan(event, rad, tfreq, frame, model, param="v"):
+        import cartopy
+        from fan import Fan
+
+        folder = os.path.join("figures", event.strftime("%b%Y"))
+        os.makedirs(folder, exist_ok=True)
+        cmap = "Spectral"
+        fan = Fan(
+            rad,
+            event,
+            fig_title="",
+        )
+        fan.setup(
+            np.arange(-180, 180, 30),
+            np.arange(30, 70, 20),
+            extent=[-150, -80, 40, 90],
+            proj=cartopy.crs.Orthographic(-120, 45),
+        )
+        fan.generate_fov(
+            rad,
+            frame,
+            p_name=param,
+            p_max=10,
+            p_min=-10,
+            cmap=cmap,
+            label="",
+            lats=np.linspace(0, 90, num=90 * 2),
+        )
+        fan.save(f"{folder}/fan.{rad}-{date.strftime('%H%M')}.png")
+        fan.close()
+        return
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-m", "--model", default="iri", help="Model name [wam/gitm/waccm/iri]"
     )
-    parser.add_argument("-r", "--rad", default="cvw", help="Radar code (cvw)")
+    parser.add_argument("-r", "--rad", default="fhw", help="Radar code (fhw)")
     parser.add_argument(
         "-bm", "--beam", default=7, type=int, help="Radar beam (default 7)"
     )
@@ -280,14 +314,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "-ev",
         "--event",
-        default=dt.datetime(2017, 8, 21, 16),
+        default=dt.datetime(2017, 8, 21, 17),
         help="Event date for simulation [YYYY-mm-ddTHH:MM]",
         type=dparser.isoparse,
     )
     parser.add_argument(
         "-tw",
         "--time_window",
-        default=90,
+        default=6,
         type=int,
         help="Time window to run the models (minutes)",
     )
@@ -301,9 +335,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f", "--cfg_file", default="cfg/rt2d.json", help="Configuration file"
     )
-    parser.add_argument(
-        "-md", "--method", default="rt", help="Method rt/dop/fan/rti/movie"
-    )
+    parser.add_argument("-md", "--method", default="rt", help="Method rt/fan")
     args = parser.parse_args()
     logger.info("\n Parameter list for simulation ")
     for k in vars(args).keys():
@@ -326,54 +358,22 @@ if __name__ == "__main__":
             rsim.gerenate_fov_plot()
             rsim.run_2d_simulation()
             rsim.compute_doppler()
-    # if args.method == "rt":
-    #     sys.path.append("rt/")
-    #     from rt2D import (
-    #         execute_2DRT_GITM_simulations,
-    #         execute_2DRT_IRI_simulations,
-    #         execute_2DRT_WACCMX_simulations,
-    #         execute_2DRT_WAM_simulations,
-    #     )
+    if args.method == "fan":
+        import radar
+        from doppler import Doppler
 
-    #     for b in range(24):
-    #         args.beam = b
-    #         gerenate_fov_plot(
-    #             args.rad,
-    #             args.beam,
-    #             args.event,
-    #             args.model,
-    #             not bool(args.event_study),
-    #         )
-    #         if args.model == "wam":
-    #             execute_2DRT_WAM_simulations(args)
-    #         if args.model == "waccm":
-    #             execute_2DRT_WACCMX_simulations(args)
-    #         if args.model == "iri":
-    #             execute_2DRT_IRI_simulations(args)
-    #         if args.model == "gitm":
-    #             execute_2DRT_GITM_simulations(args)
-    # if args.method == "dop":
-    #     sys.path.append("rt/")
-    #     from calculate_doppler import Doppler
-
-    #     beams = np.arange(24)
-    #     Doppler(args.event, args.rad, beams, args.model, parallel=True)
-    # if args.method == "fan":
-    #     sys.path.append("rt/")
-    #     from calculate_doppler import Doppler
-
-    #     beams = np.arange(24)
-    #     dates = [dt.datetime(2017, 8, 21, 16), dt.datetime(2017, 8, 21, 20)]
-    #     date = dates[0] + dt.timedelta(minutes=5)
-    #     while date < dates[-1]:
-    #         records = Doppler.fetch_by_scan_time(date, args.rad, args.model, beams)
-    #         genererate_Fan(date, args.rad, 10.5, records, args.model)
-    #         date += dt.timedelta(minutes=5)
-    # if args.method == "rti":
-    #     records = Doppler.fetch_by_beam(args.event, args.rad, args.model, args.beam)
-    # if args.method == "movie":
-    #     sys.path.append("py/")
-    #     import utils
-
-    #     folder = os.path.join("figures", args.event.strftime("%b%Y"))
-    #     utils.create_mp4(folder, "fan*.png", "movie.mp4")
+        beams = radar.get_beams(args.rad)
+        dates = [args.event, args.event + dt.timedelta(minutes=args.time_window)]
+        date = dates[0] + dt.timedelta(minutes=args.time_gaps)
+        with open(args.cfg_file, "r") as f:
+            cfg = json.load(f, object_hook=lambda x: SimpleNamespace(**x))
+        base = os.path.join(cfg.project_save_location, cfg.project_name)
+        while date < dates[-1]:
+            records = Doppler.fetch_by_scan_time(
+                date, args.rad, args.model, beams, base
+            )
+            RadarSimulation.genererate_fan(
+                date, args.rad, cfg.frequency, records, args.model
+            )
+            date += dt.timedelta(minutes=args.time_gaps * 3)
+            # break

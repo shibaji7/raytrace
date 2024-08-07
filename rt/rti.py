@@ -67,11 +67,11 @@ class RangeTimeIntervalPlot(object):
         ax.set_xlim([self.dates[0], self.dates[-1]])
         ax.set_ylim([0, self.nrang])
         ax.set_ylabel("Range gate", fontdict={"size": 12, "fontweight": "bold"})
-        # im = ax.pcolormesh(
-        #     X, Y, Z.T, lw=0.01, edgecolors="None", cmap=cmap, vmax=p_max, vmin=p_min
-        # )
-        # if color_bar:
-        #     self._add_colorbar(im, self.fig, ax, label=label)
+        im = ax.pcolormesh(
+            X, Y, Z.T, lw=0.01, edgecolors="None", cmap=cmap, vmax=p_max, vmin=p_min
+        )
+        if color_bar:
+            self._add_colorbar(im, self.fig, ax, label=label)
         ax.set_title(title, loc="left", fontdict={"fontweight": "bold"})
         if lay_eclipse:
             self.overlay_eclipse(ax, beam)
@@ -84,14 +84,15 @@ class RangeTimeIntervalPlot(object):
             parse_dates=["dates"],
         )
         o = o[(o.dates >= self.dates[0]) & (o.dates <= self.dates[1])]
-        print(o.head())
+        # print(o.head())
         srange = 180 + (45 * np.arange(101))
         tags = [f"gate_{i}" for i in range(101)]
         p = o[tags].values
-        print(np.nanmax(p), np.nanmin(p), p.shape, srange.shape, o.dates.shape)
+        # print(np.nanmax(p), np.nanmin(p), p.shape, srange.shape, o.dates.shape)
         p = np.ma.masked_where(p <= 0, p)
-        ax.pcolormesh(
-            o.dates,
+        # print(p[70,:], o.dates.tolist())
+        im = ax.pcolor(
+            o.dates.tolist(),
             srange,
             p.T,
             lw=0.01,
@@ -101,6 +102,7 @@ class RangeTimeIntervalPlot(object):
             vmin=0,
             zorder=1,
         )
+        ax.set_xlim([self.dates[0], self.dates[-1]])
         return
 
     def addGSIS(self, df, beam, title, xlabel="", ylabel="Range gate", zparam="gflg"):

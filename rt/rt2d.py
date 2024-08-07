@@ -12,14 +12,15 @@ __email__ = "shibaji7@vt.edu"
 __status__ = "Research"
 
 import copy
+import datetime as dt
 import os
 
 import eclipse
 import numpy as np
-import pydarn
 import utils
 from geopy.distance import great_circle as GC
 from loguru import logger
+from radar import Radar
 from rays import Rays2D
 from scipy.io import loadmat, savemat
 
@@ -46,7 +47,7 @@ class RadarBeam2dTrace(object):
         self.folder = utils.get_folder(rad, beam, event, model, base_output_folder)
         os.makedirs(self.folder, exist_ok=True)
         self.cfg = cfg
-        self.hdw = pydarn.read_hdw_file(self.rad)
+        self.radar = Radar(self.rad, [event, event + dt.timedelta(minutes=5)], cfg)
         self.fig_name = self.folder + "/{time}.png".format(
             time=self.event.strftime("%H%M")
         )
@@ -81,31 +82,36 @@ class RadarBeam2dTrace(object):
     def _estimate_bearing_(self):
         """Estimate laitude and logitude bearings"""
         fname = self.folder + f"/bearing.mat"
-        bearing = self.hdw.boresight.physical - (
-            (self.beam - self.hdw.beams / 2) * self.hdw.beam_separation
-        )
-        logger.info(f"Bearing angle of beam {self.beam} is {bearing} deg")
-        lat, lon = (self.hdw.geographic.lat, self.hdw.geographic.lon)
+        lat, lon = (self.radar.hdw.geographic.lat, self.radar.hdw.geographic.lon)
         p = (lat, lon)
-        gc = GC(p, p)
         dist = np.linspace(
             0, self.cfg.max_ground_range_km, self.cfg.number_of_ground_step_km
         )
-
-        m = {}
-        lats, lons = [], []
-        for d in dist:
-            x = gc.destination(p, bearing, distance=d)
-            lats.append(x[0])
-            lons.append(x[1])
-        m["dist"], m["lat"], m["lon"] = dist, np.array(lats), np.array(lons)
+        _, bearing = utils.calculate_bearing(
+            lat,
+            lon,
+            self.radar.fov[0][self.beam, 0],
+            self.radar.fov[1][self.beam, 0],
+        )
+        logger.info(f"Bearing angle of beam {self.beam} is {bearing} deg")
+        bearing_object = {}
+        lats, lons = (
+            self.radar.fov[0][: self.cfg.slant_gate_of_radar, self.beam],
+            self.radar.fov[1][: self.cfg.slant_gate_of_radar, self.beam],
+        )
+        dist = np.array([GC(p, (latx, lonx)).km for latx, lonx in zip(lats, lons)])
+        bearing_object["dist"], bearing_object["lat"], bearing_object["lon"] = (
+            dist,
+            np.array(lats),
+            np.array(lons),
+        )
         (
-            m["olat"],
-            m["olon"],
-            m["rb"],
-            m["num_range"],
-            m["max_range"],
-            m["range_inc"],
+            bearing_object["olat"],
+            bearing_object["olon"],
+            bearing_object["rb"],
+            bearing_object["num_range"],
+            bearing_object["max_range"],
+            bearing_object["range_inc"],
         ) = (
             lat,
             lon,
@@ -114,12 +120,17 @@ class RadarBeam2dTrace(object):
             float(self.cfg.max_ground_range_km),
             float(dist[1] - dist[0]),
         )
-        m["ht"] = np.arange(
+        bearing_object["ht"] = np.arange(
             self.cfg.start_height_km,
             self.cfg.end_height_km,
             self.cfg.height_incriment_km,
         ).astype(float)
-        m["start_height"], m["height_inc"], m["num_heights"], m["heights"] = (
+        (
+            bearing_object["start_height"],
+            bearing_object["height_inc"],
+            bearing_object["num_heights"],
+            bearing_object["heights"],
+        ) = (
             float(self.cfg.start_height_km),
             float(self.cfg.height_incriment_km),
             float(
@@ -138,19 +149,19 @@ class RadarBeam2dTrace(object):
             ),
         )
 
-        m["freq"], m["tol"], m["nhops"] = (
+        bearing_object["freq"], bearing_object["tol"], bearing_object["nhops"] = (
             float(self.cfg.frequency),
             float(1e-7),
             float(self.cfg.nhops),
         )
-        m["elev_s"], m["elev_i"], m["elev_e"] = (
+        bearing_object["elev_s"], bearing_object["elev_i"], bearing_object["elev_e"] = (
             float(self.cfg.start_elevation),
             float(self.cfg.elevation_inctiment),
             float(self.cfg.end_elevation),
         )
-        m["radius_earth"] = self.cfg.radius_earth
-        savemat(fname, m)
-        self.bearing_object = copy.copy(m)
+        bearing_object["radius_earth"] = self.cfg.radius_earth
+        savemat(fname, bearing_object)
+        self.bearing_object = copy.copy(bearing_object)
         return
 
     def read_density_rays(self, fname):

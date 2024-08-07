@@ -211,9 +211,7 @@ class RadarSimulation(object):
         return
 
     def compute_doppler(self):
-        import utils
         from doppler import Doppler
-        from rti import RangeTimeIntervalPlot
 
         # Initialize Doppler object
         self.dop = Doppler(
@@ -234,10 +232,16 @@ class RadarSimulation(object):
                 f"Compute doppler for, {now.strftime('%H:%M')}/{prev.strftime('%H:%M')}"
             )
             self.dop._compute_doppler_from_prev_time_(now, prev)
+        return
+    
+    def plot_rti(self):
+        import utils
+        from doppler import Doppler
+        from rti import RangeTimeIntervalPlot
 
         fig_title = f"Model: {self.model.upper()} / {self.rad.upper()}-{'%02d'%self.beam}, {self.cfg.frequency} MHz"
         rtint = RangeTimeIntervalPlot(
-            100, [events[0], events[-1]], self.rad, fig_title=fig_title, num_subplots=1
+            100, [self.start_time, self.start_time+dt.timedelta(minutes=self.time_window)], self.rad, fig_title=fig_title, num_subplots=1
         )
         records = Doppler.fetch_by_beam(
             self.start_time,
@@ -250,7 +254,7 @@ class RadarSimulation(object):
         )
         if len(records) > 0:
             rtint.addParamPlot(
-                records, self.beam, title="", zparam="vel_tot", lay_eclipse=True
+                records, self.beam, title="", zparam="vel_tot", lay_eclipse=self.cfg.iri_param.eclipse
             )
         rtint.save(
             filepath=utils.get_folder(

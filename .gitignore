@@ -8,6 +8,7 @@ __pycache__/
 
 tmp/
 outputs/
+figures/
 
 # Distribution / packaging
 .Python

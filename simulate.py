@@ -426,4 +426,3 @@ if __name__ == "__main__":
         while date < dates[-1]:
             RadarSimulation.genererate_fan(cfg, date)
             date += dt.timedelta(minutes=cfg.time_gaps)
-            break

@@ -202,7 +202,7 @@ class Doppler(object):
         rays = Rays2D(
             date, self.radar.rad, self.beam, bearing["elvs"], self.folder, rfile
         )
-        density = loadmat(efile)["ne"] * 1e6
+        density = np.ma.masked_invalid(loadmat(efile)["ne"] * 1e6)
         fun = RectBivariateSpline(grange, height, np.log10(density).T)
         return SimpleNamespace(
             **dict(

@@ -100,7 +100,7 @@ class RadarBeam2dTrace(object):
         dist, lats, lons = (
             np.insert(dist, 0, 0),
             np.insert(lats, 0, lat),
-            np.insert(lons, 0, lon)
+            np.insert(lons, 0, lon),
         )
         bearing_object["dist"], bearing_object["lat"], bearing_object["lon"] = (
             dist,

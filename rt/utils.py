@@ -13,6 +13,7 @@ __status__ = "Research"
 
 import glob
 import json
+import math
 import os
 from pathlib import Path
 from types import SimpleNamespace
@@ -20,8 +21,15 @@ from types import SimpleNamespace
 import cv2
 import numpy as np
 import scipy.io as spio
-import math
+from loguru import logger
 from scipy.interpolate import interp1d
+
+
+def read_params_2D(fname: str = None):
+    logger.info(f"Load config files: {fname}")
+    with open(fname, "r") as f:
+        cfg = json.load(f, object_hook=lambda x: SimpleNamespace(**x))
+    return cfg
 
 
 def get_gridded_parameters(

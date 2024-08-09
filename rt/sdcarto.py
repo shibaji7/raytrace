@@ -524,19 +524,6 @@ class SDCarto(GeoAxes):
             ].reshape(Xb.shape)
             XYZ = tx.transform_points(fm, lons, lats)
             Px = np.ma.masked_invalid(Px)
-            # im = self.scatter(
-            #     XYZ[:, :, 0],
-            #     XYZ[:, :, 1],
-            #     c=Px.T,
-            #     transform=tx,
-            #     cmap=cmap,
-            #     vmax=p_max,
-            #     vmin=p_min,
-            #     s=0.3,
-            #     marker="o",
-            #     alpha=0.9,
-            #     **kwargs,
-            # )
             im = self.pcolormesh(
                 XYZ[:, :, 0],
                 XYZ[:, :, 1],

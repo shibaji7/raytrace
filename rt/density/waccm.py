@@ -31,8 +31,7 @@ class WACCMX2d(object):
         self.cfg = cfg
         self.event = event
         self.file_name = os.path.join(
-            self.cfg.density_file_location,
-            self.cfg.density_file_name
+            self.cfg.density_file_location, self.cfg.density_file_name
         )
         self.load_nc_dataset()
         return

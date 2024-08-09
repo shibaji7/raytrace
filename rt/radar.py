@@ -60,6 +60,15 @@ class Radar(object):
         self.fov = pydarn.Coords.GEOGRAPHIC(self.hdw.stid)
         logger.info(f"Files: {len(self.files)}")
         return
+    
+    def get_scan_by_time(self, date):
+        o = self.df.copy()
+        #scan_time = self.
+        o = o[
+            (o.time>=date)
+            & (o.time<date+dt.timedelta(minutes=2))
+        ]
+        return o
 
     def get_lat_lon_along_beam(self, beam):
         lats, lons = self.fov[0], self.fov[1]
@@ -117,19 +126,19 @@ class Radar(object):
         return row
 
     def check_the_sounding_mode(self):
-        frequency, scan_time, beams = set(), set(), set()
+        frequency, scan_time, beams = set(), dict(), set()
         txt = ""
         for bm in self.df.bmnum.unique():
             beams.add(bm)
             o = self.df[(self.df.bmnum == bm)].groupby(by="time").mean().reset_index()
             x = np.rint((o.time.iloc[1] - o.time.iloc[0]).total_seconds())
-            scan_time.add(x)
+            scan_time[bm] = x
             tf = set()
             for t in o.tfreq:
                 frequency.add(np.rint(t))
                 tf.add(str(np.rint(t)))
             txt += f"Beam: {bm}, t={x}, f={','.join(list(tf))}\n"
-        return
+        return scan_time
 
     def __tocsv__(self, records):
         (
@@ -255,7 +264,7 @@ class Radar(object):
 if __name__ == "__main__":
     import json
 
-    fname = "cfg/rt2D.json"
+    fname = "cfg/rt2d.json"
     with open(fname, "r") as f:
         cfg = json.load(f, object_hook=lambda x: SimpleNamespace(**x))
     dates = [dt.datetime(2024, 4, 8), dt.datetime(2024, 4, 9)]
@@ -276,3 +285,7 @@ if __name__ == "__main__":
     Radar("cvw", dates, cfg)
     dates = [dt.datetime(2021, 12, 4), dt.datetime(2021, 12, 5)]
     Radar("fir", dates, cfg)
+    # Load TID observations
+    dates = [dt.datetime(2017, 5, 27), dt.datetime(2017, 5, 28)]
+    Radar("fhe", dates, cfg)
+    Radar("fhw", dates, cfg)

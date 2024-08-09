@@ -154,6 +154,7 @@ class Fan(object):
         p_min=-30,
         cmap="Spectral",
         label="Velocity [m/s]",
+        cbar=True,
         lats=np.linspace(0, 90, num=90 * 2),
         lons=np.linspace(-180, 180, num=91 * 2),
         alts=np.array([100]),
@@ -175,6 +176,7 @@ class Fan(object):
                 p_min=p_min,
                 cmap=cmap,
                 label=label,
+                cbar=cbar,
             )
         if beams and len(beams) > 0:
             [

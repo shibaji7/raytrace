@@ -14,10 +14,8 @@ __status__ = "Research"
 import argparse
 import concurrent.futures
 import datetime as dt
-import json
 import os
 import sys
-from types import SimpleNamespace
 
 import numpy as np
 from dateutil import parser as dparser
@@ -33,8 +31,10 @@ class RadarSimulation(object):
         cfg_file: str,
         beam: int = 0,
     ) -> None:
+        import utils
+
         self.cfg_file = cfg_file
-        self.read_params_2D()
+        self.cfg = utils.read_params_2D(cfg_file)
 
         self.model = self.cfg.model
         self.rad = self.cfg.rad
@@ -43,10 +43,10 @@ class RadarSimulation(object):
         self.time_window = self.cfg.time_window
         self.start_time = dparser.isoparse(self.cfg.event)
         self.event_type = self.cfg.event_type
-        
+
         self.worker = self.cfg.worker
         self.parallel = self.cfg.worker > 0
-        
+
         self.base_output_folder = os.path.join(
             self.cfg.project_save_location, self.cfg.project_name
         )
@@ -61,13 +61,6 @@ class RadarSimulation(object):
             [self.start_time, self.start_time + dt.timedelta(minutes=self.time_window)],
             self.cfg,
         )
-        return
-
-    def read_params_2D(self, fname: str = None) -> None:
-        fname = fname if fname else self.cfg_file
-        logger.info(f"Load config files: {fname}")
-        with open(fname, "r") as f:
-            self.cfg = json.load(f, object_hook=lambda x: SimpleNamespace(**x))
         return
 
     def gerenate_fov_plot(
@@ -153,14 +146,7 @@ class RadarSimulation(object):
             raise ValueError(
                 "Currently supporting following methods: iri, gitm, waccm-x, and wamipe"
             )
-        events = (
-            self.eden_model.dates if self.model=="gemini" else [
-                self.start_time + dt.timedelta(minutes=d * self.time_gaps)
-                for d in range(int(self.time_window / self.time_gaps))
-            ]
-        )
-        if self.model == "gemini":
-            events = events[:self.cfg.time_window]
+        events = self.get_event_dates()
         if self.parallel:
             with concurrent.futures.ProcessPoolExecutor(
                 max_workers=self.worker
@@ -227,25 +213,36 @@ class RadarSimulation(object):
             del_time=self.time_gaps,
             base=self.base_output_folder,
         )
-        events = [
-            self.start_time + dt.timedelta(minutes=d * self.time_gaps)
-            for d in range(int(self.time_window / self.time_gaps))
-        ]
+        events = self.get_event_dates()
         for now, prev in zip(events[1:], events[:-1]):
             logger.info(
                 f"Compute doppler for, {now.strftime('%H:%M')}/{prev.strftime('%H:%M')}"
             )
             self.dop._compute_doppler_from_prev_time_(now, prev)
         return
-    
-    def plot_rti(self):
+
+    def get_event_dates(self):
+        events = (
+            self.eden_model.dates
+            if self.model == "gemini"
+            else [
+                self.start_time + dt.timedelta(minutes=d * self.time_gaps)
+                for d in range(int(self.time_window / self.time_gaps))
+            ]
+        )
+        if self.model == "gemini":
+            events = events[: self.cfg.time_window]
+        return events
+
+    def generate_rti(self):
         import utils
         from doppler import Doppler
         from rti import RangeTimeIntervalPlot
 
-        fig_title = f"Model: {self.model.upper()} / {self.rad.upper()}-{'%02d'%self.beam}, {self.cfg.frequency} MHz"
+        events = self.get_event_dates()
+        fig_title = f"Model: {self.model.upper()} / {self.rad.upper()}-{'%02d'%self.beam}, {self.cfg.frequency} MHz \t {self.start_time.strftime('%d %b, %Y')}"
         rtint = RangeTimeIntervalPlot(
-            100, [self.start_time, self.start_time+dt.timedelta(minutes=self.time_window)], self.rad, fig_title=fig_title, num_subplots=1
+            100, [events[0], events[-1]], self.rad, fig_title=fig_title, num_subplots=1
         )
         records = Doppler.fetch_by_beam(
             self.start_time,
@@ -258,7 +255,11 @@ class RadarSimulation(object):
         )
         if len(records) > 0:
             rtint.addParamPlot(
-                records, self.beam, title="", zparam="vel_tot", lay_eclipse=self.cfg.iri_param.eclipse
+                records,
+                self.beam,
+                title="",
+                zparam="vel_tot",
+                lay_eclipse=self.cfg.event_type.eclipse,
             )
         rtint.save(
             filepath=utils.get_folder(
@@ -274,81 +275,108 @@ class RadarSimulation(object):
         return
 
     @staticmethod
-    def genererate_fan(event, rad, tfreq, frame, model, param="v"):
+    def genererate_fan(cfg, date, param="v"):
         import cartopy
+        import radar
+        from doppler import Doppler
         from fan import Fan
 
-        folder = os.path.join("figures", event.strftime("%b%Y"))
+        beams = radar.get_beams(cfg.rad)
+        base = os.path.join(cfg.project_save_location, cfg.project_name)
+        folder = os.path.join("figures", cfg.event.strftime("%b%Y"))
         os.makedirs(folder, exist_ok=True)
-        cmap = "Spectral"
-        fan = Fan(
-            rad,
-            event,
-            fig_title="",
+        radar = radar.Radar(
+            cfg.rad, [cfg.event, cfg.event + dt.timedelta(minutes=cfg.time_window)], cfg
         )
-        fan.setup(
-            np.arange(-180, 180, 30),
-            np.arange(30, 70, 20),
-            extent=[-150, -80, 40, 90],
-            proj=cartopy.crs.Orthographic(-120, 45),
+        records = Doppler.fetch_by_scan_time(
+            date, cfg.rad, cfg.model, beams, base, frange=cfg.frange, rsep=cfg.rsep
+        )
+        obs_records = radar.get_scan_by_time(date)
+
+        lons = np.arange(-180, 180, 30)
+        lats = (
+            np.arange(30, 70, 15)
+            if radar.hdw.geographic.lat > 0
+            else np.arange(-70, -30, 15)
+        )
+        proj = cartopy.crs.Orthographic(
+            10 * int(radar.hdw.geographic.lon / 10),
+            10 * int(radar.hdw.geographic.lat / 10 - 1),
+        )
+        extent = [
+            2 * int(radar.fov[1][:cfg.slant_gate_of_radar, :].min() / 2),
+            2 * int(radar.fov[1][:cfg.slant_gate_of_radar, :].max() / 2),
+            3 * int(radar.fov[0][:cfg.slant_gate_of_radar, :].min() / 3 - 3),
+            3 * int(radar.fov[0][:cfg.slant_gate_of_radar, :].max() / 3 + 3),
+        ]
+        fig_title = ""
+        fan = Fan(
+            [cfg.rad],
+            date,
+            ncols=2,
+            fig_title=fig_title,
+        )
+        fan.setup(lons, lats, extent=extent, proj=proj)
+        fan.generate_fov(
+            cfg.rad,
+            obs_records,
+            p_name=param,
+            p_max=30,
+            p_min=-30,
+            cmap="Spectral",
+            cbar=False,
         )
         fan.generate_fov(
-            rad,
-            frame,
+            cfg.rad,
+            records,
             p_name=param,
-            p_max=10,
-            p_min=-10,
-            cmap=cmap,
-            label="",
-            lats=np.linspace(0, 90, num=90 * 2),
+            p_max=30,
+            p_min=-30,
+            cmap="Spectral",
+            label=r"Velocity ($ms^-1$)",
         )
-        fan.save(f"{folder}/fan.{rad}-{date.strftime('%H%M')}.png")
+        
+        fan.save(f"{folder}/fan.{cfg.rad}-{date.strftime('%H%M')}.png")
         fan.close()
         return
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("-b", "--beam", default=-1, help="Radar beam number", type=int)
     parser.add_argument(
-        "-b", "--beam", default=7, help="Radar beam number", type=int
+        "-f",
+        "--cfg_file",
+        default="cfg/rt2d_gemini_May2017_tid.json",
+        help="Configuration file",
+        type=str,
     )
-    parser.add_argument(
-        "-f", "--cfg_file", default="cfg/rt2d_gemini_May2017_tid.json", 
-        help="Configuration file", type=str
-    )
-    parser.add_argument("-md", "--method", default="rt", help="Method rt/fan")
+    parser.add_argument("-md", "--method", default="fan", help="Method rt/fan")
     args = parser.parse_args()
     logger.info("\n Parameter list for simulation ")
     for k in vars(args).keys():
         print("     ", k, "->", str(vars(args)[k]))
     if args.method == "rt":
         import radar
+        import utils
 
-        beams = radar.get_beams(args.rad) if args.beam == -1 else [args.beam]
+        rad = utils.read_params_2D(args.cfg_file).rad
+        beams = radar.get_beams(rad) if args.beam == -1 else [args.beam]
         for beam in beams:
-            rsim = RadarSimulation(
-                args.cfg_file,
-                beam=beam
-            )
+            rsim = RadarSimulation(args.cfg_file, beam=beam)
             rsim.gerenate_fov_plot()
             rsim.run_2d_simulation()
-            #rsim.compute_doppler()
+            rsim.compute_doppler()
+            rsim.generate_rti()
     if args.method == "fan":
-        import radar
-        from doppler import Doppler
+        import utils
 
-        beams = radar.get_beams(args.rad)
-        dates = [args.event, args.event + dt.timedelta(minutes=args.time_window)]
-        date = dates[0] + dt.timedelta(minutes=args.time_gaps)
-        with open(args.cfg_file, "r") as f:
-            cfg = json.load(f, object_hook=lambda x: SimpleNamespace(**x))
-        base = os.path.join(cfg.project_save_location, cfg.project_name)
+        cfg = utils.read_params_2D(args.cfg_file)
+        cfg.event = dparser.isoparse(cfg.event)
+        dates = [cfg.event, cfg.event + dt.timedelta(minutes=cfg.time_window)]
+        date = dates[0] + dt.timedelta(minutes=cfg.time_gaps)
+
         while date < dates[-1]:
-            records = Doppler.fetch_by_scan_time(
-                date, args.rad, args.model, beams, base
-            )
-            RadarSimulation.genererate_fan(
-                date, args.rad, cfg.frequency, records, args.model
-            )
-            date += dt.timedelta(minutes=args.time_gaps * 3)
-            # break
+            RadarSimulation.genererate_fan(cfg, date)
+            date += dt.timedelta(minutes=cfg.time_gaps * 3)
+            break

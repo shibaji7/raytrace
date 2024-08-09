@@ -7,6 +7,10 @@
     "event": "2017-05-27",
     "time_window": 10,
     "time_gaps": 1,
+    "event_type":{
+        "eclipse": false,
+        "tid": true
+    },
     "density_file_location": "",
     "density_file_name": "",
     "max_ground_range_km": 3000,

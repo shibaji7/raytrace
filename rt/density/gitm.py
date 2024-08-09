@@ -1,11 +1,11 @@
 import datetime as dt
+import os
 
 import numpy as np
 import utils
 import xarray as xr
 from loguru import logger
 from scipy.io import loadmat, savemat
-import os
 
 
 class GITM2d(object):
@@ -16,8 +16,7 @@ class GITM2d(object):
     ):
         self.cfg = cfg
         self.file_name = os.path.join(
-            self.cfg.density_file_location,
-            self.cfg.density_file_name
+            self.cfg.density_file_location, self.cfg.density_file_name
         )
         self.event = event
         self.load_nc_dataset()

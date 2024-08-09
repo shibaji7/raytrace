@@ -6,20 +6,6 @@ import xarray as xr
 from loguru import logger
 from scipy.io import loadmat, savemat
 
-pconst = {
-    "boltz": 1.38066e-23,  # Boltzmann constant  in Jule K^-1
-    "h": 6.626e-34,  # Planks constant  in ergs s
-    "c": 2.9979e08,  # in m s^-1
-    "avo": 6.023e23,  # avogadro's number
-    "Re": 6371.0e3,
-    "amu": 1.6605e-27,
-    "q_e": 1.602e-19,  # Electron charge in C
-    "m_e": 9.109e-31,  # Electron mass in kg
-    "g": 9.81,  # Gravitational acceleration on the surface of the Earth
-    "eps0": 1e-9 / (36 * np.pi),
-    "R": 8.31,  # J mol^-1 K^-1
-}
-
 
 class WACCMX2d(object):
 
@@ -53,7 +39,7 @@ class WACCMX2d(object):
         u = 1 if unit == "cm" else 1e-6
         den = np.zeros_like(var)
         for i, p in enumerate(P):
-            na = p * pconst["avo"] / (pconst["R"] * T[:, i, :, :])
+            na = p * utils.pconst["avo"] / (utils.pconst["R"] * T[:, i, :, :])
             n = u * na * var[:, i, :, :]
             den[:, i, :, :] = n
         return den

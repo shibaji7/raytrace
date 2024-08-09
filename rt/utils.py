@@ -25,6 +25,21 @@ from loguru import logger
 from scipy.interpolate import interp1d
 
 
+pconst = {
+    "kconst": 80.6, # Converstion constant
+    "boltz": 1.38066e-23,  # Boltzmann constant  in Jule K^-1
+    "h": 6.626e-34,  # Planks constant  in ergs s
+    "c": 2.9979e08,  # in m s^-1
+    "avo": 6.023e23,  # avogadro's number
+    "Re": 6371.0e3,
+    "amu": 1.6605e-27,
+    "q_e": 1.602e-19,  # Electron charge in C
+    "m_e": 9.109e-31,  # Electron mass in kg
+    "g": 9.81,  # Gravitational acceleration on the surface of the Earth
+    "eps0": 1e-9 / (36 * np.pi),
+    "R": 8.31,  # J mol^-1 K^-1
+}
+
 def read_params_2D(fname: str = None):
     logger.info(f"Load config files: {fname}")
     with open(fname, "r") as f:

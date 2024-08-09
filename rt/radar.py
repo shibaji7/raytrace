@@ -63,12 +63,15 @@ class Radar(object):
     
     def get_scan_by_time(self, date):
         o = self.df.copy()
-        #scan_time = self.
+        scan_time, tf = self.check_the_sounding_mode()
+        tf = np.mean(list(tf)).round(1)
+        scan_time = np.rint(np.max(list(scan_time.values()))/60)
+        scan_time = 2 if scan_time > 1 else 1
         o = o[
             (o.time>=date)
-            & (o.time<date+dt.timedelta(minutes=2))
+            & (o.time<date+dt.timedelta(minutes=scan_time))
         ]
-        return o
+        return o, scan_time, tf
 
     def get_lat_lon_along_beam(self, beam):
         lats, lons = self.fov[0], self.fov[1]
@@ -135,10 +138,10 @@ class Radar(object):
             scan_time[bm] = x
             tf = set()
             for t in o.tfreq:
-                frequency.add(np.rint(t))
-                tf.add(str(np.rint(t)))
+                frequency.add(np.round(t, 1))
+                tf.add(str(np.round(t, 1)))
             txt += f"Beam: {bm}, t={x}, f={','.join(list(tf))}\n"
-        return scan_time
+        return scan_time, frequency
 
     def __tocsv__(self, records):
         (

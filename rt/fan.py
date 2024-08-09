@@ -178,7 +178,7 @@ class Fan(object):
             text_decription["txt"],
             ha=text_decription["ha"],
             va=text_decription["va"],
-            ax=ax.transAxes
+            transform=ax.transAxes
         )
         ax.overlay_radar(rad, font_color=col)
         ax.overlay_fov(rad, lineColor=col)

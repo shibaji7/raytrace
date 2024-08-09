@@ -25,7 +25,6 @@ from rays import Rays2D
 from scipy.interpolate import RectBivariateSpline
 from scipy.io import loadmat, savemat
 
-
 class Doppler(object):
 
     def __init__(
@@ -105,6 +104,12 @@ class Doppler(object):
                         base_ray_path,
                         frequency,
                     )
+                    # Doppler shift and velocity calculated by PHaRLAP
+                    dop_shift = event_ray.simulation[elv]["ray_data"]["Doppler_shift"]
+                    dop_vel = 0.5 * dop_shift * utils.pconst["c"] / (frequency * 1e6)
+                    print(dop_shift, dop_vel)
+                    setattr(ray_dop, "pharlap_doppler_shift", dop_shift)
+                    setattr(ray_dop, "pharlap_doppler_vel", dop_vel)
                     doppler["rays"].append(ray_dop)
             savemat(
                 dop_file,
@@ -123,7 +128,7 @@ class Doppler(object):
         base_ray_path,
         frequency,
     ):
-        kconst, cconst, delt = 80.6, 3e8, self.del_time * self.cfg.rise_time_sec
+        delt = self.del_time * self.cfg.rise_time_sec
         # Compute change in height for event ray
         d_height = np.diff(
             event_ray_path["height"], prepend=event_ray_path["height"][0]
@@ -132,16 +137,18 @@ class Doppler(object):
         # Need to rethnik about how rays experiance change in Doppler
         # now we implemented as if modified rays observed a difference from
         # baseline.
-        d_ne = 10 ** event_ne_fn(
+        d_ne = (
+            10 ** base_ne_fn(
+                event_ray_path["ground_range"], event_ray_path["height"], grid=False
+            )- 10 ** event_ne_fn(
             event_ray_path["ground_range"], event_ray_path["height"], grid=False
-        ) - 10 ** base_ne_fn(
-            event_ray_path["ground_range"], event_ray_path["height"], grid=False
+            )
         )
         # Delete all interaction below 50 km (parameterize by config)
         d_ne[event_ray_path["height"] <= 50] = 0.0
         # Compute change in Doppler freqency due to change in refractive index along the ray
         d_frq_dne = (
-            (kconst / (cconst * frequency * 1e6))
+            (utils.pconst["kconst"] / (utils.pconst["c"] * frequency * 1e6))
             * (d_ne / delt)
             * d_height
             / np.cos(np.deg2rad(90.0 - elv))
@@ -151,12 +158,12 @@ class Doppler(object):
             np.array(d_frq_dne), np.array(event_ray_path["ground_range"])
         )
         # Compute total change in Doppler frequency due to change in reflection height
-        dh = (event_ray_path["height"].max() - base_ray_path["height"].max()) * 1e3
+        dh = (base_ray_path["height"].max() - event_ray_path["height"].max()) * 1e3
         frq_dh = (
-            (-2.0 * frequency * 1e6 / cconst) * (dh / (delt)) * np.cos(np.deg2rad(elv))
+            (-2.0 * frequency * 1e6 / utils.pconst["c"]) * (dh / (delt)) * np.cos(np.deg2rad(elv))
         )
-        vel_dne = 0.5 * frq_dne * cconst / (frequency * 1e6)
-        vel_dh = 0.5 * frq_dh * cconst / (frequency * 1e6)
+        vel_dne = 0.5 * frq_dne * utils.pconst["c"] / (frequency * 1e6)
+        vel_dh = 0.5 * frq_dh * utils.pconst["c"] / (frequency * 1e6)
         ray_dop = dict(
             elv=elv,  # Elevation
             d_height=d_height.ravel(),  # Differential height

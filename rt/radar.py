@@ -266,16 +266,16 @@ class Radar(object):
         obs_frame,
         fname,
         params=["p_l", "gflg", "v"],
-        model_frame=None,
+        model_frame=[],
         model_params=[],
     ):
         unique_beams = np.sort(obs_frame.bmnum.unique())
-        n_gate, n_beam = (len(self.fov.shape[:, unique_beams[0]]), len(unique_beams))
+        n_gate, n_beam = (len(self.fov[0][:, unique_beams[0]]), len(unique_beams))
 
-        def extract_2D_data(px):
-            dat = np.zeros((n_beam, n_gate)) * np.nan
+        def extract_2D_data(px, frame):
+            dat = np.zeros((n_gate, n_beam)) * np.nan
             for i, b in enumerate(unique_beams):
-                uf = obs_frame[(self.df.bmnum == b)]
+                uf = frame[(frame.bmnum == b)]
                 if len(uf) > 0:
                     slists = uf.slist.tolist()
                     dat[slists, i] = np.array(uf[px])
@@ -284,6 +284,8 @@ class Radar(object):
 
         logger.info(f"Scan to netCDF")
         ds = Dataset(fname, "w")
+
+        # Create observational list
         _ = ds.createDimension("o_gates", n_gate)
         _ = ds.createDimension("o_beams", n_beam)
         # Create gate dimension
@@ -301,15 +303,38 @@ class Radar(object):
             self.fov[0][:, unique_beams.tolist()],
             self.fov[1][:, unique_beams.tolist()],
         )
-        # Create date dimension
-        # dates = ds.createVariable("dates", "i4", ("o_index",))
-        # dates[:] = [(s - self.dates[0]).total_seconds() for s in obs_frame.time]
-        # dates.units = f"Sec since {self.dates[0].strftime('%Y-%m-%dT%H:%M:%S')}"
-
         # Create other parameters
         for param in params:
             p = ds.createVariable("o_" + param, "f4", ("o_gates", "o_beams"))
-            p[:] = extract_2D_data(param)
+            p[:] = extract_2D_data(param, obs_frame)
+
+        # Create modeling list
+        if len(model_frame) > 0:
+            unique_beams = np.sort(model_frame.bmnum.unique())
+            n_beam = len(unique_beams)
+            _ = ds.createDimension("m_gates", n_gate)
+            _ = ds.createDimension("m_beams", n_beam)
+            # Create gate dimension
+            gates = ds.createVariable("m_gates", "i2", ("m_gates",))
+            gates[:] = np.arange(n_gate)
+            # Create beam dimension
+            beams = ds.createVariable("m_beams", "i2", ("m_beams",))
+            beams[:] = unique_beams
+            # Create lat/lon dimension along gates
+            lats, lons = (
+                ds.createVariable("m_lats", "f4", ("m_gates", "m_beams")),
+                ds.createVariable("m_lons", "f4", ("m_gates", "m_beams")),
+            )
+            lats[:], lons[:] = (
+                self.fov[0][:, unique_beams.tolist()],
+                self.fov[1][:, unique_beams.tolist()],
+            )
+            # Create other parameters
+            for param in model_params:
+                p = ds.createVariable("m_" + param, "f4", ("m_gates", "m_beams"))
+                p[:] = extract_2D_data(param, model_frame)
+
+        # Save the dataset
         ds.close()
         return
 
@@ -363,7 +388,6 @@ class Radar(object):
         if len(model_frame) > 0:
             unique_times = sorted(model_frame.time.unique())
             n_time = len(unique_times)  # Modify time length
-            print(n_time)
             _ = ds.createDimension("m_gates", n_gate)
             _ = ds.createDimension("m_index", n_time)
             # Create gate dimension
@@ -383,7 +407,6 @@ class Radar(object):
             for param in model_params:
                 p = ds.createVariable("m_" + param, "f4", ("m_index", "m_gates"))
                 p[:] = extract_2D_data(param, model_frame)
-        print(unique_times)
         # Save the dataset
         ds.close()
         return

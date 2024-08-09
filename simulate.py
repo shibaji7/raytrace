@@ -160,6 +160,7 @@ class RadarSimulation(object):
 
     def _run_rt_(self, event):
         import plots
+        from rays import Plots
         from rt2d import RadarBeam2dTrace
 
         rto = RadarBeam2dTrace(
@@ -191,13 +192,18 @@ class RadarSimulation(object):
 
         # Create RT figures
         if not os.path.exists(rto.fig_name):
-            plots.plot_rays(
-                rto.folder,
+            Plots.plot_rays(
+                self.cfg,
+                rto, self.rad, self.beam, 
                 rto.fig_name,
-                rto,
-                rf"{self.model.upper()} + {self.rad.upper()}/{str(self.beam)}, $f_0$={str(self.cfg.frequency)} MHz",
-                maxground=self.cfg.max_ground_range_km,
             )
+            # plots.plot_rays(
+            #     rto.folder,
+            #     rto.fig_name,
+            #     rto,
+            #     rf"{self.model.upper()} + {self.rad.upper()}/{str(self.beam)}, $f_0$={str(self.cfg.frequency)} MHz",
+            #     maxground=self.cfg.max_ground_range_km,
+            # )
         return
 
     def compute_doppler(self):
@@ -274,24 +280,26 @@ class RadarSimulation(object):
         )
         rtint.close()
         fname = os.path.join(
-                utils.get_folder(
+            utils.get_folder(
                 self.rad,
                 self.beam,
                 self.start_time,
                 self.model,
                 self.base_output_folder,
-            ), f"{self.start_time.strftime('%Y%m%d')}-{'%02d'%self.beam}.nc"
+            ),
+            f"{self.start_time.strftime('%Y%m%d')}-{'%02d'%self.beam}.nc",
         )
         logger.info(f"File: {fname}")
         self.radar.beam_to_netCDF(
-            self.beam, fname, 
+            self.beam,
+            fname,
             model_frame=records,
             model_params=["vel_tot"],
         )
         return
 
     @staticmethod
-    def genererate_fan(cfg, date, param="v"):
+    def genererate_fan(cfg, date):
         import cartopy
         import radar
         from doppler import Doppler
@@ -335,7 +343,7 @@ class RadarSimulation(object):
         fan.generate_fov(
             cfg.rad,
             obs_records,
-            p_name=param,
+            p_name="v",
             p_max=30,
             p_min=-30,
             cmap="Spectral",
@@ -351,7 +359,7 @@ class RadarSimulation(object):
         fan.generate_fov(
             cfg.rad,
             records,
-            p_name=param,
+            p_name="vel_tot",
             p_max=30,
             p_min=-30,
             cmap="Spectral",
@@ -367,6 +375,16 @@ class RadarSimulation(object):
         fan.annotate_figure()
         fan.save(f"{folder}/fan.{cfg.rad}-{date.strftime('%H%M')}.png")
         fan.close()
+
+        fname = os.path.join(
+            folder, f"{date.strftime('%Y%m%d%H%M')}-{cfg.rad}.nc"
+        )
+        radar.scan_to_netCDF(
+            obs_records,
+            fname,
+            model_frame=records,
+            model_params=["vel_tot"],
+        )
         return
 
 
@@ -408,3 +426,4 @@ if __name__ == "__main__":
         while date < dates[-1]:
             RadarSimulation.genererate_fan(cfg, date)
             date += dt.timedelta(minutes=cfg.time_gaps)
+            break

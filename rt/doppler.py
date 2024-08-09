@@ -247,7 +247,7 @@ class Doppler(object):
                         srange=srange,
                         bmnum=beam,
                         slist=gate,
-                        v=ray["vel_tot"],
+                        vel_tot=ray["vel_tot"],
                         frq_dne=ray["frq_dne"],
                         vel_dne=ray["vel_dne"],
                         frq_dh=ray["frq_dh"],

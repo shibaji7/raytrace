@@ -159,7 +159,6 @@ class RadarSimulation(object):
         return
 
     def _run_rt_(self, event):
-        import plots
         from rays import Plots
         from rt2d import RadarBeam2dTrace
 
@@ -191,19 +190,14 @@ class RadarSimulation(object):
             rto.load_rto(eden)
 
         # Create RT figures
-        if not os.path.exists(rto.fig_name):
-            Plots.plot_rays(
-                self.cfg,
-                rto, self.rad, self.beam, 
-                rto.fig_name,
-            )
-            # plots.plot_rays(
-            #     rto.folder,
-            #     rto.fig_name,
-            #     rto,
-            #     rf"{self.model.upper()} + {self.rad.upper()}/{str(self.beam)}, $f_0$={str(self.cfg.frequency)} MHz",
-            #     maxground=self.cfg.max_ground_range_km,
-            # )
+        #if not os.path.exists(rto.fig_name):
+        plot = Plots(
+            event, self.cfg, rto, 
+            self.rad, self.beam
+        )
+        plot.lay_rays(kind=self.cfg.ray_trace_plot_kind)
+        plot.save(rto.fig_name)
+        plot.close()
         return
 
     def compute_doppler(self):
@@ -390,7 +384,7 @@ class RadarSimulation(object):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--beam", default=-1, help="Radar beam number", type=int)
+    parser.add_argument("-b", "--beam", default=11, help="Radar beam number", type=int)
     parser.add_argument(
         "-f",
         "--cfg_file",
@@ -398,7 +392,7 @@ if __name__ == "__main__":
         help="Configuration file",
         type=str,
     )
-    parser.add_argument("-md", "--method", default="fan", help="Method rt/fan")
+    parser.add_argument("-md", "--method", default="rt", help="Method rt/fan")
     args = parser.parse_args()
     logger.info("\n Parameter list for simulation ")
     for k in vars(args).keys():
@@ -413,7 +407,7 @@ if __name__ == "__main__":
             rsim = RadarSimulation(args.cfg_file, beam=beam)
             rsim.gerenate_fov_plot()
             rsim.run_2d_simulation()
-            rsim.compute_doppler()
+            sim.compute_doppler()
             rsim.generate_rti()
     if args.method == "fan":
         import utils

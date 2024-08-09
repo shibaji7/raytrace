@@ -5,7 +5,7 @@
     "beam": 11,
     "project_name": "May2017_gemini_tid",
     "event": "2017-05-27T16",
-    "time_window": 2,
+    "time_window": 359,
     "time_gaps": 1,
     "event_type":{
         "eclipse": false,
@@ -41,5 +41,6 @@
     "project_save_location": "outputs/",
     "frange": 180,
     "rsep": 45,
-    "worker": 2
+    "worker": 0,
+    "ray_trace_plot_kind": "ref_indx"
 }

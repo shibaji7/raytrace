@@ -72,7 +72,9 @@ class Fan(object):
         self.lay_eclipse = lay_eclipse
         return
 
-    def add_axes(self, ):
+    def add_axes(
+        self,
+    ):
         """
         Instatitate figure and axes labels
         """
@@ -110,7 +112,7 @@ class Fan(object):
 
             ax.add_feature(Nightshade(self.date, alpha=1))
         return ax
-    
+
     def annotate_figure(self, axis_num=0):
         # Annotate the generic info in axis
         ax = self.fig.get_axes()[axis_num]
@@ -153,10 +155,7 @@ class Fan(object):
         beams=[],
         ax=None,
         maxGate=45,
-        text_decription=dict(
-            x=0.1, y=0.9, txt="",
-            ha="left", va="center"
-        ),
+        text_decription=dict(x=0.1, y=0.9, txt="", ha="left", va="center"),
         col="k",
         p_name="vel",
         p_max=30,
@@ -178,7 +177,7 @@ class Fan(object):
             text_decription["txt"],
             ha=text_decription["ha"],
             va=text_decription["va"],
-            transform=ax.transAxes
+            transform=ax.transAxes,
         )
         ax.overlay_radar(rad, font_color=col)
         ax.overlay_fov(rad, lineColor=col)

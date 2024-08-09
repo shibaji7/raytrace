@@ -60,17 +60,14 @@ class Radar(object):
         self.fov = pydarn.Coords.GEOGRAPHIC(self.hdw.stid)
         logger.info(f"Files: {len(self.files)}")
         return
-    
+
     def get_scan_by_time(self, date):
         o = self.df.copy()
         scan_time, tf = self.check_the_sounding_mode()
         tf = np.mean(list(tf)).round(1)
-        scan_time = np.rint(np.max(list(scan_time.values()))/60)
+        scan_time = np.rint(np.max(list(scan_time.values())) / 60)
         scan_time = 2 if scan_time > 1 else 1
-        o = o[
-            (o.time>=date)
-            & (o.time<date+dt.timedelta(minutes=scan_time))
-        ]
+        o = o[(o.time >= date) & (o.time < date + dt.timedelta(minutes=scan_time))]
         return o, scan_time, tf
 
     def get_lat_lon_along_beam(self, beam):

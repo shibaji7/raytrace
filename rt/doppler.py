@@ -25,6 +25,7 @@ from rays import Rays2D
 from scipy.interpolate import RectBivariateSpline
 from scipy.io import loadmat, savemat
 
+
 class Doppler(object):
 
     def __init__(
@@ -59,6 +60,7 @@ class Doppler(object):
     def _compute_doppler_from_prev_time_(
         self, now: dt.datetime, prev: dt.datetime
     ) -> None:
+        delt = self.del_time * self.cfg.rise_time_sec
         self.now, self.prev = (now, prev)
         logger.info(
             f"Run Doppler compute for {self.radar.rad}/{self.beam}, on {self.now}, Model:{self.model}"
@@ -104,10 +106,17 @@ class Doppler(object):
                         base_ray_path,
                         frequency,
                     )
-                    # Doppler shift and velocity calculated by PHaRLAP
-                    dop_shift = event_ray.simulation[elv]["ray_data"]["Doppler_shift"]
-                    dop_vel = 0.5 * dop_shift * utils.pconst["c"] / (frequency * 1e6)
-                    print(dop_shift, dop_vel)
+                    # Doppler shift and velocity calculated from .phase_path
+                    dp = (
+                        base_ray.simulation[elv]["ray_data"]["phase_path"]
+                        - event_ray.simulation[elv]["ray_data"]["phase_path"]
+                    ) * 1e3  # convert to meters
+                    dop_shift = (
+                        (-2.0 * frequency * 1e6 / utils.pconst["c"]) * (dp / (delt))
+                    ).ravel()[0]
+                    dop_vel = (
+                        0.5 * dop_shift * utils.pconst["c"] / (frequency * 1e6)
+                    ).ravel()[0]
                     setattr(ray_dop, "pharlap_doppler_shift", dop_shift)
                     setattr(ray_dop, "pharlap_doppler_vel", dop_vel)
                     doppler["rays"].append(ray_dop)
@@ -137,12 +146,10 @@ class Doppler(object):
         # Need to rethnik about how rays experiance change in Doppler
         # now we implemented as if modified rays observed a difference from
         # baseline.
-        d_ne = (
-            10 ** base_ne_fn(
-                event_ray_path["ground_range"], event_ray_path["height"], grid=False
-            )- 10 ** event_ne_fn(
+        d_ne = 10 ** base_ne_fn(
             event_ray_path["ground_range"], event_ray_path["height"], grid=False
-            )
+        ) - 10 ** event_ne_fn(
+            event_ray_path["ground_range"], event_ray_path["height"], grid=False
         )
         # Delete all interaction below 50 km (parameterize by config)
         d_ne[event_ray_path["height"] <= 50] = 0.0
@@ -160,7 +167,9 @@ class Doppler(object):
         # Compute total change in Doppler frequency due to change in reflection height
         dh = (base_ray_path["height"].max() - event_ray_path["height"].max()) * 1e3
         frq_dh = (
-            (-2.0 * frequency * 1e6 / utils.pconst["c"]) * (dh / (delt)) * np.cos(np.deg2rad(elv))
+            (-2.0 * frequency * 1e6 / utils.pconst["c"])
+            * (dh / (delt))
+            * np.cos(np.deg2rad(elv))
         )
         vel_dne = 0.5 * frq_dne * utils.pconst["c"] / (frequency * 1e6)
         vel_dh = 0.5 * frq_dh * utils.pconst["c"] / (frequency * 1e6)
@@ -243,6 +252,8 @@ class Doppler(object):
                         vel_dne=ray["vel_dne"],
                         frq_dh=ray["frq_dh"],
                         vel_dh=ray["vel_dh"],
+                        pharlap_doppler_vel=ray["pharlap_doppler_vel"],
+                        pharlap_doppler_shift=ray["pharlap_doppler_shift"],
                     )
                 )
         records = pd.DataFrame.from_records(records)
@@ -271,6 +282,8 @@ class Doppler(object):
                         vel_dne=ray["vel_dne"],
                         frq_dh=ray["frq_dh"],
                         vel_dh=ray["vel_dh"],
+                        pharlap_doppler_vel=ray["pharlap_doppler_vel"],
+                        pharlap_doppler_shift=ray["pharlap_doppler_shift"],
                     )
                 )
         records = pd.DataFrame.from_records(records)

@@ -254,6 +254,7 @@ class RadarSimulation(object):
             rsep=self.cfg.rsep,
         )
         if len(records) > 0:
+            records.time = records.time.apply(lambda x: dparser.isoparse(x))
             rtint.addParamPlot(
                 records,
                 self.beam,
@@ -272,6 +273,21 @@ class RadarSimulation(object):
             + "/rti.png"
         )
         rtint.close()
+        fname = os.path.join(
+                utils.get_folder(
+                self.rad,
+                self.beam,
+                self.start_time,
+                self.model,
+                self.base_output_folder,
+            ), f"{self.start_time.strftime('%Y%m%d')}-{'%02d'%self.beam}.nc"
+        )
+        logger.info(f"File: {fname}")
+        self.radar.beam_to_netCDF(
+            self.beam, fname, 
+            model_frame=records,
+            model_params=["vel_tot"],
+        )
         return
 
     @staticmethod
@@ -304,10 +320,10 @@ class RadarSimulation(object):
             10 * int(radar.hdw.geographic.lat / 10 - 1),
         )
         extent = [
-            2 * int(radar.fov[1][:cfg.slant_gate_of_radar, :].min() / 2),
-            2 * int(radar.fov[1][:cfg.slant_gate_of_radar, :].max() / 2),
-            3 * int(radar.fov[0][:cfg.slant_gate_of_radar, :].min() / 3 - 3),
-            3 * int(radar.fov[0][:cfg.slant_gate_of_radar, :].max() / 3 + 3),
+            2 * int(radar.fov[1][: cfg.slant_gate_of_radar, :].min() / 2),
+            2 * int(radar.fov[1][: cfg.slant_gate_of_radar, :].max() / 2),
+            3 * int(radar.fov[0][: cfg.slant_gate_of_radar, :].min() / 3 - 3),
+            3 * int(radar.fov[0][: cfg.slant_gate_of_radar, :].max() / 3 + 3),
         ]
         fan = Fan(
             [cfg.rad],
@@ -325,10 +341,12 @@ class RadarSimulation(object):
             cmap="Spectral",
             cbar=False,
             text_decription=dict(
-                x=0.05, y=0.95, 
-                txt="Observations" + "\n" + fr"$f_0$={tf} MHz / $T_s$={scan_time} m",
-                ha="left", va="center"
-            )
+                x=0.05,
+                y=0.95,
+                txt="Observations" + "\n" + rf"$f_0$={tf} MHz / $T_s$={scan_time} m",
+                ha="left",
+                va="center",
+            ),
         )
         fan.generate_fov(
             cfg.rad,
@@ -339,10 +357,12 @@ class RadarSimulation(object):
             cmap="Spectral",
             label=r"Velocity ($ms^-1$)",
             text_decription=dict(
-                x=0.05, y=0.95, 
-                txt=fr"Model: {cfg.model} / $f_0$={cfg.frequency} MHz",
-                ha="left", va="center"
-            )
+                x=0.05,
+                y=0.95,
+                txt=rf"Model: {cfg.model} / $f_0$={cfg.frequency} MHz",
+                ha="left",
+                va="center",
+            ),
         )
         fan.annotate_figure()
         fan.save(f"{folder}/fan.{cfg.rad}-{date.strftime('%H%M')}.png")

@@ -291,7 +291,7 @@ class RadarSimulation(object):
         records = Doppler.fetch_by_scan_time(
             date, cfg.rad, cfg.model, beams, base, frange=cfg.frange, rsep=cfg.rsep
         )
-        obs_records = radar.get_scan_by_time(date)
+        obs_records, scan_time, tf = radar.get_scan_by_time(date)
 
         lons = np.arange(-180, 180, 30)
         lats = (
@@ -309,12 +309,11 @@ class RadarSimulation(object):
             3 * int(radar.fov[0][:cfg.slant_gate_of_radar, :].min() / 3 - 3),
             3 * int(radar.fov[0][:cfg.slant_gate_of_radar, :].max() / 3 + 3),
         ]
-        fig_title = ""
         fan = Fan(
             [cfg.rad],
             date,
             ncols=2,
-            fig_title=fig_title,
+            fig_title="",
         )
         fan.setup(lons, lats, extent=extent, proj=proj)
         fan.generate_fov(
@@ -325,6 +324,11 @@ class RadarSimulation(object):
             p_min=-30,
             cmap="Spectral",
             cbar=False,
+            text_decription=dict(
+                x=0.05, y=0.95, 
+                txt="Observations" + "\n" + fr"$f_0$={tf} MHz / $T_s$={scan_time} m",
+                ha="left", va="center"
+            )
         )
         fan.generate_fov(
             cfg.rad,
@@ -334,8 +338,13 @@ class RadarSimulation(object):
             p_min=-30,
             cmap="Spectral",
             label=r"Velocity ($ms^-1$)",
+            text_decription=dict(
+                x=0.05, y=0.95, 
+                txt=fr"Model: {cfg.model} / $f_0$={cfg.frequency} MHz",
+                ha="left", va="center"
+            )
         )
-        
+        fan.annotate_figure()
         fan.save(f"{folder}/fan.{cfg.rad}-{date.strftime('%H%M')}.png")
         fan.close()
         return
@@ -378,5 +387,4 @@ if __name__ == "__main__":
 
         while date < dates[-1]:
             RadarSimulation.genererate_fan(cfg, date)
-            date += dt.timedelta(minutes=cfg.time_gaps * 3)
-            break
+            date += dt.timedelta(minutes=cfg.time_gaps)

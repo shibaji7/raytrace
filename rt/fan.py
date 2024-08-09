@@ -72,7 +72,7 @@ class Fan(object):
         self.lay_eclipse = lay_eclipse
         return
 
-    def add_axes(self):
+    def add_axes(self, ):
         """
         Instatitate figure and axes labels
         """
@@ -103,6 +103,17 @@ class Fan(object):
         gl.n_steps = 90
         self.proj = proj
         self.geo = cartopy.crs.PlateCarree()
+        if self.lay_eclipse:
+            ax.overaly_eclipse_path(self.lay_eclipse, lineWidth=0.2)
+        if self.terminator:
+            from cartopy.feature.nightshade import Nightshade
+
+            ax.add_feature(Nightshade(self.date, alpha=1))
+        return ax
+    
+    def annotate_figure(self, axis_num=0):
+        # Annotate the generic info in axis
+        ax = self.fig.get_axes()[axis_num]
         ax.text(
             -0.02,
             0.99,
@@ -125,13 +136,7 @@ class Fan(object):
             va="center",
             transform=ax.transAxes,
         )
-        if self.lay_eclipse:
-            ax.overaly_eclipse_path(self.lay_eclipse, lineWidth=0.2)
-        if self.terminator:
-            from cartopy.feature.nightshade import Nightshade
-
-            ax.add_feature(Nightshade(self.date, alpha=1))
-        return ax
+        return
 
     def date_string(self, label_style="web"):
         # Set the date and time formats
@@ -148,6 +153,10 @@ class Fan(object):
         beams=[],
         ax=None,
         maxGate=45,
+        text_decription=dict(
+            x=0.1, y=0.9, txt="",
+            ha="left", va="center"
+        ),
         col="k",
         p_name="vel",
         p_max=30,
@@ -163,6 +172,14 @@ class Fan(object):
         Generate plot with dataset overlaid
         """
         ax = ax if ax else self.add_axes()
+        ax.text(
+            text_decription["x"],
+            text_decription["y"],
+            text_decription["txt"],
+            ha=text_decription["ha"],
+            va=text_decription["va"],
+            ax=ax.transAxes
+        )
         ax.overlay_radar(rad, font_color=col)
         ax.overlay_fov(rad, lineColor=col)
         if len(frame) > 0:

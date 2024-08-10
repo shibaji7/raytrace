@@ -144,7 +144,6 @@ import numpy as np
 from matplotlib.projections import polar
 from matplotlib.transforms import Affine2D
 from mpl_toolkits.axisartist.grid_finder import DictFormatter, FixedLocator
-from matplotlib.collections import LineCollection
 
 
 class Plots(object):
@@ -231,15 +230,17 @@ class Plots(object):
         self.ax.patch.zorder = 0.9
         return self.ax, self.aux_ax
 
-    def lay_rays(self, kind="pf"):
+    def lay_rays(self, kind="pf", zoomed_in=[]):
         self.generate_curvedEarthAxes()
-        th, r = self.to_polar(
+        Th, R = self.to_polar(
             self.trace_obj.bearing_object["dist"],
             self.trace_obj.bearing_object["heights"],
         )
         o, cmap, label, norm = self.get_parameter(kind)
         im = self.aux_ax.pcolormesh(
-            th, r, o, 
+            Th,
+            R,
+            o,
             norm=norm,
             cmap=cmap,
             alpha=0.8,
@@ -270,39 +271,81 @@ class Plots(object):
                 self.aux_ax.scatter([th[-1]], [r[-1]], marker="s", s=3, color=col)
         stitle = "%s UT" % self.event.strftime("%Y-%m-%d %H:%M")
         self.aux_ax.text(
-            0.95, 1.01, stitle, ha="right", va="center", 
-            transform=self.aux_ax.transAxes
+            0.95, 1.01, stitle, ha="right", va="center", transform=self.aux_ax.transAxes
         )
         stitle = f"Model: {self.cfg.model.upper()} / {self.rad}-{'%02d'%self.beam}, $f_0$={self.cfg.frequency} MHz"
         self.aux_ax.text(
-            0.05, 1.02, stitle, ha="left", va="center", 
-            transform=self.aux_ax.transAxes
-        )   
+            0.05, 1.02, stitle, ha="left", va="center", transform=self.aux_ax.transAxes
+        )
+        # Create Zoomed in panel
+        if len(zoomed_in):
+            self.__zoomed_in_panel__(Th, R, kind, zoomed_in)
         return
-    
+
+    def __zoomed_in_panel__(self, Th, R, kind, zoomed_in):
+        self.zoom_ax = self.ax.inset_axes([0.4, 1.3, 0.3, 0.5])
+        o, cmap, _, norm = self.get_parameter(kind)
+        self.zoom_ax.pcolormesh(
+            Th,
+            R,
+            o,
+            norm=norm,
+            cmap=cmap,
+            alpha=0.8,
+        )
+        rays = self.trace_obj.rays
+        for i, elv in enumerate(rays.elvs):
+            ray_path_data, ray_data = (
+                rays.ray_path_data[elv],
+                rays.simulation[elv]["ray_data"],
+            )
+            th, r = self.to_polar(ray_path_data.ground_range, ray_path_data.height)
+            self.zoom_ax.plot(th, r, c="k", zorder=3, alpha=0.7, ls="-", lw=0.05)
+
+        th_lim, r_lim = self.to_polar(zoomed_in[0], zoomed_in[1])
+        self.zoom_ax.set_xlim(th_lim)
+        self.zoom_ax.set_ylim(r_lim)
+        th_ticklabels, r_ticklabels = (
+            self.zoom_ax.get_xticklabels(),
+            self.zoom_ax.get_yticklabels(),
+        )
+        for t in th_ticklabels:
+            new_x = str(int(t._x * self.Re))
+            t.set_text("$\mathdefault{" + new_x + "}$")
+        self.zoom_ax.set_xticklabels(th_ticklabels)
+        for t in r_ticklabels:
+            new_y = str(int(t._y - self.Re))
+            t.set_text("$\mathdefault{" + new_y + "}$")
+        self.zoom_ax.set_yticklabels(r_ticklabels)
+
+        self.zoom_ax.set_xlabel("Ground Range, [km]", fontdict={"size": 8})
+        self.zoom_ax.set_ylabel("Height, [km]", fontdict={"size": 8})
+        self.aux_ax.indicate_inset_zoom(self.zoom_ax)
+        return
+
     def get_parameter(self, kind):
         import matplotlib.colors as colors
 
         if kind == "pf":
             o, cmap, label, norm = (
                 getattr(self, kind),
-                "plasma", 
+                "plasma",
                 r"$f_0$ [MHz]",
-                colors.Normalize(2, 6)
+                colors.Normalize(2, 6),
             )
         if kind == "edens":
             o, cmap, label, norm = (
                 getattr(self, kind),
                 "plasma",
                 r"$N_e$ [$/m^{-3}$]",
-                colors.LogNorm(1e4, 1e6)
+                colors.LogNorm(1e4, 1e6),
             )
         if kind == "ref_indx":
             o, cmap, label, norm = (
                 getattr(self, kind),
                 "plasma",
                 r"$\eta$",
-                colors.Normalize(0.6, 1)
+                colors.Normalize(0.6, 1),
             )
         return o, cmap, label, norm
 

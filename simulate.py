@@ -190,14 +190,11 @@ class RadarSimulation(object):
             rto.load_rto(eden)
 
         # Create RT figures
-        #if not os.path.exists(rto.fig_name):
-        plot = Plots(
-            event, self.cfg, rto, 
-            self.rad, self.beam
-        )
-        plot.lay_rays(kind=self.cfg.ray_trace_plot_kind)
-        plot.save(rto.fig_name)
-        plot.close()
+        if not os.path.exists(rto.fig_name):
+            plot = Plots(event, self.cfg, rto, self.rad, self.beam)
+            plot.lay_rays(kind=self.cfg.ray_trace_plot_kind, zoomed_in=zoomed_in)
+            plot.save(rto.fig_name)
+            plot.close()
         return
 
     def compute_doppler(self):
@@ -242,7 +239,14 @@ class RadarSimulation(object):
         events = self.get_event_dates()
         fig_title = f"Model: {self.model.upper()} / {self.rad.upper()}-{'%02d'%self.beam}, {self.cfg.frequency} MHz \t {self.start_time.strftime('%d %b, %Y')}"
         rtint = RangeTimeIntervalPlot(
-            100, [events[0], events[-1]], self.rad, fig_title=fig_title, num_subplots=1
+            100, [events[0], events[-1]], self.rad, fig_title=fig_title, num_subplots=2
+        )
+        rtint.addParamPlot(
+            self.radar.df.copy(),
+            self.beam,
+            title="Observations",
+            xlabel="",
+            lay_eclipse=self.cfg.event_type.eclipse,
         )
         records = Doppler.fetch_by_beam(
             self.start_time,
@@ -283,13 +287,14 @@ class RadarSimulation(object):
             ),
             f"{self.start_time.strftime('%Y%m%d')}-{'%02d'%self.beam}.nc",
         )
-        logger.info(f"File: {fname}")
-        self.radar.beam_to_netCDF(
-            self.beam,
-            fname,
-            model_frame=records,
-            model_params=["vel_tot"],
-        )
+        if not os.path.exists(fname):
+            logger.info(f"File: {fname}")
+            self.radar.beam_to_netCDF(
+                self.beam,
+                fname,
+                model_frame=records,
+                model_params=["vel_tot"],
+            )
         return
 
     @staticmethod
@@ -370,18 +375,18 @@ class RadarSimulation(object):
         fan.save(f"{folder}/fan.{cfg.rad}-{date.strftime('%H%M')}.png")
         fan.close()
 
-        fname = os.path.join(
-            folder, f"{date.strftime('%Y%m%d%H%M')}-{cfg.rad}.nc"
-        )
-        radar.scan_to_netCDF(
-            obs_records,
-            fname,
-            model_frame=records,
-            model_params=["vel_tot"],
-        )
+        fname = os.path.join(folder, f"{date.strftime('%Y%m%d%H%M')}-{cfg.rad}.nc")
+        if not os.path.exists(fname):
+            radar.scan_to_netCDF(
+                obs_records,
+                fname,
+                model_frame=records,
+                model_params=["vel_tot"],
+            )
         return
 
 
+zoomed_in = []
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--beam", default=11, help="Radar beam number", type=int)
@@ -407,7 +412,7 @@ if __name__ == "__main__":
             rsim = RadarSimulation(args.cfg_file, beam=beam)
             rsim.gerenate_fov_plot()
             rsim.run_2d_simulation()
-            sim.compute_doppler()
+            rsim.compute_doppler()
             rsim.generate_rti()
     if args.method == "fan":
         import utils

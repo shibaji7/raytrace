@@ -41,6 +41,6 @@
     "project_save_location": "outputs/",
     "frange": 180,
     "rsep": 45,
-    "worker": 0,
-    "ray_trace_plot_kind": "ref_indx"
+    "worker": 6,
+    "ray_trace_plot_kind": "edens"
 }

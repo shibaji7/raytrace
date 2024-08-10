@@ -72,7 +72,7 @@ class RangeTimeIntervalPlot(object):
         )
         if color_bar:
             self._add_colorbar(im, self.fig, ax, label=label)
-        ax.set_title(title, loc="left", fontdict={"fontweight": "bold"})
+        ax.text(0.01, 0.95, title, ha="left", va="center", transform=ax.transAxes)
         if lay_eclipse:
             self.overlay_eclipse(ax, beam)
         return

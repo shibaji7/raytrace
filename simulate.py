@@ -277,24 +277,25 @@ class RadarSimulation(object):
             + "/rti.png"
         )
         rtint.close()
-        fname = os.path.join(
-            utils.get_folder(
-                self.rad,
-                self.beam,
-                self.start_time,
-                self.model,
-                self.base_output_folder,
-            ),
-            f"{self.start_time.strftime('%Y%m%d')}-{'%02d'%self.beam}.nc",
-        )
-        if not os.path.exists(fname):
-            logger.info(f"File: {fname}")
-            self.radar.beam_to_netCDF(
-                self.beam,
-                fname,
-                model_frame=records,
-                model_params=["vel_tot"],
+        if self.cfg.to_netcdf:
+            fname = os.path.join(
+                utils.get_folder(
+                    self.rad,
+                    self.beam,
+                    self.start_time,
+                    self.model,
+                    self.base_output_folder,
+                ),
+                f"{self.start_time.strftime('%Y%m%d')}-{'%02d'%self.beam}.nc",
             )
+            logger.info(f"Save to File: {fname}")
+            if not os.path.exists(fname):
+                self.radar.beam_to_netCDF(
+                    self.beam,
+                    fname,
+                    model_frame=records,
+                    model_params=["vel_tot"],
+                )
         return
 
     @staticmethod
@@ -375,14 +376,16 @@ class RadarSimulation(object):
         fan.save(f"{folder}/fan.{cfg.rad}-{date.strftime('%H%M')}.png")
         fan.close()
 
-        fname = os.path.join(folder, f"{date.strftime('%Y%m%d%H%M')}-{cfg.rad}.nc")
-        if not os.path.exists(fname):
-            radar.scan_to_netCDF(
-                obs_records,
-                fname,
-                model_frame=records,
-                model_params=["vel_tot"],
-            )
+        if cfg.to_netcdf:
+            fname = os.path.join(folder, f"{date.strftime('%Y%m%d%H%M')}-{cfg.rad}.nc")
+            logger.info(f"Save to File: {fname}")
+            if not os.path.exists(fname):
+                radar.scan_to_netCDF(
+                    obs_records,
+                    fname,
+                    model_frame=records,
+                    model_params=["vel_tot"],
+                )
         return
 
 

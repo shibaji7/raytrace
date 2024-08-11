@@ -402,9 +402,9 @@ if __name__ == "__main__":
     logger.info("\n Parameter list for simulation ")
     for k in vars(args).keys():
         print("     ", k, "->", str(vars(args)[k]))
+    import utils
     if args.method == "rt":
         import radar
-        import utils
 
         rad = utils.read_params_2D(args.cfg_file).rad
         beams = radar.get_beams(rad) if args.beam == -1 else [args.beam]
@@ -425,3 +425,4 @@ if __name__ == "__main__":
         while date < dates[-1]:
             RadarSimulation.genererate_fan(cfg, date)
             date += dt.timedelta(minutes=cfg.time_gaps)
+    utils.clean()

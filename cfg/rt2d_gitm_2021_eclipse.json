@@ -1,16 +1,28 @@
 {
     "verbose": true,
-    "project_name": "eclipse_2017_iri",
-    "density_file_location": "",
+    "model": "gitm",
+    "rad": "fir",
+    "beam": 11,
+    "project_name": "Dec2021_gemini_eclipse",
+    "event": "2021-12-04T06",
+    "time_window": 10,
+    "time_gaps": 1,
+    "event_type":{
+        "eclipse": true,
+        "tid": false
+    },
+    "density_file_location": "/home/shibaji/",
+    "density_file_name": null,
+    "gemini_grid_coordinate_file": null,
     "max_ground_range_km": 4000,
-    "number_of_ground_step_km": 200,
+    "number_of_ground_step_km": 100,
     "slant_gate_of_radar": 75,
     "start_height_km": 100,
-    "end_height_km": 500,
+    "end_height_km": 400,
     "height_incriment_km": 1,
     "scale": "log",
     "kind": "linear",
-    "frequency": 10.5,
+    "frequency": 11.5,
     "start_elevation": 5,
     "end_elevation": 60,
     "elevation_inctiment": 0.1,
@@ -20,15 +32,15 @@
     "radius_earth": 6371,
     "iri_param": {
         "iri_version": 20,
-        "eclipse": false,
-        "start_mask_time": "2017-08-21T16"
+        "start_mask_time": null
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_sd_folder": "tmp/",
-    "eclipse_shadow": true,
     "sd_file_type": "fitacf",
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
     "project_save_location": "outputs/",
     "frange": 180,
-    "rsep": 45
+    "rsep": 45,
+    "worker": 6,
+    "ray_trace_plot_kind": "pf"
 }

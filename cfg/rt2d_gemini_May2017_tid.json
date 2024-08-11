@@ -11,7 +11,7 @@
         "eclipse": false,
         "tid": true
     },
-    "density_file_location": "/home/shibaji/GEMINI3D/20170527/",
+    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/GEMINI3D/20170527/",
     "density_file_name": null,
     "gemini_grid_coordinate_file": "coordinates.mat",
     "max_ground_range_km": 2500,

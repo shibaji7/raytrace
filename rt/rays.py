@@ -157,7 +157,7 @@ class Plots(object):
         self.ref_indx = np.sqrt(1 - (self.pf**2 / cfg.frequency**2))
         self.rad = rad
         self.beam = beam
-        self.Re = Re
+        self.Re = Re if Re is not None else self.cfg.radius_earth
         return
 
     def to_polar(self, grange, height):

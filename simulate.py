@@ -144,7 +144,7 @@ class RadarSimulation(object):
             self.eden_model = GEMINI2d(self.cfg, self.start_time)
         else:
             raise ValueError(
-                "Currently supporting following methods: iri, gitm, waccm-x, and wamipe"
+                f"Currently supporting following methods: iri, gitm, waccm-x, and wamipe, and you provided '{self.model}'"
             )
         events = self.get_event_dates()
         if self.parallel:
@@ -406,6 +406,7 @@ if __name__ == "__main__":
     for k in vars(args).keys():
         print("     ", k, "->", str(vars(args)[k]))
     import utils
+
     if args.method == "rt":
         import radar
 

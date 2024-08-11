@@ -1,18 +1,18 @@
 {
     "verbose": true,
-    "model": "iri",
-    "rad": "fir",
+    "model": "waccm",
+    "rad": "fhw",
     "beam": 11,
-    "project_name": "Dec2021_iri_eclipse",
-    "event": "2021-12-04T06",
+    "project_name": "Aug2017_waccm_eclipse",
+    "event": "2017-08-21T16",
     "time_window": 180,
     "time_gaps": 10,
     "event_type":{
         "eclipse": true,
         "tid": false
     },
-    "density_file_location": "/home/shibaji/",
-    "density_file_name": "",
+    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/WACCM/20170821/",
+    "density_file_name": "ECL_1100_0100_all.nc",
     "gemini_grid_coordinate_file": null,
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 100,
@@ -32,7 +32,7 @@
     "radius_earth": 6371,
     "iri_param": {
         "iri_version": 20,
-        "start_mask_time": "2021-12-04T07"
+        "start_mask_time": null
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_sd_folder": "tmp/",

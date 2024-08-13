@@ -5,6 +5,7 @@ import utils
 import xarray as xr
 from loguru import logger
 from scipy.io import loadmat, savemat
+import datetime as dt
 
 
 class WACCMX2d(object):
@@ -68,9 +69,8 @@ class WACCMX2d(object):
             "dfield",
             "op_dt",
         ]
-        file = os.path.join(self.folder, self.file_name)
-        logger.info(f"Load files -> {file}")
-        ds = xr.open_dataset(file, drop_variables=drop_vars)
+        logger.info(f"Load files -> {self.file_name}")
+        ds = xr.open_dataset(self.file_name, drop_variables=drop_vars)
         self.store["glat"], self.store["glon"] = (
             ds.lat.values,
             np.mod(360 + ds.lon.values, 360),
@@ -91,7 +91,7 @@ class WACCMX2d(object):
         del ds
         return
 
-    def fetch_nc_dataset(
+    def fetch_dataset(
         self,
         time,
         lats,

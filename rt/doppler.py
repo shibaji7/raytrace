@@ -108,12 +108,12 @@ class Doppler(object):
                     )
                     # Doppler shift and velocity calculated from .phase_path
                     dp = (
-                        base_ray.simulation[elv]["ray_data"]["phase_path"]
-                        - event_ray.simulation[elv]["ray_data"]["phase_path"]
+                        event_ray.simulation[elv]["ray_data"]["phase_path"]
+                        - base_ray.simulation[elv]["ray_data"]["phase_path"]
                     ) * 1e3  # convert to meters
                     dop_shift = (
                         (-2.0 * frequency * 1e6 / utils.pconst["c"]) * (dp / (delt))
-                    ).ravel()[0]
+                    ).ravel()[0] * self.cfg.doppler_multiplier
                     dop_vel = (
                         0.5 * dop_shift * utils.pconst["c"] / (frequency * 1e6)
                     ).ravel()[0]
@@ -146,11 +146,13 @@ class Doppler(object):
         # Need to rethnik about how rays experiance change in Doppler
         # now we implemented as if modified rays observed a difference from
         # baseline.
-        d_ne = 10 ** base_ne_fn(
-            event_ray_path["ground_range"], event_ray_path["height"], grid=False
-        ) - 10 ** event_ne_fn(
-            event_ray_path["ground_range"], event_ray_path["height"], grid=False
-        )
+        d_ne = (
+            10 ** event_ne_fn(
+                event_ray_path["ground_range"], event_ray_path["height"], grid=False
+            ) - 10 ** base_ne_fn(
+                event_ray_path["ground_range"], event_ray_path["height"], grid=False
+            )
+        ) * self.cfg.doppler_multiplier
         # Delete all interaction below 50 km (parameterize by config)
         d_ne[event_ray_path["height"] <= 50] = 0.0
         # Compute change in Doppler freqency due to change in refractive index along the ray
@@ -165,7 +167,7 @@ class Doppler(object):
             np.array(d_frq_dne), np.array(event_ray_path["ground_range"])
         )
         # Compute total change in Doppler frequency due to change in reflection height
-        dh = (base_ray_path["height"].max() - event_ray_path["height"].max()) * 1e3
+        dh = (event_ray_path["height"].max() - base_ray_path["height"].max()) * 1e3 * self.cfg.doppler_multiplier
         frq_dh = (
             (-2.0 * frequency * 1e6 / utils.pconst["c"])
             * (dh / (delt))
@@ -266,13 +268,14 @@ class Doppler(object):
         files = glob.glob(folder + "/*.mat")
         records = []
         for file in files:
+            logger.info(f"Load doppler file: {file}")
             doppler = utils.loadmatlabfiles(file)
             for ray in doppler["doppler"]["rays"]:
-                ray = utils._todict_(ray)
-                srange = ray["geometric_distance"]
-                gate = int((srange - frange) / rsep)
-                records.append(
-                    dict(
+                try:
+                    ray = utils._todict_(ray)
+                    srange = ray["geometric_distance"]
+                    gate = int((srange - frange) / rsep)
+                    d = dict(
                         time=doppler["doppler"]["time"],
                         srange=srange,
                         bmnum=beam,
@@ -285,6 +288,21 @@ class Doppler(object):
                         pharlap_doppler_vel=ray["pharlap_doppler_vel"],
                         pharlap_doppler_shift=ray["pharlap_doppler_shift"],
                     )
-                )
+                except:
+                    logger.error(f"Loading {file} error")
+                    d = dict(
+                        time=doppler["doppler"]["time"],
+                        srange=np.nan,
+                        bmnum=np.nan,
+                        slist=np.nan,
+                        vel_tot=np.nan,
+                        frq_dne=np.nan,
+                        vel_dne=np.nan,
+                        frq_dh=np.nan,
+                        vel_dh=np.nan,
+                        pharlap_doppler_vel=np.nan,
+                        pharlap_doppler_shift=np.nan,
+                    )
+                records.append(d)
         records = pd.DataFrame.from_records(records)
         return records

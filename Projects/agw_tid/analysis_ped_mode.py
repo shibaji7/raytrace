@@ -16,14 +16,19 @@ import os
 from loguru import logger
 from dateutil import parser as dparser
 import argparse
+import datetime as dt
 
 CD_STEPS = ""
-ZOOMED_IN = []
+ZOOMED_IN = [[500, 1000], [120, 220]]
+_DIR_ = "figures/zoomed/"
+DATES = [
+
+]
 
 def add_sys_paths():
     """Adding /rt to sys path
     """
-    global CD_STEPS
+    global CD_STEPS, _DIR_
     pwd = os.getcwd()
     last_dir = pwd.split("/")[-1]
     index_of_trace_dir = pwd.split("/").index("raytrace")
@@ -41,6 +46,10 @@ def add_sys_paths():
     logger.info(f"Loacl lib-{local_libs}")
     CD_STEPS = "".join(["../"]*int(len(pwd.split("/"))-index_of_trace_dir-1))
     sys.path.extend(local_libs)
+    os.makedirs(
+        os.path.join(CD_STEPS, _DIR_), 
+        exist_ok=True
+    )
     return
 
 add_sys_paths()
@@ -51,7 +60,7 @@ from gemini import GEMINI2d
 
 
 def create_regionnal_plots(cfg, beam):
-    global CD_STEPS, ZOOMED_IN
+    global CD_STEPS, ZOOMED_IN, _DIR_
     event = dparser.isoparse(cfg.event)
     logger.info(f"Create regional plot for {cfg.rad}/{beam}/{event}")
     base_output_folder = os.path.join(
@@ -60,19 +69,22 @@ def create_regionnal_plots(cfg, beam):
     )
     model = GEMINI2d(cfg, event)
     for d in model.dates:
-        rto = RadarBeam2dTrace(
-            d, cfg.rad, beam,
-            cfg, cfg.model,
-            base_output_folder,
-        )
-        eden = model.load_from_file(rto.edensity_file)
-        rto.load_rto(eden)
-        plot = Plots(event, cfg, rto, cfg.rad, beam)
-        plot.lay_rays(kind=cfg.ray_trace_plot_kind, zoomed_in=ZOOMED_IN)
-        plot.save("sample.png")
-        plot.close()
-        break
-    
+        if d in DATES:
+            rto = RadarBeam2dTrace(
+                d, cfg.rad, beam,
+                cfg, cfg.model,
+                base_output_folder,
+            )
+            eden = model.load_from_file(rto.edensity_file)
+            rto.load_rto(eden)
+            plot = Plots(event, cfg, rto, cfg.rad, beam)
+            plot.lay_rays(
+                kind="ref_indx"#cfg.ray_trace_plot_kind
+                , zoomed_in=ZOOMED_IN
+            )
+            print(os.path.join(CD_STEPS, _DIR_, f"{d.strftime('%Y%m%d.%H%M')}.png"))
+            plot.save(os.path.join(CD_STEPS, _DIR_, f"{d.strftime('%Y%m%d.%H%M')}.png"))
+            plot.close()
     return
 
 zoomed_in = []

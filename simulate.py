@@ -392,7 +392,7 @@ class RadarSimulation(object):
 zoomed_in = []
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--beam", default=11, help="Radar beam number", type=int)
+    parser.add_argument("-b", "--beam", default=0, help="Radar beam number", type=int)
     parser.add_argument(
         "-f",
         "--cfg_file",

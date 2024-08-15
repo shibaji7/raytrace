@@ -238,26 +238,42 @@ class Doppler(object):
             folder = utils.get_folder(rad, beam, event, model, base)
             folder = os.path.join(folder, "Doppler")
             file = os.path.join(folder, event.strftime("%H%M.mat"))
-            doppler = utils.loadmatlabfiles(file)
-            for ray in doppler["doppler"]["rays"]:
-                ray = utils._todict_(ray)
-                srange = ray["geometric_distance"]
-                gate = int((srange - frange) / rsep)
-                records.append(
-                    dict(
-                        time=doppler["doppler"]["time"],
-                        srange=srange,
-                        bmnum=beam,
-                        slist=gate,
-                        vel_tot=ray["vel_tot"],
-                        frq_dne=ray["frq_dne"],
-                        vel_dne=ray["vel_dne"],
-                        frq_dh=ray["frq_dh"],
-                        vel_dh=ray["vel_dh"],
-                        pharlap_doppler_vel=ray["pharlap_doppler_vel"],
-                        pharlap_doppler_shift=ray["pharlap_doppler_shift"],
-                    )
-                )
+            if os.path.exists(file):
+                doppler = utils.loadmatlabfiles(file)
+                for ray in doppler["doppler"]["rays"]:
+                    try:
+                        ray = utils._todict_(ray)
+                        srange = ray["geometric_distance"]
+                        gate = int((srange - frange) / rsep)
+                        d = dict(
+                                time=doppler["doppler"]["time"],
+                                srange=srange,
+                                bmnum=beam,
+                                slist=gate,
+                                vel_tot=ray["vel_tot"],
+                                frq_dne=ray["frq_dne"],
+                                vel_dne=ray["vel_dne"],
+                                frq_dh=ray["frq_dh"],
+                                vel_dh=ray["vel_dh"],
+                                pharlap_doppler_vel=ray["pharlap_doppler_vel"],
+                                pharlap_doppler_shift=ray["pharlap_doppler_shift"],
+                        )
+                    except:
+                        logger.error(f"Loading {file} error")
+                        d = dict(
+                            time=doppler["doppler"]["time"],
+                            srange=np.nan,
+                            bmnum=np.nan,
+                            slist=np.nan,
+                            vel_tot=np.nan,
+                            frq_dne=np.nan,
+                            vel_dne=np.nan,
+                            frq_dh=np.nan,
+                            vel_dh=np.nan,
+                            pharlap_doppler_vel=np.nan,
+                            pharlap_doppler_shift=np.nan,
+                        )
+                    records.append(d)
         records = pd.DataFrame.from_records(records)
         return records
 

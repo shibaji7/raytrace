@@ -3,7 +3,7 @@
     "model": "gemini",
     "rad": "fhe",
     "beam": 11,
-    "project_name": "May2017_gemini_tid",
+    "project_name": "May2017_gemini_control",
     "event": "2017-05-27T16",
     "time_window": 359,
     "time_gaps": 1,
@@ -11,7 +11,7 @@
         "eclipse": false,
         "tid": true
     },
-    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/GEMINI3D/20170527/",
+    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/GEMINI3D/20170527-Control/",
     "density_file_name": null,
     "gemini_grid_coordinate_file": "coordinates.mat",
     "max_ground_range_km": 2500,
@@ -35,7 +35,7 @@
         "iri_version": 20,
         "start_mask_time": null
     },
-    "base_eclipse_folder": null,
+    "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_sd_folder": "tmp/",
     "sd_file_type": "fitacf",
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",

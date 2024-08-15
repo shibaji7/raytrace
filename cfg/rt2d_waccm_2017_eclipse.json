@@ -4,9 +4,9 @@
     "rad": "fhw",
     "beam": 11,
     "project_name": "Aug2017_waccm_eclipse",
-    "event": "2017-08-21T16",
+    "event": "2017-08-21T16:10",
     "time_window": 180,
-    "time_gaps": 10,
+    "time_gaps": 1,
     "event_type":{
         "eclipse": true,
         "tid": false
@@ -30,6 +30,7 @@
     "rise_time_sec": 60,
     "threshold": 1e-5,
     "radius_earth": 6371,
+    "doppler_multiplier": 1,
     "iri_param": {
         "iri_version": 20,
         "start_mask_time": null
@@ -41,7 +42,7 @@
     "project_save_location": "outputs/",
     "frange": 180,
     "rsep": 45,
-    "worker": 6,
+    "worker": 8,
     "ray_trace_plot_kind": "pf",
     "to_netcdf": false
 }

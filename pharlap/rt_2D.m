@@ -34,8 +34,8 @@ irregs_flag = 1;
 kp = 0;
 
 %% load data
-load(char(strcat('../', dic, '/bearing.mat')))
-load(char(strcat('../', dic, '/', compose('%02d',UT(4)), '.', compose('%02d',UT(5)), '.mat')))
+load(char(strcat(dic, '/bearing.mat')))
+load(char(strcat(dic, '/', compose('%02d',UT(4)), '.', compose('%02d',UT(5)), '.mat')))
 
 %% initialize IRI grid
 clear iri_options

@@ -35,10 +35,10 @@
         "start_mask_time": null
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
-    "tmp_sd_folder": "tmp/",
+    "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",
     "sd_file_type": "fitacf",
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
-    "project_save_location": "outputs/",
+    "project_save_location": "/home/shibaji/OneDrive/trace/outputs/",
     "frange": 180,
     "rsep": 45,
     "worker": 6,

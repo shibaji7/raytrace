@@ -11,9 +11,9 @@
         "eclipse": true,
         "tid": false
     },
-    "density_file_location": "/home/shibaji/",
-    "density_file_name": "",
-    "gemini_grid_coordinate_file": null,
+    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/GITM/20211204/",
+    "density_file_name": "result_202112_euv-002.nc",
+    "grid_coordinate_file": null,
     "max_ground_range_km": 3000,
     "number_of_ground_step_km": 100,
     "slant_gate_of_radar": 75,

@@ -13,7 +13,7 @@
     },
     "density_file_location": null,
     "density_file_name": null,
-    "gemini_grid_coordinate_file": null,
+    "grid_coordinate_file": null,
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 200,
     "slant_gate_of_radar": 75,

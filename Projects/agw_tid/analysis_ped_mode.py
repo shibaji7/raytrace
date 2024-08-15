@@ -19,10 +19,10 @@ import argparse
 import datetime as dt
 
 CD_STEPS = ""
-ZOOMED_IN = [[500, 1000], [120, 220]]
+ZOOMED_IN = [[500, 1600], [120, 220]]
 _DIR_ = "figures/zoomed/"
 DATES = [
-
+    dt.datetime(2017, 5, 27, 19, 53)
 ]
 
 def add_sys_paths():

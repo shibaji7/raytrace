@@ -11,8 +11,8 @@
         "eclipse": true,
         "tid": false
     },
-    "density_file_location": "/home/shibaji/",
-    "density_file_name": "",
+    "density_file_location": null,
+    "density_file_name": null,
     "gemini_grid_coordinate_file": null,
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 100,
@@ -35,10 +35,10 @@
         "start_mask_time": "2021-12-04T07"
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
-    "tmp_sd_folder": "tmp/",
+    "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",
     "sd_file_type": "fitacf",
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
-    "project_save_location": "outputs/",
+    "project_save_location": "/home/shibaji/OneDrive/trace/outputs/",
     "frange": 180,
     "rsep": 45,
     "worker": 6,

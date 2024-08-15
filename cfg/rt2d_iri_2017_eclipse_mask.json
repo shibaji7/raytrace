@@ -1,7 +1,19 @@
 {
     "verbose": true,
-    "project_name": "eclipse_2017_iri_mask",
-    "density_file_location": "",
+    "model": "iri",
+    "rad": "fir",
+    "beam": 11,
+    "project_name": "Dec2021_iri_eclipse_mask",
+    "event": "2021-12-04T06",
+    "time_window": 180,
+    "time_gaps": 10,
+    "event_type":{
+        "eclipse": true,
+        "tid": false
+    },
+    "density_file_location": null,
+    "density_file_name": null,
+    "gemini_grid_coordinate_file": null,
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 200,
     "slant_gate_of_radar": 75,
@@ -24,11 +36,10 @@
         "start_mask_time": "2017-08-21T16"
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
-    "tmp_sd_folder": "tmp/",
-    "eclipse_shadow": true,
+    "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",
     "sd_file_type": "fitacf",
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
-    "project_save_location": "outputs/",
+    "project_save_location": "/home/shibaji/OneDrive/trace/outputs/",
     "frange": 180,
     "rsep": 45
 }

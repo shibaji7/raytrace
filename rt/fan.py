@@ -115,6 +115,7 @@ class Fan(object):
 
     def annotate_figure(self, axis_num=0):
         # Annotate the generic info in axis
+        utils.setsize(10)
         ax = self.fig.get_axes()[axis_num]
         ax.text(
             -0.02,
@@ -170,6 +171,7 @@ class Fan(object):
         """
         Generate plot with dataset overlaid
         """
+        utils.setsize(10)
         ax = ax if ax else self.add_axes()
         ax.text(
             text_decription["x"],

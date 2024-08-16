@@ -33,6 +33,9 @@ class RadarSimulation(object):
     ) -> None:
         import utils
 
+        ## Kill all Matlab Server Hosts for this run 
+        os.system("killall MathWorksServiceHost.")
+
         self.cfg_file = cfg_file
         self.cfg = utils.read_params_2D(cfg_file)
 
@@ -299,7 +302,7 @@ class RadarSimulation(object):
         return
 
     @staticmethod
-    def genererate_fan(cfg, date):
+    def genererate_fan(cfg, date, cfg_file):
         import cartopy
         import radar
         from doppler import Doppler
@@ -339,7 +342,7 @@ class RadarSimulation(object):
             ncols=2,
             fig_title="",
         )
-        fan.setup(lons, lats, extent=extent, proj=proj)
+        fan.setup(lons, lats, extent=extent, proj=proj, lay_eclipse=cfg_file)
         fan.generate_fov(
             cfg.rad,
             obs_records,
@@ -427,6 +430,6 @@ if __name__ == "__main__":
         date = dates[0] + dt.timedelta(minutes=cfg.time_gaps)
 
         while date < dates[-1]:
-            RadarSimulation.genererate_fan(cfg, date)
+            RadarSimulation.genererate_fan(cfg, date, args.cfg_file)
             date += dt.timedelta(minutes=cfg.time_gaps)
     utils.clean()

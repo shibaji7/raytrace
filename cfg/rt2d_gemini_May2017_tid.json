@@ -5,7 +5,7 @@
     "beam": 11,
     "project_name": "May2017_gemini_tid",
     "event": "2017-05-27T16",
-    "time_window": 359,
+    "time_window": 300,
     "time_gaps": 1,
     "event_type":{
         "eclipse": false,

@@ -408,9 +408,9 @@ class SDCarto(GeoAxes):
         )
         # if cb: _add_colorbar(fig, ax, im)
 
-        utils.setsize(5)
+        utils.setsize(8)
         fig = self.get_figure()
-        cpos = [1.25, 0.1, 0.025, 0.6]
+        cpos = [1.4, 0.1, 0.025, 0.6]
         cax = self.inset_axes(cpos, transform=self.transAxes)
         cb = fig.colorbar(im, ax=self, cax=cax)
         cb.set_label("Obscuration")

@@ -5,7 +5,7 @@
     "beam": 11,
     "project_name": "Dec2021_gitm_eclipse",
     "event": "2021-12-04T06",
-    "time_window": 10,
+    "time_window": 180,
     "time_gaps": 1,
     "event_type":{
         "eclipse": true,
@@ -30,6 +30,7 @@
     "rise_time_sec": 60,
     "threshold": 1e-5,
     "radius_earth": 6371,
+    "doppler_multiplier": 1,
     "iri_param": {
         "iri_version": 20,
         "start_mask_time": null

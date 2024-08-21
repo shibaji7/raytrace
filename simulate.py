@@ -269,16 +269,15 @@ class RadarSimulation(object):
                 zparam="vel_tot",
                 lay_eclipse=self.cfg.event_type.eclipse,
             )
-        rtint.save(
-            filepath=utils.get_folder(
-                self.rad,
-                self.beam,
-                self.start_time,
-                self.model,
-                self.base_output_folder,
-            )
-            + "/rti.png"
-        )
+        filepath = utils.get_folder(
+            self.rad,
+            self.beam,
+            self.start_time,
+            self.model,
+            self.base_output_folder,
+        ) + "/rti.png"
+        logger.info(f"File: {filepath}")
+        rtint.save( filepath )
         rtint.close()
         if self.cfg.to_netcdf:
             fname = os.path.join(
@@ -342,7 +341,12 @@ class RadarSimulation(object):
             ncols=2,
             fig_title="",
         )
-        fan.setup(lons, lats, extent=extent, proj=proj, lay_eclipse=cfg_file)
+        eclipse_lats, lay_eclipse = np.linspace(0, 90, num=90 * 2), None
+        if cfg.event_type.eclipse:
+            lay_eclipse = cfg_file
+            if radar.hdw.geographic.lat < 0:
+                eclipse_lats = np.linspace(-90, 0, num=90 * 2)
+        fan.setup(lons, lats, extent=extent, proj=proj, lay_eclipse=lay_eclipse)
         fan.generate_fov(
             cfg.rad,
             obs_records,
@@ -358,6 +362,7 @@ class RadarSimulation(object):
                 ha="left",
                 va="center",
             ),
+            lats=eclipse_lats,
         )
         fan.generate_fov(
             cfg.rad,
@@ -374,6 +379,7 @@ class RadarSimulation(object):
                 ha="left",
                 va="center",
             ),
+            lats=eclipse_lats,
         )
         fan.annotate_figure()
         fan.save(f"{folder}/fan.{cfg.rad}-{date.strftime('%H%M')}.png")

@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import utils as utils
 from matplotlib.dates import DateFormatter
+from loguru import logger
 
 plt.style.use(["science", "ieee"])
 plt.rcParams["font.family"] = "sans-serif"
@@ -17,7 +18,7 @@ class RangeTimeIntervalPlot(object):
     Create plots for velocity, width, power, elevation angle, etc.
     """
 
-    def __init__(self, nrang, dates, rad, fig_title="", num_subplots=3):
+    def __init__(self, nrang, dates, rad, fig_title="", num_subplots=3, srange_type="slist"):
         self.nrang = nrang
         self.unique_gates = np.linspace(1, nrang, nrang)
         self.rad = rad
@@ -28,6 +29,7 @@ class RangeTimeIntervalPlot(object):
             figsize=(8, 3 * num_subplots), dpi=300
         )  # Size for website
         self.fig_title = fig_title
+        self.srange_type = srange_type
         utils.setsize(12)
         return
 
@@ -53,13 +55,17 @@ class RangeTimeIntervalPlot(object):
         cmap = mpl.cm.get_cmap(cmap)
         # Configure axes
         ax.xaxis.set_major_formatter(DateFormatter(r"%H^{%M}"))
-        hours = mdates.HourLocator(byhour=range(0, 24, 1))
+        hours = mdates.HourLocator(byhour=range(0, 24, 3))
         ax.xaxis.set_major_locator(hours)
         dtime = (
             pd.Timestamp(self.dates[-1]).to_pydatetime()
             - pd.Timestamp(self.dates[0]).to_pydatetime()
         ).total_seconds() / 3600.0
-        if dtime < 4.0:
+        if dtime > 2.0 and dtime < 4.0:
+            hours = mdates.HourLocator(byhour=range(0, 24, 1))
+            ax.xaxis.set_minor_locator(hours)
+            ax.xaxis.set_minor_formatter(DateFormatter(r"%H^{%M}"))
+        elif dtime < 2.0:
             minutes = mdates.MinuteLocator(byminute=range(0, 60, 10))
             ax.xaxis.set_minor_locator(minutes)
             ax.xaxis.set_minor_formatter(DateFormatter(r"%H^{%M}"))
@@ -68,7 +74,8 @@ class RangeTimeIntervalPlot(object):
         ax.set_ylim([0, self.nrang])
         ax.set_ylabel("Range gate", fontdict={"size": 12, "fontweight": "bold"})
         im = ax.pcolormesh(
-            X, Y, Z.T, lw=0.01, edgecolors="None", cmap=cmap, vmax=p_max, vmin=p_min
+            X, Y, Z.T, lw=0.01, edgecolors="None", cmap=cmap, vmax=p_max, vmin=p_min,
+            zorder=3
         )
         if color_bar:
             self._add_colorbar(im, self.fig, ax, label=label)
@@ -78,29 +85,27 @@ class RangeTimeIntervalPlot(object):
         return
 
     def overlay_eclipse(self, ax, beam):
+        file = f"datasets/eclipse_path/{self.dates[0].strftime('%Y-%m-%d')}/oc.{self.rad}.{beam}.csv"
+        logger.info(f"Overlay eclipse path from file: {file}")
         # Add eclipses
-        o = pd.read_csv(
-            f"datasets/eclipse_path/{self.dates[0].strftime('%Y-%m-%d')}/oc.{self.rad}.{beam}.csv",
-            parse_dates=["dates"],
-        )
+        o = pd.read_csv( file, parse_dates=["dates"], )
         o = o[(o.dates >= self.dates[0]) & (o.dates <= self.dates[1])]
-        # print(o.head())
-        srange = 180 + (45 * np.arange(101))
+        srange = (
+            np.arange(101) 
+            if self.srange_type == "slist" else
+            180 + (45 * np.arange(101))
+        )
         tags = [f"gate_{i}" for i in range(101)]
         p = o[tags].values
-        # print(np.nanmax(p), np.nanmin(p), p.shape, srange.shape, o.dates.shape)
         p = np.ma.masked_where(p <= 0, p)
-        # print(p[70,:], o.dates.tolist())
-        im = ax.pcolor(
+        im = ax.contourf(
             o.dates.tolist(),
             srange,
             p.T,
-            lw=0.01,
-            edgecolors="None",
             cmap="gray_r",
-            vmax=1,
-            vmin=0,
-            zorder=1,
+            zorder=3,
+            alpha=0.3,
+            levels=[0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0],
         )
         ax.set_xlim([self.dates[0], self.dates[-1]])
         return

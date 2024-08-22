@@ -331,21 +331,27 @@ class Plots(object):
                 getattr(self, kind),
                 "plasma",
                 r"$f_0$ [MHz]",
-                colors.Normalize(2, 6),
+                colors.Normalize(
+                    self.cfg.ray_trace_plot_lim.pf
+                ),
             )
         if kind == "edens":
             o, cmap, label, norm = (
                 getattr(self, kind),
                 "plasma",
                 r"$N_e$ [$/m^{-3}$]",
-                colors.LogNorm(1e4, 1e6),
+                colors.LogNorm(
+                    self.cfg.ray_trace_plot_lim.edens
+                ),
             )
         if kind == "ref_indx":
             o, cmap, label, norm = (
                 getattr(self, kind),
                 "plasma",
                 r"$\eta$",
-                colors.Normalize(0.6, 1),
+                colors.Normalize(
+                    self.cfg.ray_trace_plot_lim.ref_indx
+                ),
             )
         return o, cmap, label, norm
 

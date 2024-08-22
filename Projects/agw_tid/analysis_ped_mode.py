@@ -19,7 +19,7 @@ import argparse
 import datetime as dt
 
 CD_STEPS = ""
-ZOOMED_IN = [[500, 2000], [150, 250]]
+ZOOMED_IN = [[500, 1800], [150, 300]]
 _DIR_ = "figures/zoomed/"
 DATES = [
     dt.datetime(2017, 5, 27, 19, 52),

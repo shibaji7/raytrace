@@ -33,8 +33,7 @@
     "radius_earth": 6371,
     "iri_param": {
         "iri_version": 20,
-        "eclipse": true,
-        "start_mask_time": "2017-08-21T16"
+        "start_mask_time": null
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",
@@ -42,5 +41,13 @@
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
     "project_save_location": "/home/shibaji/OneDrive/trace/outputs/",
     "frange": 180,
-    "rsep": 45
+    "rsep": 45,
+    "worker": 0,
+    "ray_trace_plot_kind": "pf",
+    "ray_trace_plot_lim": {
+        "pf": [4, 6],
+        "edens": [1e4, 1e6],
+        "ref_indx": [0.6, 0.95]
+    },
+    "to_netcdf": false
 }

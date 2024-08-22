@@ -15,7 +15,7 @@
     "density_file_name": null,
     "grid_coordinate_file": "coords.mat",
     "max_ground_range_km": 2500,
-    "number_of_ground_step_km": 150,
+    "number_of_ground_step_km": 100,
     "run_radar_beam_resolution": false,
     "slant_gate_of_radar": 75,
     "start_height_km": 100,
@@ -45,5 +45,10 @@
     "rsep": 45,
     "worker": 0,
     "ray_trace_plot_kind": "pf",
+    "ray_trace_plot_lim": {
+        "pf": [4, 6],
+        "edens": [1e4, 1e6],
+        "ref_indx": [0.6, 0.95]
+    },
     "to_netcdf": false
 }

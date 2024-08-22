@@ -14,6 +14,7 @@
     "density_file_location": null,
     "density_file_name": null,
     "grid_coordinate_file": null,
+    "run_radar_beam_resolution": false,
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 100,
     "slant_gate_of_radar": 100,

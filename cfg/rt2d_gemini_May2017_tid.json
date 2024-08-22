@@ -14,6 +14,7 @@
     "density_file_location": "/home/shibaji/Modeled-Electron-Densities/GEMINI3D/20170527/",
     "density_file_name": null,
     "grid_coordinate_file": "coordinates.mat",
+    "run_radar_beam_resolution": false,
     "max_ground_range_km": 2500,
     "number_of_ground_step_km": 100,
     "slant_gate_of_radar": 75,

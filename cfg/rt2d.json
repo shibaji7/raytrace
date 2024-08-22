@@ -13,6 +13,7 @@
     },
     "density_file_location": "",
     "density_file_name": "",
+    "run_radar_beam_resolution": false,
     "max_ground_range_km": 3000,
     "number_of_ground_step_km": 200,
     "slant_gate_of_radar": 75,

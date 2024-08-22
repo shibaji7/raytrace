@@ -92,16 +92,35 @@ class RadarBeam2dTrace(object):
         )
         logger.info(f"Bearing angle of beam {self.beam} is {bearing} deg")
         bearing_object = {}
-        lats, lons = (
-            self.radar.fov[0][: self.cfg.slant_gate_of_radar, self.beam],
-            self.radar.fov[1][: self.cfg.slant_gate_of_radar, self.beam],
-        )
-        dist = np.array([GC(p, (latx, lonx)).km for latx, lonx in zip(lats, lons)])
-        dist, lats, lons = (
-            np.insert(dist, 0, 0),
-            np.insert(lats, 0, lat),
-            np.insert(lons, 0, lon),
-        )
+
+        # Create resolution along the beam
+        if self.cfg.run_radar_beam_resolution:
+            ## This produce a 45 km range resulution path
+            lats, lons = (
+                self.radar.fov[0][: self.cfg.slant_gate_of_radar, self.beam],
+                self.radar.fov[1][: self.cfg.slant_gate_of_radar, self.beam],
+            )
+            dist = np.array([GC(p, (latx, lonx)).km for latx, lonx in zip(lats, lons)])
+            dist, lats, lons = (
+                np.insert(dist, 0, 0),
+                np.insert(lats, 0, lat),
+                np.insert(lons, 0, lon),
+            )
+        else:
+            ## This produce a high/low resolution path by json file input
+            lats, lons = [], []
+            gc = GC(p, p)
+            dist = np.linspace(
+                0, self.cfg.max_ground_range_km, 
+                self.cfg.number_of_ground_step_km
+            )
+            for d in dist:
+                x = gc.destination(p, bearing, distance=d)
+                lats.append(x[0])
+                lons.append(x[1])
+            lats, lons = np.array(lats), np.array(lons)
+
+        # Store to objects
         bearing_object["dist"], bearing_object["lat"], bearing_object["lon"] = (
             dist,
             np.array(lats),

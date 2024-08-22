@@ -22,7 +22,9 @@ CD_STEPS = ""
 ZOOMED_IN = [[500, 2000], [150, 250]]
 _DIR_ = "figures/zoomed/"
 DATES = [
-    dt.datetime(2017, 5, 27, 19, 53)
+    dt.datetime(2017, 5, 27, 19, 52),
+    dt.datetime(2017, 5, 27, 19, 53),
+    dt.datetime(2017, 5, 27, 19, 54)
 ]
 
 def add_sys_paths():
@@ -79,7 +81,7 @@ def create_regionnal_plots(cfg, beam):
             rto.load_rto(eden)
             plot = Plots(event, cfg, rto, cfg.rad, beam)
             plot.lay_rays(
-                kind="ref_indx"#cfg.ray_trace_plot_kind
+                kind=cfg.ray_trace_plot_kind
                 , zoomed_in=ZOOMED_IN
             )
             print(os.path.join(CD_STEPS, _DIR_, f"{d.strftime('%Y%m%d.%H%M')}.png"))
@@ -90,11 +92,11 @@ def create_regionnal_plots(cfg, beam):
 zoomed_in = []
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--beam", default=0, help="Radar beam number", type=int)
+    parser.add_argument("-b", "--beam", default=11, help="Radar beam number", type=int)
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/rt2d_gemini_May2017_tid.json",
+        default="cfg/rt2d_gemini_May2017_tid_high_res.json",
         help="Configuration file",
         type=str,
     )

@@ -44,7 +44,7 @@
     "frange": 180,
     "rsep": 45,
     "worker": 6,
-    "ray_trace_plot_kind": "edens",
+    "ray_trace_plot_kind": "pf",
     "ray_trace_plot_lim": {
         "pf": [4, 6],
         "edens": [1e4, 1e6],

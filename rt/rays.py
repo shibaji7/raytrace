@@ -230,7 +230,7 @@ class Plots(object):
         self.ax.patch.zorder = 0.9
         return self.ax, self.aux_ax
 
-    def lay_rays(self, kind="pf", zoomed_in=[]):
+    def lay_rays(self, kind="pf", zoomed_in=[], elv_range=[]):
         self.generate_curvedEarthAxes()
         Th, R = self.to_polar(
             self.trace_obj.bearing_object["dist"],
@@ -258,7 +258,13 @@ class Plots(object):
         )
         _ = cbax.set_label(label)
         rays = self.trace_obj.rays
-        for i, elv in enumerate(rays.elvs):
+        self.elvs = rays.elvs
+        self.elvs = (
+            self.elvs 
+            if (elv_range is None) or (len(elv_range) < 2) else 
+            self.elvs[(self.elvs>=elv_range[0]) & (self.elvs<=elv_range[1])]
+        )
+        for i, elv in enumerate(self.elvs):
             ray_path_data, ray_data = (
                 rays.ray_path_data[elv],
                 rays.simulation[elv]["ray_data"],
@@ -294,7 +300,7 @@ class Plots(object):
             alpha=0.8,
         )
         rays = self.trace_obj.rays
-        for i, elv in enumerate(rays.elvs):
+        for i, elv in enumerate(self.elvs):
             ray_path_data, ray_data = (
                 rays.ray_path_data[elv],
                 rays.simulation[elv]["ray_data"],

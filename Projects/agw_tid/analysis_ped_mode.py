@@ -21,6 +21,7 @@ from loguru import logger
 
 CD_STEPS = ""
 ZOOMED_IN = [[500, 1800], [150, 300]]
+ELV_RANGE = []
 _DIR_ = "figures/zoomed/"
 DATES = [
     dt.datetime(2017, 5, 27, 19, 52),
@@ -57,9 +58,13 @@ from gemini import GEMINI2d
 from rays import Plots
 from rt2d import RadarBeam2dTrace
 
+import radar
+from doppler import Doppler
+from rti import RangeTimeIntervalPlot
+
 
 def create_regionnal_plots(cfg, beam):
-    global CD_STEPS, ZOOMED_IN, _DIR_
+    global CD_STEPS, ZOOMED_IN, ELV_RANGE, _DIR_
     event = dparser.isoparse(cfg.event)
     logger.info(f"Create regional plot for {cfg.rad}/{beam}/{event}")
     base_output_folder = os.path.join(
@@ -81,10 +86,62 @@ def create_regionnal_plots(cfg, beam):
             eden = model.load_from_file(rto.edensity_file)
             rto.load_rto(eden)
             plot = Plots(event, cfg, rto, cfg.rad, beam)
-            plot.lay_rays(kind=cfg.ray_trace_plot_kind, zoomed_in=ZOOMED_IN)
-            print(os.path.join(CD_STEPS, _DIR_, f"{d.strftime('%Y%m%d.%H%M')}.png"))
+            plot.lay_rays(
+                kind=cfg.ray_trace_plot_kind, 
+                zoomed_in=ZOOMED_IN, 
+                elv_range=ELV_RANGE
+            )
             plot.save(os.path.join(CD_STEPS, _DIR_, f"{d.strftime('%Y%m%d.%H%M')}.png"))
             plot.close()
+    return
+
+def create_zoomed_rti_rays(cfg, beam):
+    global CD_STEPS, ELV_RANGE, _DIR_
+    start = dparser.isoparse(cfg.event)
+    end = start + dt.timedelta(minutes=int(cfg.time_window))
+    radr = radar.Radar(
+        cfg.rad, [start, end], cfg
+    )
+    logger.info(f"Create regional plot for {cfg.rad}/{beam}/{start}")
+    base_output_folder = os.path.join(
+        CD_STEPS,
+        cfg.project_save_location,
+        cfg.project_name,
+    )
+
+    fig_title = f"Model: {cfg.model.upper()} / {cfg.rad.upper()}-{'%02d'%cfg.beam}, {cfg.frequency} MHz \t {start.strftime('%d %b, %Y')}"
+    rtint = RangeTimeIntervalPlot(
+        100, [start, end], cfg.rad, fig_title=fig_title, num_subplots=2
+    )
+    rtint.addParamPlot(
+        radr.df.copy(),
+        beam,
+        title="Observations",
+        xlabel="",
+        lay_eclipse=None,
+    )
+    records = Doppler.fetch_by_beam(
+        start, cfg.rad, cfg.model,
+        cfg.beam, base_output_folder,
+        frange=cfg.frange, rsep=cfg.rsep,
+    )
+    if len(ELV_RANGE) == 2:
+        records = records[
+            (records.elv >= ELV_RANGE[0])
+            & (records.elv <= ELV_RANGE[1])
+        ]
+    if len(records) > 0:
+        records.time = records.time.apply(lambda x: dparser.isoparse(x))
+        rtint.addParamPlot(
+            records,
+            beam,
+            title="",
+            zparam="vel_tot",
+            lay_eclipse=cfg.event_type.eclipse,
+        )
+    print(records.head())
+    rtint.save(os.path.join(CD_STEPS, _DIR_, f"{cfg.rad}.{start.strftime('%Y%m%d')}.png"))
+    rtint.close()
     return
 
 
@@ -108,3 +165,4 @@ if __name__ == "__main__":
 
     cfg = utils.read_params_2D(args.cfg_file)
     create_regionnal_plots(cfg, args.beam)
+    create_zoomed_rti_rays(cfg, args.beam)

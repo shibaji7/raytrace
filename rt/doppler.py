@@ -239,7 +239,10 @@ class Doppler(object):
         )
 
     @staticmethod
-    def fetch_by_scan_time(event, rad, model, beams, base, frange=180, rsep=45):
+    def fetch_by_scan_time(
+        event, rad, model, beams, base, 
+        frange=180, rsep=45,
+    ):
         records = []
         for beam in beams:
             folder = utils.get_folder(rad, beam, event, model, base)
@@ -264,6 +267,7 @@ class Doppler(object):
                             vel_dh=ray["vel_dh"],
                             pharlap_doppler_vel=ray["pharlap_doppler_vel"],
                             pharlap_doppler_shift=ray["pharlap_doppler_shift"],
+                            elv=ray["elv"],
                         )
                     except:
                         logger.error(f"Loading {file} error")
@@ -279,13 +283,17 @@ class Doppler(object):
                             vel_dh=np.nan,
                             pharlap_doppler_vel=np.nan,
                             pharlap_doppler_shift=np.nan,
+                            elv=np.nan,
                         )
                     records.append(d)
         records = pd.DataFrame.from_records(records)
         return records
 
     @staticmethod
-    def fetch_by_beam(event, rad, model, beam, base, frange=180, rsep=45):
+    def fetch_by_beam(
+        event, rad, model, beam, base, 
+        frange=180, rsep=45,
+    ):
         folder = utils.get_folder(rad, beam, event, model, base)
         folder = os.path.join(folder, "Doppler")
         files = glob.glob(folder + "/*.mat")
@@ -310,6 +318,7 @@ class Doppler(object):
                         vel_dh=ray["vel_dh"],
                         pharlap_doppler_vel=ray["pharlap_doppler_vel"],
                         pharlap_doppler_shift=ray["pharlap_doppler_shift"],
+                        elv=ray["elv"],
                     )
                 except:
                     logger.error(f"Loading {file} error")
@@ -325,6 +334,7 @@ class Doppler(object):
                         vel_dh=np.nan,
                         pharlap_doppler_vel=np.nan,
                         pharlap_doppler_shift=np.nan,
+                        elv=np.nan,
                     )
                 records.append(d)
         records = pd.DataFrame.from_records(records)

@@ -1,18 +1,18 @@
 {
     "verbose": true,
-    "model": "wam",
-    "rad": "fir",
+    "model": "wamipe",
+    "rad": "cvw",
     "beam": 11,
-    "project_name": "Dec2021_wam_eclipse",
-    "event": "2021-12-04T06",
+    "project_name": "Oct2023_wamipe_eclipse",
+    "event": "2023-10-14T14",
     "time_window": 1,
     "time_gaps": 1,
     "event_type":{
         "eclipse": true,
         "tid": false
     },
-    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/WAM/20170527/",
-    "density_file_name": "",
+    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/WAM/20231014/",
+    "density_file_name": "IPE_State.apex.*.h5",
     "grid_coordinate_file": "IPE_Grid.h5",
     "run_radar_beam_resolution": false,
     "max_ground_range_km": 3000,
@@ -49,5 +49,20 @@
         "edens": [1e4, 1e6],
         "ref_indx": [0.6, 0.95]
     },
-    "to_netcdf": false
+    "to_netcdf": false,
+    "wam_paramteres": {
+        "coordinates": {
+            "nmp": 80,
+            "nlp": 170, 
+            "iDIM": 1115,
+            "napex": 3,
+            "grid_name": "apex_grid"
+        },
+        "dataset_name": "apex",
+        "density_params": [
+            "o_plus_density", "h_plus_density", "he_plus_density",
+            "n_plus_density", "no_plus_density", "n2_plus_density",
+            "o2_plus_density", "o_plus_2D_density", "o_plus_2P_density"
+        ]
+    }
 }

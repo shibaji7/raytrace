@@ -109,6 +109,7 @@ class Fan(object):
             ax.overaly_eclipse_path(self.lay_eclipse, lineWidth=0.2)
         if self.terminator:
             from cartopy.feature.nightshade import Nightshade
+
             ax.add_feature(Nightshade(self.date, alpha=1))
         return ax
 

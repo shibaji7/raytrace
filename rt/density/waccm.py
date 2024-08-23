@@ -1,3 +1,4 @@
+import datetime as dt
 import os
 
 import numpy as np
@@ -5,7 +6,6 @@ import utils
 import xarray as xr
 from loguru import logger
 from scipy.io import loadmat, savemat
-import datetime as dt
 
 
 class WACCMX2d(object):

@@ -332,8 +332,7 @@ class Plots(object):
                 "plasma",
                 r"$f_0$ [MHz]",
                 colors.Normalize(
-                    self.cfg.ray_trace_plot_lim.pf[0],
-                    self.cfg.ray_trace_plot_lim.pf[1]
+                    self.cfg.ray_trace_plot_lim.pf[0], self.cfg.ray_trace_plot_lim.pf[1]
                 ),
             )
         if kind == "edens":
@@ -343,7 +342,7 @@ class Plots(object):
                 r"$N_e$ [$/m^{-3}$]",
                 colors.LogNorm(
                     self.cfg.ray_trace_plot_lim.edens[0],
-                    self.cfg.ray_trace_plot_lim.edens[1]
+                    self.cfg.ray_trace_plot_lim.edens[1],
                 ),
             )
         if kind == "ref_indx":
@@ -353,7 +352,7 @@ class Plots(object):
                 r"$\eta$",
                 colors.Normalize(
                     self.cfg.ray_trace_plot_lim.ref_indx[0],
-                    self.cfg.ray_trace_plot_lim.ref_indx[1]
+                    self.cfg.ray_trace_plot_lim.ref_indx[1],
                 ),
             )
         return o, cmap, label, norm

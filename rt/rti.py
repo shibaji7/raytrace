@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import utils as utils
-from matplotlib.dates import DateFormatter
 from loguru import logger
+from matplotlib.dates import DateFormatter
 
 plt.style.use(["science", "ieee"])
 plt.rcParams["font.family"] = "sans-serif"
@@ -18,7 +18,9 @@ class RangeTimeIntervalPlot(object):
     Create plots for velocity, width, power, elevation angle, etc.
     """
 
-    def __init__(self, nrang, dates, rad, fig_title="", num_subplots=3, srange_type="slist"):
+    def __init__(
+        self, nrang, dates, rad, fig_title="", num_subplots=3, srange_type="slist"
+    ):
         self.nrang = nrang
         self.unique_gates = np.linspace(1, nrang, nrang)
         self.rad = rad
@@ -74,8 +76,15 @@ class RangeTimeIntervalPlot(object):
         ax.set_ylim([0, self.nrang])
         ax.set_ylabel("Range gate", fontdict={"size": 12, "fontweight": "bold"})
         im = ax.pcolormesh(
-            X, Y, Z.T, lw=0.01, edgecolors="None", cmap=cmap, vmax=p_max, vmin=p_min,
-            zorder=3
+            X,
+            Y,
+            Z.T,
+            lw=0.01,
+            edgecolors="None",
+            cmap=cmap,
+            vmax=p_max,
+            vmin=p_min,
+            zorder=3,
         )
         if color_bar:
             self._add_colorbar(im, self.fig, ax, label=label)
@@ -88,12 +97,15 @@ class RangeTimeIntervalPlot(object):
         file = f"datasets/eclipse_path/{self.dates[0].strftime('%Y-%m-%d')}/oc.{self.rad}.{beam}.csv"
         logger.info(f"Overlay eclipse path from file: {file}")
         # Add eclipses
-        o = pd.read_csv( file, parse_dates=["dates"], )
+        o = pd.read_csv(
+            file,
+            parse_dates=["dates"],
+        )
         o = o[(o.dates >= self.dates[0]) & (o.dates <= self.dates[1])]
         srange = (
-            np.arange(101) 
-            if self.srange_type == "slist" else
-            180 + (45 * np.arange(101))
+            np.arange(101)
+            if self.srange_type == "slist"
+            else 180 + (45 * np.arange(101))
         )
         tags = [f"gate_{i}" for i in range(101)]
         p = o[tags].values

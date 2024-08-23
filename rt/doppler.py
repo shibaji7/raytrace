@@ -147,9 +147,12 @@ class Doppler(object):
         # now we implemented as if modified rays observed a difference from
         # baseline.
         d_ne = (
-            10 ** event_ne_fn(
+            10
+            ** event_ne_fn(
                 event_ray_path["ground_range"], event_ray_path["height"], grid=False
-            ) - 10 ** base_ne_fn(
+            )
+            - 10
+            ** base_ne_fn(
                 event_ray_path["ground_range"], event_ray_path["height"], grid=False
             )
         ) * self.cfg.doppler_multiplier
@@ -167,7 +170,11 @@ class Doppler(object):
             np.array(d_frq_dne), np.array(event_ray_path["ground_range"])
         )
         # Compute total change in Doppler frequency due to change in reflection height
-        dh = (event_ray_path["height"].max() - base_ray_path["height"].max()) * 1e3 * self.cfg.doppler_multiplier
+        dh = (
+            (event_ray_path["height"].max() - base_ray_path["height"].max())
+            * 1e3
+            * self.cfg.doppler_multiplier
+        )
         frq_dh = (
             (-2.0 * frequency * 1e6 / utils.pconst["c"])
             * (dh / (delt))
@@ -246,17 +253,17 @@ class Doppler(object):
                         srange = ray["geometric_distance"]
                         gate = int((srange - frange) / rsep)
                         d = dict(
-                                time=doppler["doppler"]["time"],
-                                srange=srange,
-                                bmnum=beam,
-                                slist=gate,
-                                vel_tot=ray["vel_tot"],
-                                frq_dne=ray["frq_dne"],
-                                vel_dne=ray["vel_dne"],
-                                frq_dh=ray["frq_dh"],
-                                vel_dh=ray["vel_dh"],
-                                pharlap_doppler_vel=ray["pharlap_doppler_vel"],
-                                pharlap_doppler_shift=ray["pharlap_doppler_shift"],
+                            time=doppler["doppler"]["time"],
+                            srange=srange,
+                            bmnum=beam,
+                            slist=gate,
+                            vel_tot=ray["vel_tot"],
+                            frq_dne=ray["frq_dne"],
+                            vel_dne=ray["vel_dne"],
+                            frq_dh=ray["frq_dh"],
+                            vel_dh=ray["vel_dh"],
+                            pharlap_doppler_vel=ray["pharlap_doppler_vel"],
+                            pharlap_doppler_shift=ray["pharlap_doppler_shift"],
                         )
                     except:
                         logger.error(f"Loading {file} error")

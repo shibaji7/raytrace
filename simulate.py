@@ -33,7 +33,7 @@ class RadarSimulation(object):
     ) -> None:
         import utils
 
-        ## Kill all Matlab Server Hosts for this run 
+        ## Kill all Matlab Server Hosts for this run
         os.system("killall MathWorksServiceHost.")
 
         self.cfg_file = cfg_file
@@ -136,6 +136,7 @@ class RadarSimulation(object):
         from gitm import GITM2d
         from iri import IRI2d
         from waccm import WACCMX2d
+        from wamipe import WAMIPE2d
 
         if self.model == "iri":
             self.eden_model = IRI2d(self.cfg, self.start_time)
@@ -145,6 +146,8 @@ class RadarSimulation(object):
             self.eden_model = WACCMX2d(self.cfg, self.start_time)
         elif self.model == "gemini":
             self.eden_model = GEMINI2d(self.cfg, self.start_time)
+        elif self.model == "wamipe":
+            self.eden_model = WAMIPE2d(self.cfg, self.start_time)
         else:
             raise ValueError(
                 f"Currently supporting following methods: iri, gitm, waccm-x, and wamipe, and you provided '{self.model}'"
@@ -269,15 +272,18 @@ class RadarSimulation(object):
                 zparam="vel_tot",
                 lay_eclipse=self.cfg.event_type.eclipse,
             )
-        filepath = utils.get_folder(
-            self.rad,
-            self.beam,
-            self.start_time,
-            self.model,
-            self.base_output_folder,
-        ) + "/rti.png"
+        filepath = (
+            utils.get_folder(
+                self.rad,
+                self.beam,
+                self.start_time,
+                self.model,
+                self.base_output_folder,
+            )
+            + "/rti.png"
+        )
         logger.info(f"File: {filepath}")
-        rtint.save( filepath )
+        rtint.save(filepath)
         rtint.close()
         if self.cfg.to_netcdf:
             fname = os.path.join(
@@ -401,11 +407,11 @@ class RadarSimulation(object):
 zoomed_in = []
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--beam", default=0, help="Radar beam number", type=int)
+    parser.add_argument("-b", "--beam", default=11, help="Radar beam number", type=int)
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/rt2d_gemini_May2017_tid.json",
+        default="cfg/rt2d_wam_eclipse.json",
         help="Configuration file",
         type=str,
     )

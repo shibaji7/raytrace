@@ -42,9 +42,7 @@ class GEMINI2d(object):
         Load grid file
         """
         logger.info(f"Loading GEMINI Grid files")
-        self.ccord_file = (
-            self.cfg.density_file_location + self.cfg.grid_coordinate_file
-        )
+        self.ccord_file = self.cfg.density_file_location + self.cfg.grid_coordinate_file
         self.grid = pd.DataFrame()
         with h5py.File(self.ccord_file, "r") as fkey:
             self.grid["glat"] = np.array(fkey.get("glat")[0]).tolist()

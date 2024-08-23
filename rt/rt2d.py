@@ -111,8 +111,7 @@ class RadarBeam2dTrace(object):
             lats, lons = [], []
             gc = GC(p, p)
             dist = np.linspace(
-                0, self.cfg.max_ground_range_km, 
-                self.cfg.number_of_ground_step_km
+                0, self.cfg.max_ground_range_km, self.cfg.number_of_ground_step_km
             )
             for d in dist:
                 x = gc.destination(p, bearing, distance=d)

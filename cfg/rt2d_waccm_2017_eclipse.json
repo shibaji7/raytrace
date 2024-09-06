@@ -4,9 +4,9 @@
     "rad": "fhw",
     "beam": 11,
     "project_name": "Aug2017_waccm_eclipse",
-    "event": "2017-08-21T16:10",
+    "event": "2017-08-21T16",
     "time_window": 180,
-    "time_gaps": 10,
+    "time_gaps": 5,
     "event_type":{
         "eclipse": true,
         "tid": false

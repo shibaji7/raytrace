@@ -48,6 +48,7 @@ class RangeTimeIntervalPlot(object):
         cmap: str = "Spectral",
         color_bar: bool = True,
         lay_eclipse: bool = False,
+        kind: str = "pcolor",
     ):
         ax = self._add_axis()
         df = df[df.bmnum == beam]
@@ -75,17 +76,31 @@ class RangeTimeIntervalPlot(object):
         ax.set_xlim([self.dates[0], self.dates[-1]])
         ax.set_ylim([0, self.nrang])
         ax.set_ylabel("Range gate", fontdict={"size": 12, "fontweight": "bold"})
-        im = ax.pcolormesh(
-            X,
-            Y,
-            Z.T,
-            lw=0.01,
-            edgecolors="None",
-            cmap=cmap,
-            vmax=p_max,
-            vmin=p_min,
-            zorder=3,
-        )
+        if kind == "pcolor":
+            im = ax.pcolormesh(
+                X,
+                Y,
+                Z.T,
+                lw=0.01,
+                edgecolors="None",
+                cmap=cmap,
+                vmax=p_max,
+                vmin=p_min,
+                zorder=3,
+            )
+        else:
+            im = ax.scatter(
+                df.time,
+                df.slist,
+                c=df[zparam],
+                marker="s",
+                s=5,
+                edgecolors="None",
+                cmap=cmap,
+                vmax=p_max,
+                vmin=p_min,
+                zorder=3,
+            )
         if color_bar:
             self._add_colorbar(im, self.fig, ax, label=label)
         ax.text(0.01, 0.95, title, ha="left", va="center", transform=ax.transAxes)

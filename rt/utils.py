@@ -154,18 +154,19 @@ def smooth(x, window_len=11, window="hanning"):
     return y
 
 
-def create_movie(folder, outfile, pat, fps=1):
+def create_movie(folder, outfile, pat, fps=3, out_fold=None):
     """
     Create movies from pngs
     """
     files = glob.glob(f"{folder}/{pat}")
     files.sort()
 
+    out_fold = out_fold if out_fold else folder
     fourcc = cv2.VideoWriter_fourcc(*"XVID")
     img = cv2.imread(files[0])
     height, width, layers = img.shape
     size = (int(width / 2) * 2, int(height / 2) * 2)
-    video = cv2.VideoWriter(folder + "/" + outfile, fourcc, fps, size)
+    video = cv2.VideoWriter(out_fold + "/" + outfile, fourcc, fps, size)
     for idx in range(len(files)):
         im = cv2.imread(files[idx])
         im = cv2.resize(im, size)
@@ -175,11 +176,12 @@ def create_movie(folder, outfile, pat, fps=1):
     return
 
 
-def create_mp4(folder, pat, outfile, fps=3):
+def create_mp4(folder, pat, outfile, fps=3, out_fold=None):
     import os
 
+    out_fold = out_fold if out_fold else folder
     cmd = f"""
-    ffmpeg -framerate {fps} -pattern_type glob -i '{folder}/{pat}' -c:v libx264 {folder}/{outfile}
+    ffmpeg -framerate {fps} -pattern_type glob -i '{folder}/{pat}' -c:v libx264 {out_fold}/{outfile}
     """
     os.system(cmd)
     return

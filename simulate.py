@@ -271,6 +271,7 @@ class RadarSimulation(object):
                 title="",
                 zparam="vel_tot",
                 lay_eclipse=self.cfg.event_type.eclipse,
+                # kind="scatter",
             )
         filepath = (
             utils.get_folder(
@@ -411,7 +412,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/rt2d_wam_eclipse.json",
+        default="cfg/rt2d_waccm_2017_eclipse.json",
         help="Configuration file",
         type=str,
     )

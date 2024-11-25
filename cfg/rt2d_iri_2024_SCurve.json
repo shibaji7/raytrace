@@ -1,0 +1,53 @@
+{
+    "verbose": true,
+    "model": "iri",
+    "rad": "bks",
+    "beam": 11,
+    "project_name": "April2024_iri_eclipse",
+    "event": "2024-04-08T17:30",
+    "time_window": 10,
+    "time_gaps": 1,
+    "event_type":{
+        "eclipse": true,
+        "tid": false
+    },
+    "density_file_location": null,
+    "density_file_name": null,
+    "grid_coordinate_file": null,
+    "run_radar_beam_resolution": false,
+    "max_ground_range_km": 4000,
+    "number_of_ground_step_km": 100,
+    "slant_gate_of_radar": 100,
+    "start_height_km": 100,
+    "end_height_km": 400,
+    "height_incriment_km": 1,
+    "scale": "log",
+    "kind": "linear",
+    "frequency": 11.5,
+    "start_elevation": 5,
+    "end_elevation": 60,
+    "elevation_inctiment": 0.1,
+    "nhops": 1,
+    "rise_time_sec": 60,
+    "threshold": 1e-5,
+    "radius_earth": 6371,
+    "iri_param": {
+        "iri_version": 20,
+        "start_mask_time": "2024-04-08T17:30"
+    },
+    "base_eclipse_folder": "datasets/eclipse_path/",
+    "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",
+    "sd_file_type": "fitacf",
+    "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
+    "project_save_location": "/home/shibaji/OneDrive/trace/outputs/",
+    "frange": 180,
+    "rsep": 45,
+    "worker": 0,
+    "ray_trace_plot_kind": "pf",
+    "ray_trace_plot_lim": {
+        "pf": [4, 6],
+        "edens": [1e4, 1e6],
+        "ref_indx": [0.6, 0.95]
+    },
+    "to_netcdf": false
+}

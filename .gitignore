@@ -10,6 +10,7 @@ tmp/
 outputs/
 figures/
 *.png
+*nohup*
 
 # Distribution / packaging
 .Python

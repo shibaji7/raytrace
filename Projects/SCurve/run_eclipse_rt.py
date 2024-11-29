@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""run_eclipse_rt.py: Analyze the eclipse related items for IRI 2024"""
+"""run_eclipse_rt.py: Analyze the eclipse related SCurve runs"""
 
 __author__ = "Chakraborty, S."
 __copyright__ = ""

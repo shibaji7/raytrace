@@ -139,7 +139,6 @@ def create_zoomed_rti_rays(cfg, beam):
             zparam="vel_tot",
             lay_eclipse=cfg.event_type.eclipse,
         )
-    print(records.head())
     rtint.save(os.path.join(CD_STEPS, _DIR_, f"{cfg.rad}.{start.strftime('%Y%m%d')}.png"))
     rtint.close()
     return

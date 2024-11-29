@@ -165,7 +165,7 @@ class RadarSimulation(object):
         return
 
     def _run_rt_(self, event):
-        from rays import Plots
+        from rays import PlotRays
         from rt2d import RadarBeam2dTrace
 
         rto = RadarBeam2dTrace(
@@ -197,7 +197,7 @@ class RadarSimulation(object):
 
         # Create RT figures
         if not os.path.exists(rto.fig_name):
-            plot = Plots(event, self.cfg, rto, self.rad, self.beam)
+            plot = PlotRays(event, self.cfg, rto, self.rad, self.beam)
             plot.lay_rays(kind=self.cfg.ray_trace_plot_kind, zoomed_in=zoomed_in)
             plot.save(rto.fig_name)
             plot.close()

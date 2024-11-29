@@ -34,7 +34,8 @@
     "doppler_multiplier": 1,
     "iri_param": {
         "iri_version": 20,
-        "start_mask_time": "2024-04-08T17:30"
+        "start_mask_time": "2024-04-08T17:30",
+        "eclipse_shadow_multiplier": 0.6
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",

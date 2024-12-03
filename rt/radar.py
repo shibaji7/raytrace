@@ -93,7 +93,6 @@ class Radar(object):
                     records += reader.read_fitacf()
             if len(records) > 0:
                 self.__tocsv__(records)
-        print(self.df.head())
         if "lat" not in self.df.columns:
             self.df.tfreq = np.round(np.array(self.df.tfreq) / 1e3, 1)
             self.update_location_details()

@@ -80,6 +80,7 @@ class Radar(object):
             self.cfg.tmp_sd_folder,
             f"{self.rad}.{self.type}.{self.dates[0].strftime('%Y%m%d')}.csv",
         )
+        logger.info(f"Searching file: {self.fname}")
         os.makedirs(self.cfg.tmp_sd_folder, exist_ok=True)
         if os.path.exists(self.fname):
             self.df = pd.read_csv(self.fname, parse_dates=["time"])
@@ -92,10 +93,12 @@ class Radar(object):
                     records += reader.read_fitacf()
             if len(records) > 0:
                 self.__tocsv__(records)
+        print(self.df.head())
         if "lat" not in self.df.columns:
             self.df.tfreq = np.round(np.array(self.df.tfreq) / 1e3, 1)
             self.update_location_details()
         self.check_the_sounding_mode()
+        self.df["srange"] = self.df.frang + (self.df.slist * self.df.rsep)
         return
 
     def create_eclipse_shadow(self):
@@ -418,25 +421,26 @@ if __name__ == "__main__":
     fname = "cfg/rt2d.json"
     with open(fname, "r") as f:
         cfg = json.load(f, object_hook=lambda x: SimpleNamespace(**x))
-    dates = [dt.datetime(2024, 4, 8), dt.datetime(2024, 4, 9)]
-    Radar("bks", dates, cfg)
-    Radar("fhe", dates, cfg)
-    Radar("fhw", dates, cfg)
-    Radar("kap", dates, cfg)
-    Radar("gbr", dates, cfg)
-    dates = [dt.datetime(2017, 8, 21), dt.datetime(2017, 8, 22)]
-    Radar("fhe", dates, cfg)
-    Radar("fhw", dates, cfg)
-    Radar("cve", dates, cfg)
-    Radar("cvw", dates, cfg)
-    dates = [dt.datetime(2023, 10, 14), dt.datetime(2023, 10, 15)]
-    Radar("fhe", dates, cfg)
-    Radar("fhw", dates, cfg)
-    Radar("cve", dates, cfg)
-    Radar("cvw", dates, cfg)
-    dates = [dt.datetime(2021, 12, 4), dt.datetime(2021, 12, 5)]
-    Radar("fir", dates, cfg)
+    # dates = [dt.datetime(2024, 4, 8), dt.datetime(2024, 4, 9)]
+    # Radar("bks", dates, cfg)
+    # Radar("fhe", dates, cfg)
+    # Radar("fhw", dates, cfg)
+    # Radar("kap", dates, cfg)
+    # Radar("gbr", dates, cfg)
+    # dates = [dt.datetime(2017, 8, 21), dt.datetime(2017, 8, 22)]
+    # Radar("fhe", dates, cfg)
+    # Radar("fhw", dates, cfg)
+    # Radar("cve", dates, cfg)
+    # Radar("cvw", dates, cfg)
+    # dates = [dt.datetime(2023, 10, 14), dt.datetime(2023, 10, 15)]
+    # Radar("fhe", dates, cfg)
+    # Radar("fhw", dates, cfg)
+    # Radar("cve", dates, cfg)
+    # Radar("cvw", dates, cfg)
+    # dates = [dt.datetime(2021, 12, 4), dt.datetime(2021, 12, 5)]
+    # Radar("fir", dates, cfg)
     # Load TID observations
     dates = [dt.datetime(2017, 5, 27), dt.datetime(2017, 5, 28)]
     Radar("fhe", dates, cfg)
     Radar("fhw", dates, cfg)
+    Radar("bks", dates, cfg)

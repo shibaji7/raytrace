@@ -53,7 +53,7 @@ class RangeTimeIntervalPlot(object):
         ax = self._add_axis()
         df = df[df.bmnum == beam]
         X, Y, Z = utils.get_gridded_parameters(
-            df, xparam="time", yparam="slist", zparam=zparam, rounding=False
+            df, xparam="time", yparam=self.srange_type, zparam=zparam, rounding=False
         )
         cmap = mpl.cm.get_cmap(cmap)
         # Configure axes
@@ -74,7 +74,7 @@ class RangeTimeIntervalPlot(object):
             ax.xaxis.set_minor_formatter(DateFormatter(r"%H^{%M}"))
         ax.set_xlabel(xlabel, fontdict={"size": 12, "fontweight": "bold"})
         ax.set_xlim([self.dates[0], self.dates[-1]])
-        ax.set_ylim([0, self.nrang])
+        ax.set_ylim([0, self.nrang if self.srange_type=="slist" else 180 + self.nrang*45])
         ax.set_ylabel("Range gate", fontdict={"size": 12, "fontweight": "bold"})
         if kind == "pcolor":
             im = ax.pcolormesh(

@@ -93,6 +93,30 @@ def plot_ls(beam, cfg):
         plot.close()
     return
 
+def create_rtis_by_radars(cfg, beam, rads=["fhe"]):
+    global CD_STEPS, ELV_RANGE, _DIR_
+    start = dt.datetime(2017,5,27,14)
+    end = dt.datetime(2017,5,28)
+    rtint = RangeTimeIntervalPlot(
+        100, [start, end], cfg.rad, fig_title="", num_subplots=len(rads),
+        srange_type="srange"
+    )
+    for rad in rads:
+        radr = radar.Radar(rad, [start, end], cfg)
+        fig_title = f"{cfg.rad.upper()}-{'%02d'%beam}, {cfg.frequency} MHz /\t {start.strftime('%d %b, %Y')}"
+        print(radr.df.head(), radr.df.columns)
+        rtint.addParamPlot(
+            radr.df.copy(),
+            beam,
+            title=f"Observation / {fig_title}",
+            xlabel="",
+            lay_eclipse=None,
+        )
+    file = os.path.join(CD_STEPS, _DIR_, f"{cfg.rad}.{start.strftime('%Y%m%d')}.png")
+    logger.info(f"Save to file: {file}")
+    rtint.save(file)
+    rtint.close()
+    return
 
 def create_zoomed_rti_rays(cfg, beam):
     global CD_STEPS, ELV_RANGE, _DIR_
@@ -163,4 +187,5 @@ if __name__ == "__main__":
     cfg = utils.read_params_2D(args.cfg_file)
     cfg.event = dparser.isoparse(cfg.event)
     # plot_ls(args.beam, cfg)
-    create_zoomed_rti_rays(cfg, args.beam)
+    # create_zoomed_rti_rays(cfg, args.beam)
+    create_rtis_by_radars(cfg, args.beam)

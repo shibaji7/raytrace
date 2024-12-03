@@ -62,7 +62,7 @@ def load_files():
 
 def plot_ls(beam, cfg):
     global CD_STEPS, _DIR_, DATES, ZOOMED_IN
-    from iri import IRI2d
+    from gemini import GEMINI2d
     from rays import PlotRays
     from rt2d import RadarBeam2dTrace
 
@@ -82,10 +82,10 @@ def plot_ls(beam, cfg):
             cfg.model,
             base_output_folder,
         )
-        model = IRI2d(cfg, cfg.event)
+        model = GEMINI2d(cfg, d)
         eden = model.load_from_file(rto.edensity_file)
         rto.load_rto(eden)
-        plot = PlotRays(cfg.event, cfg, rto, cfg.rad, beam, xlim=[0, 1600])
+        plot = PlotRays(d, cfg, rto, cfg.rad, beam, xlim=[0, 1600])
         plot.lay_rays(kind=cfg.ray_trace_plot_kind, zoomed_in=ZOOMED_IN)
         file = os.path.join(CD_STEPS, _DIR_, f"{d.strftime('%Y%m%d.%H%M')}.png")
         logger.info(f"Saved to file: {file}")
@@ -104,7 +104,6 @@ def create_rtis_by_radars(cfg, beam, rads=["fhe"]):
     for rad in rads:
         radr = radar.Radar(rad, [start, end], cfg)
         fig_title = f"{cfg.rad.upper()}-{'%02d'%beam}, {cfg.frequency} MHz /\t {start.strftime('%d %b, %Y')}"
-        print(radr.df.head(), radr.df.columns)
         rtint.addParamPlot(
             radr.df.copy(),
             beam,
@@ -186,6 +185,6 @@ if __name__ == "__main__":
 
     cfg = utils.read_params_2D(args.cfg_file)
     cfg.event = dparser.isoparse(cfg.event)
-    # plot_ls(args.beam, cfg)
+    plot_ls(args.beam, cfg)
     # create_zoomed_rti_rays(cfg, args.beam)
-    create_rtis_by_radars(cfg, args.beam)
+    # create_rtis_by_radars(cfg, args.beam)

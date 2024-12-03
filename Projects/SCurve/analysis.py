@@ -11,17 +11,19 @@ __maintainer__ = "Chakraborty, S."
 __email__ = "chakras4@erau.edu"
 __status__ = "Research"
 
+import argparse
 import os
 import sys
-import argparse
-from loguru import logger
+
 from dateutil import parser as dparser
+from loguru import logger
 
 sys.path.extend([".", "rt/", "rt/density/"])
 import utils
 
 CD_STEPS = ""
 _DIR_ = "figures/zoomed/"
+
 
 def add_sys_paths():
     """Adding /rt to sys path"""
@@ -44,13 +46,15 @@ def add_sys_paths():
     os.makedirs(os.path.join(CD_STEPS, _DIR_), exist_ok=True)
     return
 
+
 def load_files():
     return
 
+
 def plot_ls(beam, cfg):
+    from iri import IRI2d
     from rays import PlotRays
     from rt2d import RadarBeam2dTrace
-    from iri import IRI2d
 
     base_output_folder = os.path.join(
         CD_STEPS,
@@ -78,6 +82,7 @@ def plot_ls(beam, cfg):
     plot.save(file)
     plot.close()
     return
+
 
 if __name__ == "__main__":
     add_sys_paths()

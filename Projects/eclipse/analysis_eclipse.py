@@ -11,11 +11,12 @@ __maintainer__ = "Chakraborty, S."
 __email__ = "shibaji7@vt.edu"
 __status__ = "Research"
 
+import argparse
 import os
 import sys
-import argparse
-from loguru import logger
+
 from dateutil import parser as dparser
+from loguru import logger
 
 CD_STEPS = ""
 _DIR_ = "figures/movies/"
@@ -46,18 +47,19 @@ def add_sys_paths():
 add_sys_paths()
 import utils
 
+
 def create_movies(cfg, args):
     base_output_folder = os.path.join(
-        cfg.project_save_location, cfg.project_name,
-        cfg.event.strftime("%Y-%m-%d"), cfg.rad,
-        "%02d"%args.beam, cfg.model
+        cfg.project_save_location,
+        cfg.project_name,
+        cfg.event.strftime("%Y-%m-%d"),
+        cfg.rad,
+        "%02d" % args.beam,
+        cfg.model,
     )
     to_local = os.path.join(CD_STEPS, _DIR_)
     utils.create_movie(
-        base_output_folder, 
-        f"movie_{'%02d'%args.beam}.avi",
-        "*.png",
-        out_fold=to_local
+        base_output_folder, f"movie_{'%02d'%args.beam}.avi", "*.png", out_fold=to_local
     )
     return
 

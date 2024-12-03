@@ -90,17 +90,17 @@ class WACCMX2d(object):
         ds.close()
         del ds
         return
-    
+
     def find_time_index(self, t):
         """Finds the index of the interval in the array where the number falls.
 
         Returns:
-            The index of the interval where the number falls, or -1 if the number is 
+            The index of the interval where the number falls, or -1 if the number is
             outside the range of the array.
         """
         for i in range(len(self.store["time"]) - 1):
             if self.store["time"][i] <= t < self.store["time"][i + 1]:
-                return i, i+1
+                return i, i + 1
         return -1, 0
 
     def fetch_dataset(
@@ -120,22 +120,24 @@ class WACCMX2d(object):
         else:
             # Select the two index if timestamp in the simulation
             i, j = self.find_time_index(time)
-            logger.info(f"{time}/ into between timestamp {self.store['time'][i]} & {self.store['time'][j]}")
-            weights = (self.store["time"][1]-self.store["time"][0]).total_seconds()
+            logger.info(
+                f"{time}/ into between timestamp {self.store['time'][i]} & {self.store['time'][j]}"
+            )
+            weights = (self.store["time"][1] - self.store["time"][0]).total_seconds()
             px, _ = self.fetch_interpolated_data(lats, lons, alts, i)
             py, self.alts = self.fetch_interpolated_data(lats, lons, alts, j)
             i_wg, j_wg = (
-                (time-self.store["time"][i]).total_seconds()/weights,
-                (self.store["time"][j]-time).total_seconds()/weights,
+                (time - self.store["time"][i]).total_seconds() / weights,
+                (self.store["time"][j] - time).total_seconds() / weights,
             )
-            self.param = px*i_wg + py*j_wg
-        
+            self.param = px * i_wg + py * j_wg
+
         if to_file:
             savemat(to_file, dict(ne=self.param))
         return self.param, self.alts
-    
+
     def fetch_interpolated_data(
-        self, 
+        self,
         lats,
         lons,
         alts,
@@ -160,7 +162,6 @@ class WACCMX2d(object):
             )
             ix += 1
         return out, galt
-        
 
     def load_from_file(self, to_file: str):
         logger.info(f"Load from file {to_file.split('/')[-1]}")

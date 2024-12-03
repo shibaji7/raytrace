@@ -260,9 +260,9 @@ class Plots(object):
         rays = self.trace_obj.rays
         self.elvs = rays.elvs
         self.elvs = (
-            self.elvs 
-            if (elv_range is None) or (len(elv_range) < 2) else 
-            self.elvs[(self.elvs>=elv_range[0]) & (self.elvs<=elv_range[1])]
+            self.elvs
+            if (elv_range is None) or (len(elv_range) < 2)
+            else self.elvs[(self.elvs >= elv_range[0]) & (self.elvs <= elv_range[1])]
         )
         for i, elv in enumerate(self.elvs):
             ray_path_data, ray_data = (
@@ -375,7 +375,7 @@ class Plots(object):
 
 class PlotRays(object):
 
-    def __init__(self, event, cfg, trace_obj, rad, beam):
+    def __init__(self, event, cfg, trace_obj, rad, beam, ylim=[], xlim=[]):
         self.event = event
         self.cfg = cfg
         self.trace_obj = trace_obj
@@ -384,8 +384,10 @@ class PlotRays(object):
         self.ref_indx = np.sqrt(1 - (self.pf**2 / cfg.frequency**2))
         self.rad = rad
         self.beam = beam
+        self.xlim = xlim
+        self.ylim = ylim
         return
-    
+
     def save(self, filepath):
         self.fig.savefig(filepath, bbox_inches="tight", facecolor=(1, 1, 1, 1))
         return
@@ -394,7 +396,6 @@ class PlotRays(object):
         self.fig.clf()
         plt.close()
         return
-    
 
     def get_parameter(self, kind):
         import matplotlib.colors as colors
@@ -429,7 +430,7 @@ class PlotRays(object):
                 ),
             )
         return o, cmap, label, norm
-    
+
     def lay_rays(self, kind="pf", zoomed_in=[], elv_range=[]):
         self.create_figure_pane()
 
@@ -457,19 +458,16 @@ class PlotRays(object):
         rays = self.trace_obj.rays
         self.elvs = rays.elvs
         self.elvs = (
-            self.elvs 
-            if (elv_range is None) or (len(elv_range) < 2) else 
-            self.elvs[(self.elvs>=elv_range[0]) & (self.elvs<=elv_range[1])]
+            self.elvs
+            if (elv_range is None) or (len(elv_range) < 2)
+            else self.elvs[(self.elvs >= elv_range[0]) & (self.elvs <= elv_range[1])]
         )
         for i, elv in enumerate(self.elvs):
             ray_path_data, ray_data = (
                 rays.ray_path_data[elv],
                 rays.simulation[elv]["ray_data"],
             )
-            th, r = (
-                ray_path_data.ground_range.copy(),
-                ray_path_data.height.copy()
-            )
+            th, r = (ray_path_data.ground_range.copy(), ray_path_data.height.copy())
             ray_label = ray_data["ray_label"]
             self.ax.plot(th, r, c="k", zorder=3, alpha=0.7, ls="-", lw=0.1)
             col = "k" if ray_label == 1 else "r"
@@ -483,19 +481,23 @@ class PlotRays(object):
         self.ax.text(
             0.05, 1.02, stitle, ha="left", va="center", transform=self.ax.transAxes
         )
-        
+
         # Create Zoomed in panel
         if len(zoomed_in):
             self.__zoomed_in_panel__(kind, zoomed_in)
         return
-    
+
     def create_figure_pane(self):
         self.fig = plt.figure(figsize=(8, 3), dpi=300)
         self.ax = self.fig.add_subplot(111)
         self.ax.set_ylabel(r"Height [km]")
         self.ax.set_xlabel(r"Ground range [km]")
-        self.ax.set_xlim([0, self.cfg.max_ground_range_km])
-        self.ax.set_ylim([0, self.cfg.end_height_km])
+        self.ax.set_xlim(
+            self.xlim if len(self.xlim) == 2 else [0, self.cfg.max_ground_range_km]
+        )
+        self.ax.set_ylim(
+            self.ylim if len(self.ylim) == 2 else [0, self.cfg.end_height_km]
+        )
         return
 
     def __zoomed_in_panel__(self, kind, zoomed_in):
@@ -524,15 +526,6 @@ class PlotRays(object):
             self.zoom_ax.get_xticklabels(),
             self.zoom_ax.get_yticklabels(),
         )
-        for t in th_ticklabels:
-            new_x = str(int(t._x * self.Re))
-            t.set_text("$\mathdefault{" + new_x + "}$")
-        self.zoom_ax.set_xticklabels(th_ticklabels)
-        for t in r_ticklabels:
-            new_y = str(int(t._y - self.Re))
-            t.set_text("$\mathdefault{" + new_y + "}$")
-        self.zoom_ax.set_yticklabels(r_ticklabels)
-
         self.zoom_ax.set_xlabel("Ground Range, [km]", fontdict={"size": 8})
         self.zoom_ax.set_ylabel("Height, [km]", fontdict={"size": 8})
         self.ax.indicate_inset_zoom(self.zoom_ax)

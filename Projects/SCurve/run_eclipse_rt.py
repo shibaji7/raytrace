@@ -11,23 +11,26 @@ __maintainer__ = "Chakraborty, S."
 __email__ = "chakras4@erau.edu"
 __status__ = "Research"
 
-import os
-import sys
 import argparse
-from loguru import logger
+import sys
+
 from dateutil import parser as dparser
+from loguru import logger
 
 sys.path.extend([".", "rt/", "rt/density/"])
 import utils
 
+
 def run_eclipse_rt(args):
     from simulate import RadarSimulation
+
     rs = RadarSimulation(beam=args.beam, cfg_file=args.cfg_file)
     rs.gerenate_fov_plot()
     rs.run_2d_simulation()
     rs.compute_doppler()
     rs.generate_rti()
     return
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

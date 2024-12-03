@@ -240,8 +240,13 @@ class Doppler(object):
 
     @staticmethod
     def fetch_by_scan_time(
-        event, rad, model, beams, base, 
-        frange=180, rsep=45,
+        event,
+        rad,
+        model,
+        beams,
+        base,
+        frange=180,
+        rsep=45,
     ):
         records = []
         for beam in beams:
@@ -291,8 +296,13 @@ class Doppler(object):
 
     @staticmethod
     def fetch_by_beam(
-        event, rad, model, beam, base, 
-        frange=180, rsep=45,
+        event,
+        rad,
+        model,
+        beam,
+        base,
+        frange=180,
+        rsep=45,
     ):
         folder = utils.get_folder(rad, beam, event, model, base)
         folder = os.path.join(folder, "Doppler")

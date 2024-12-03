@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""analysis_ped_mode.py: Analyze the pederson mode"""
+"""run_eclipse_rt.py: Analyze the eclipse related SCurve runs"""
 
 __author__ = "Chakraborty, S."
 __copyright__ = ""
@@ -8,7 +8,7 @@ __credits__ = []
 __license__ = "MIT"
 __version__ = "1.0."
 __maintainer__ = "Chakraborty, S."
-__email__ = "shibaji7@vt.edu"
+__email__ = "chakras4@erau.edu"
 __status__ = "Research"
 
 import argparse
@@ -19,15 +19,19 @@ import sys
 from dateutil import parser as dparser
 from loguru import logger
 
+sys.path.extend(["../../rt/", "../../rt/density/"])
+import radar
+import utils
+from doppler import Doppler
+from rti import RangeTimeIntervalPlot
+
 CD_STEPS = ""
-ZOOMED_IN = [[500, 1800], [150, 300]]
-ELV_RANGE = []
 _DIR_ = "figures/zoomed/"
 DATES = [
-    dt.datetime(2017, 5, 27, 19, 52),
-    dt.datetime(2017, 5, 27, 19, 53),
-    dt.datetime(2017, 5, 27, 19, 54),
+    dt.datetime(2017, 5, 27, 18, 0) + dt.timedelta(minutes=i * 10) for i in range(15)
 ]
+ZOOMED_IN = [[500, 1600], [150, 250]]
+ELV_RANGE = [5, 15]
 
 
 def add_sys_paths():
@@ -52,50 +56,47 @@ def add_sys_paths():
     return
 
 
-add_sys_paths()
-import radar
-import utils
-from doppler import Doppler
-from gemini import GEMINI2d
-from rays import Plots
-from rt2d import RadarBeam2dTrace
-from rti import RangeTimeIntervalPlot
+def load_files():
+    return
 
 
-def create_regionnal_plots(cfg, beam):
-    global CD_STEPS, ZOOMED_IN, ELV_RANGE, _DIR_
-    event = dparser.isoparse(cfg.event)
-    logger.info(f"Create regional plot for {cfg.rad}/{beam}/{event}")
+def plot_ls(beam, cfg):
+    global CD_STEPS, _DIR_, DATES, ZOOMED_IN
+    from iri import IRI2d
+    from rays import PlotRays
+    from rt2d import RadarBeam2dTrace
+
     base_output_folder = os.path.join(
         CD_STEPS,
         cfg.project_save_location,
         cfg.project_name,
     )
-    model = GEMINI2d(cfg, event)
-    for d in model.dates:
-        if d in DATES:
-            rto = RadarBeam2dTrace(
-                d,
-                cfg.rad,
-                beam,
-                cfg,
-                cfg.model,
-                base_output_folder,
-            )
-            eden = model.load_from_file(rto.edensity_file)
-            rto.load_rto(eden)
-            plot = Plots(event, cfg, rto, cfg.rad, beam)
-            plot.lay_rays(
-                kind=cfg.ray_trace_plot_kind, zoomed_in=ZOOMED_IN, elv_range=ELV_RANGE
-            )
-            plot.save(os.path.join(CD_STEPS, _DIR_, f"{d.strftime('%Y%m%d.%H%M')}.png"))
-            plot.close()
+    logger.info(f"Base folder: {base_output_folder}")
+    DATES.append(cfg.event)
+    for d in DATES:
+        rto = RadarBeam2dTrace(
+            d,
+            cfg.rad,
+            beam,
+            cfg,
+            cfg.model,
+            base_output_folder,
+        )
+        model = IRI2d(cfg, cfg.event)
+        eden = model.load_from_file(rto.edensity_file)
+        rto.load_rto(eden)
+        plot = PlotRays(cfg.event, cfg, rto, cfg.rad, beam, xlim=[0, 1600])
+        plot.lay_rays(kind=cfg.ray_trace_plot_kind, zoomed_in=ZOOMED_IN)
+        file = os.path.join(CD_STEPS, _DIR_, f"{d.strftime('%Y%m%d.%H%M')}.png")
+        logger.info(f"Saved to file: {file}")
+        plot.save(file)
+        plot.close()
     return
 
 
 def create_zoomed_rti_rays(cfg, beam):
     global CD_STEPS, ELV_RANGE, _DIR_
-    start = dparser.isoparse(cfg.event)
+    start = cfg.event
     end = start + dt.timedelta(minutes=int(cfg.time_window))
     radr = radar.Radar(cfg.rad, [start, end], cfg)
     logger.info(f"Create regional plot for {cfg.rad}/{beam}/{start}")
@@ -136,31 +137,30 @@ def create_zoomed_rti_rays(cfg, beam):
             zparam="vel_tot",
             lay_eclipse=cfg.event_type.eclipse,
         )
-    rtint.save(
-        os.path.join(CD_STEPS, _DIR_, f"{cfg.rad}.{start.strftime('%Y%m%d')}.png")
-    )
+    file = os.path.join(CD_STEPS, _DIR_, f"{cfg.rad}.{start.strftime('%Y%m%d')}.png")
+    logger.info(f"Save to file: {file}")
+    rtint.save(file)
     rtint.close()
     return
 
 
-zoomed_in = []
 if __name__ == "__main__":
+    add_sys_paths()
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--beam", default=11, help="Radar beam number", type=int)
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/rt2d_gemini_May2017_tid_high_res.json",
+        default="../../cfg/rt2d_gemini_May2017_tid.json",
         help="Configuration file",
         type=str,
     )
-    # parser.add_argument("-md", "--method", default="rt", help="Method rt/fan")
     args = parser.parse_args()
-    args.cfg_file = os.path.join(CD_STEPS, args.cfg_file)
     logger.info("\n Parameter list for simulation ")
     for k in vars(args).keys():
         print("     ", k, "->", str(vars(args)[k]))
 
     cfg = utils.read_params_2D(args.cfg_file)
-    create_regionnal_plots(cfg, args.beam)
+    cfg.event = dparser.isoparse(cfg.event)
+    # plot_ls(args.beam, cfg)
     create_zoomed_rti_rays(cfg, args.beam)

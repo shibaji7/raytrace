@@ -1,0 +1,56 @@
+{
+    "verbose": true,
+    "model": "iri",
+    "ray_source": {
+        "station_name": "wwv"
+    },
+    "ray_target": {
+        "station_name": "w2naf"
+    },
+    "project_name": "Aug2024_iri_eclipse_hamsci_SCurve",
+    "event": "2024-04-08T19:00",
+    "time_window": 240,
+    "time_gaps": 10,
+    "event_type":{
+        "eclipse": true,
+        "tid": false
+    },
+    "density_file_location": null,
+    "density_file_name": null,
+    "grid_coordinate_file": null,
+    "run_radar_beam_resolution": false,
+    "max_ground_range_km": 4000,
+    "number_of_ground_step_km": 100,
+    "slant_gate_of_radar": 100,
+    "start_height_km": 100,
+    "end_height_km": 400,
+    "height_incriment_km": 1,
+    "scale": "log",
+    "kind": "linear",
+    "frequency": 10,
+    "start_elevation": 5,
+    "end_elevation": 60,
+    "elevation_inctiment": 0.1,
+    "nhops": 1,
+    "rise_time_sec": 60,
+    "threshold": 1e-5,
+    "radius_earth": 6371,
+    "doppler_multiplier": 1,
+    "iri_param": {
+        "iri_version": 20,
+        "start_mask_time": "2024-04-08T17:00",
+        "eclipse_shadow_multiplier": 3
+    },
+    "base_eclipse_folder": "datasets/eclipse_path/",
+    "tmp_hamsci_folder": "/home/shibaji/OneDrive/trace/hamsci/",
+    "project_save_location": "/home/shibaji/OneDrive/trace/outputs/",
+    "psws_node_registry": "cfg/PSWS_Node_Registry.csv",
+    "worker": 0,
+    "ray_trace_plot_kind": "pf",
+    "ray_trace_plot_lim": {
+        "pf": [4, 6],
+        "edens": [1e4, 1e6],
+        "ref_indx": [0.6, 0.95]
+    },
+    "to_netcdf": false
+}

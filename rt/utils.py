@@ -81,6 +81,16 @@ def get_folder(rad, beam, date, model, base):
     os.makedirs(fold, exist_ok=True)
     return fold
 
+def get_hamsci_folder(source, date, model, base, call_sign=None):
+    """
+    Get folder by date
+    """
+    import os
+
+    fold = os.path.join(base, date.strftime("%Y-%m-%d"), source, model)
+    fold = os.path.join(fold, call_sign) if call_sign else fold
+    os.makedirs(fold, exist_ok=True)
+    return fold
 
 def read_params_2D(fname):
     with open(fname, "r") as f:

@@ -52,10 +52,9 @@ def load_files():
 
 
 def plot_ls(beam, cfg):
+    from iri import IRI2d
     from rays import PlotRays
     from rt2d import RadarBeam2dTrace
-
-    from iri import IRI2d
 
     base_output_folder = os.path.join(
         CD_STEPS,

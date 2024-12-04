@@ -237,6 +237,25 @@ class Fan(object):
                 for b in beams
             ]
         return ax
+    
+    def generate_ham_fov(self, ax, source:dict, stations:list=[]):
+        ax.overlay_point(
+            source["lat"], source["lon"], 
+            source["call_sign"], marker="D", 
+            markerColor="b", markerSize=4
+        )
+        for stn in stations:
+            ax.overlay_point(
+                stn["lat"], stn["lon"], 
+                stn["call_sign"], markerColor="r"
+            )
+            ax.plot(
+                [stn["lon"], stn["lat"]], 
+                [source["lon"], source["lat"]], color="b", 
+                lw=0.8, ls="-",
+                transform=self.geo
+            )
+        return ax
 
     def save(self, filepath):
         self.fig.savefig(filepath, bbox_inches="tight", facecolor=(1, 1, 1, 1))

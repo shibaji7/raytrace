@@ -103,7 +103,7 @@ def create_rtis_by_radars(cfg, beam, rads=["fhe", "fhw", "bks"]):
         [start, end],
         cfg.rad,
         fig_title="",
-        num_subplots=len(rads)+1,
+        num_subplots=len(rads) + 1,
         srange_type="srange",
     )
     for rad in rads:
@@ -122,7 +122,9 @@ def create_rtis_by_radars(cfg, beam, rads=["fhe", "fhw", "bks"]):
                 beam,
                 zparam="p_l",
                 title=f"Observation / {fig_title}",
-                label = r"Power, (dB)", p_max=18, p_min=3, 
+                label=r"Power, (dB)",
+                p_max=18,
+                p_min=3,
                 cmap="jet",
                 xlabel="",
                 lay_eclipse=None,

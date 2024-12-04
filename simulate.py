@@ -134,10 +134,9 @@ class RadarSimulation(object):
         logger.info(f"Inside {self.model.upper()} Simulation...")
         from gemini import GEMINI2d
         from gitm import GITM2d
+        from iri import IRI2d
         from waccm import WACCMX2d
         from wamipe import WAMIPE2d
-
-        from iri import IRI2d
 
         if self.model == "iri":
             self.eden_model = IRI2d(self.cfg, self.start_time)
@@ -246,8 +245,12 @@ class RadarSimulation(object):
         events = self.get_event_dates()
         fig_title = f"Model: {self.model.upper()} / {self.rad.upper()}-{'%02d'%self.beam}, {self.cfg.frequency} MHz \t {self.start_time.strftime('%d %b, %Y')}"
         rtint = RangeTimeIntervalPlot(
-            60, [events[0], events[-1]], self.rad, fig_title=fig_title, num_subplots=2,
-            srange_type="srange"
+            60,
+            [events[0], events[-1]],
+            self.rad,
+            fig_title=fig_title,
+            num_subplots=2,
+            srange_type="srange",
         )
         rtint.addParamPlot(
             self.radar.df.copy(),

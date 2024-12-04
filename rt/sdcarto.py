@@ -394,6 +394,7 @@ class SDCarto(GeoAxes):
         lats=np.linspace(0, 90, num=90 * 2),
         lons=np.linspace(-180, 180, num=91 * 2),
         alts=np.array([100]),
+        xpos=1.4,
     ):
         p, _, _ = eclipse.get_eclipse(self.plot_date, alts, lats, lons)
         p = np.ma.masked_invalid(p)[0, 0, :, :]
@@ -402,7 +403,7 @@ class SDCarto(GeoAxes):
             lats,
             p,
             transform=cartopy.crs.PlateCarree(),
-            cmap="gray_r",
+            cmap="Blues",
             alpha=0.6,
             levels=[0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0],
         )
@@ -410,7 +411,7 @@ class SDCarto(GeoAxes):
 
         utils.setsize(8)
         fig = self.get_figure()
-        cpos = [1.4, 0.1, 0.025, 0.6]
+        cpos = [xpos, 0.1, 0.025, 0.6]
         cax = self.inset_axes(cpos, transform=self.transAxes)
         cb = fig.colorbar(im, ax=self, cax=cax)
         cb.set_label("Obscuration")
@@ -602,6 +603,51 @@ class SDCarto(GeoAxes):
             orientation="horizontal",
         )
         cb.set_label(label)
+        return
+    
+    def overlay_point(
+        self,
+        lat, lon, call_sign,
+        tx=cartopy.crs.PlateCarree(),
+        marker="o",
+        zorder=2,
+        markerColor="k",
+        markerSize=2,
+        fontSize="xx-small",
+        font_color="k",
+        xOffset=5,
+        yOffset=-1.5,
+        annotate=True,
+    ):
+        """Adding the radar location"""
+        if "aacgm" in self.coords:
+            lat, lon = self.to_aagcm(lat, lon)
+        self.scatter(
+            [lon],
+            [lat],
+            s=markerSize,
+            marker=marker,
+            color=markerColor,
+            zorder=zorder,
+            transform=tx,
+            lw=0.8,
+            alpha=0.4,
+        )
+        if annotate:
+            lat, lon = lat + yOffset, lon + xOffset
+            if "aacgm" in self.coords:
+                lat, lon = self.to_aagcm(lat, lon)
+            x, y = self.projection.transform_point(lon, lat, src_crs=tx)
+            self.text(
+                x,
+                y,
+                call_sign.upper(),
+                ha="center",
+                va="center",
+                transform=self.projection,
+                fontdict={"color": font_color, "size": fontSize},
+                alpha=0.8,
+            )
         return
 
 

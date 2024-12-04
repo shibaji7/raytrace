@@ -131,9 +131,9 @@ class HamSci(object):
         call_signs: list=["w2naf"],
         source: dict = dict(call_sign="wwv", lat=40.6776, lon=-105.0461),
         fname:str = None,
-        lons=None,
-        lats=None,
-        extent=None,
+        lons:np.array=None,
+        lats:np.array=None,
+        extent:np.array=None,
         proj=None,
     ):
         event = event if event else self.event
@@ -141,7 +141,6 @@ class HamSci(object):
         stations = []
         for call_sign in call_signs:
             meta = self.gds[call_sign.upper()].meta
-            print(meta)
             stations.append(dict(
                 lat=meta["lat"],
                 lon=meta["lon"],

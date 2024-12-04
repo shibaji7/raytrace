@@ -45,6 +45,7 @@ class HamSCISimulation(object):
             self.cfg, [self.start_time, self.end_time], self.cfg.frequency
         )
         self.hamsci.setup_pandas_dataset()
+        self.hamsci.generate_fov(self.start_time, call_signs=[self.cfg.ray_target.station_name])
         return
 
 

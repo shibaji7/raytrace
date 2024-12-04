@@ -249,11 +249,14 @@ class Fan(object):
                 stn["lat"], stn["lon"], 
                 stn["call_sign"], markerColor="r"
             )
+            xy = self.proj.transform_points(
+                self.geo, 
+                np.array([stn["lon"], source["lon"]]), 
+                np.array([stn["lat"], source["lat"]]), 
+            )
             ax.plot(
-                [stn["lon"], stn["lat"]], 
-                [source["lon"], source["lat"]], color="b", 
-                lw=0.8, ls="-",
-                transform=self.geo
+                xy[:,0], xy[:,1], color="k", 
+                lw=0.5, ls="-", alpha=0.8
             )
         return ax
 

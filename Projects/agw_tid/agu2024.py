@@ -31,7 +31,7 @@ DATES = [
     dt.datetime(2017, 5, 27, 18, 0) + dt.timedelta(minutes=i * 10) for i in range(15)
 ]
 ZOOMED_IN = [[500, 1600], [150, 250]]
-ELV_RANGE = [5, 15]
+ELV_RANGE = [20, 30]
 
 
 def add_sys_paths():
@@ -93,13 +93,18 @@ def plot_ls(beam, cfg):
         plot.close()
     return
 
+
 def create_rtis_by_radars(cfg, beam, rads=["fhe"]):
     global CD_STEPS, ELV_RANGE, _DIR_
-    start = dt.datetime(2017,5,27,14)
-    end = dt.datetime(2017,5,28)
+    start = dt.datetime(2017, 5, 27, 14)
+    end = dt.datetime(2017, 5, 28)
     rtint = RangeTimeIntervalPlot(
-        100, [start, end], cfg.rad, fig_title="", num_subplots=len(rads),
-        srange_type="srange"
+        60,
+        [start, end],
+        cfg.rad,
+        fig_title="",
+        num_subplots=len(rads),
+        srange_type="srange",
     )
     for rad in rads:
         radr = radar.Radar(rad, [start, end], cfg)
@@ -117,6 +122,7 @@ def create_rtis_by_radars(cfg, beam, rads=["fhe"]):
     rtint.close()
     return
 
+
 def create_zoomed_rti_rays(cfg, beam):
     global CD_STEPS, ELV_RANGE, _DIR_
     start = cfg.event
@@ -131,7 +137,7 @@ def create_zoomed_rti_rays(cfg, beam):
 
     fig_title = f"Model: {cfg.model.upper()} / {cfg.rad.upper()}-{'%02d'%cfg.beam}, {cfg.frequency} MHz \t {start.strftime('%d %b, %Y')}"
     rtint = RangeTimeIntervalPlot(
-        100, [start, end], cfg.rad, fig_title=fig_title, num_subplots=2
+        60, [start, end], cfg.rad, fig_title=fig_title, num_subplots=2
     )
     rtint.addParamPlot(
         radr.df.copy(),
@@ -185,6 +191,6 @@ if __name__ == "__main__":
 
     cfg = utils.read_params_2D(args.cfg_file)
     cfg.event = dparser.isoparse(cfg.event)
-    plot_ls(args.beam, cfg)
+    # plot_ls(args.beam, cfg)
     # create_zoomed_rti_rays(cfg, args.beam)
-    # create_rtis_by_radars(cfg, args.beam)
+    create_rtis_by_radars(cfg, args.beam)

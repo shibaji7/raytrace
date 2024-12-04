@@ -74,8 +74,13 @@ class RangeTimeIntervalPlot(object):
             ax.xaxis.set_minor_formatter(DateFormatter(r"%H^{%M}"))
         ax.set_xlabel(xlabel, fontdict={"size": 12, "fontweight": "bold"})
         ax.set_xlim([self.dates[0], self.dates[-1]])
-        ax.set_ylim([0, self.nrang if self.srange_type=="slist" else 180 + self.nrang*45])
-        ax.set_ylabel("Range gate", fontdict={"size": 12, "fontweight": "bold"})
+        ax.set_ylim(
+            [0, self.nrang if self.srange_type == "slist" else 180 + self.nrang * 45]
+        )
+        ax.set_ylabel(
+            "Range gate" if self.srange_type == "slist" else "Slant Range, km",
+            fontdict={"size": 12, "fontweight": "bold"},
+        )
         if kind == "pcolor":
             im = ax.pcolormesh(
                 X,

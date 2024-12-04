@@ -246,7 +246,8 @@ class RadarSimulation(object):
         events = self.get_event_dates()
         fig_title = f"Model: {self.model.upper()} / {self.rad.upper()}-{'%02d'%self.beam}, {self.cfg.frequency} MHz \t {self.start_time.strftime('%d %b, %Y')}"
         rtint = RangeTimeIntervalPlot(
-            100, [events[0], events[-1]], self.rad, fig_title=fig_title, num_subplots=2
+            60, [events[0], events[-1]], self.rad, fig_title=fig_title, num_subplots=2,
+            srange_type="srange"
         )
         rtint.addParamPlot(
             self.radar.df.copy(),
@@ -272,7 +273,7 @@ class RadarSimulation(object):
                 title="",
                 zparam="vel_tot",
                 lay_eclipse=self.cfg.event_type.eclipse,
-                # kind="scatter",
+                kind="scatter",
             )
         filepath = (
             utils.get_folder(

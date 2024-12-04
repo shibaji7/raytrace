@@ -96,7 +96,7 @@ class RangeTimeIntervalPlot(object):
         else:
             im = ax.scatter(
                 df.time,
-                df.slist,
+                df[self.srange_type],
                 c=df[zparam],
                 marker="s",
                 s=5,

@@ -604,10 +604,12 @@ class SDCarto(GeoAxes):
         )
         cb.set_label(label)
         return
-    
+
     def overlay_point(
         self,
-        lat, lon, call_sign,
+        lat,
+        lon,
+        call_sign,
         tx=cartopy.crs.PlateCarree(),
         marker="o",
         zorder=2,

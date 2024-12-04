@@ -14,15 +14,15 @@ __status__ = "Research"
 import datetime as dt
 import glob
 import os
-import numpy as np
+import sys
 
+import cartopy
+import numpy as np
 import pytz
+from dateutil import parser as dparser
 from hamsci_psws import grape1
 from loguru import logger
-from dateutil import parser as dparser
-import cartopy
 
-import sys
 sys.path.extend([".", "rt/", "rt/density/", "Projects/SCurve/"])
 import utils
 from fan import Fan
@@ -127,13 +127,13 @@ class HamSci(object):
     def generate_fov(
         self,
         event: dt.datetime,
-        cfg_file: str="cfg/rt2d_iri_2024_iri_hamsci_SCurve.json",
-        call_signs: list=["w2naf"],
+        cfg_file: str = "cfg/rt2d_iri_2024_iri_hamsci_SCurve.json",
+        call_signs: list = ["w2naf"],
         source: dict = dict(call_sign="wwv", lat=40.6776, lon=-105.0461),
-        fname:str = None,
-        lons:np.array=None,
-        lats:np.array=None,
-        extent:np.array=None,
+        fname: str = None,
+        lons: np.array = None,
+        lats: np.array = None,
+        extent: np.array = None,
         proj=None,
     ):
         event = event if event else self.event
@@ -141,23 +141,17 @@ class HamSci(object):
         stations = []
         for call_sign in call_signs:
             meta = self.gds[call_sign.upper()].meta
-            stations.append(dict(
-                lat=meta["lat"],
-                lon=meta["lon"],
-                call_sign=call_sign,
-            ))
+            stations.append(
+                dict(
+                    lat=meta["lat"],
+                    lon=meta["lon"],
+                    call_sign=call_sign,
+                )
+            )
 
         lons = np.arange(-180, 180, 30) if lons is None else lons
-        lats = (
-            np.arange(30, 70, 15)
-            if lats is None
-            else lats
-        )
-        proj = (
-            cartopy.crs.Orthographic(-100, 30)
-            if proj is None
-            else proj
-        )
+        lats = np.arange(30, 70, 15) if lats is None else lats
+        proj = cartopy.crs.Orthographic(-100, 30) if proj is None else proj
         extent = [-130, -60, 20, 70]
         f = Fan(source["call_sign"], event, fig_title="")
         f.setup(
@@ -170,11 +164,20 @@ class HamSci(object):
         ax = f.add_axes()
         f.generate_ham_fov(ax, source, stations)
         ax.overaly_eclipse_path(cfg_file, year=self.dates[0].year)
-        ax.overlay_eclipse(np.arange(0,90,1), np.arange(-130,-20,1), [300], xpos=1.01)
-        fname = fname if fname else utils.get_hamsci_folder(
-                "wwv", event, self.cfg.model,
+        ax.overlay_eclipse(
+            np.arange(0, 90, 1), np.arange(-130, -20, 1), [300], xpos=1.01
+        )
+        fname = (
+            fname
+            if fname
+            else utils.get_hamsci_folder(
+                "wwv",
+                event,
+                self.cfg.model,
                 self.base_output_folder,
-            ) + "/fov.png"
+            )
+            + "/fov.png"
+        )
         logger.info(f"Save to {fname}")
         f.annotate_figure()
         f.save(fname)
@@ -184,6 +187,10 @@ class HamSci(object):
 
 if __name__ == "__main__":
     cfg = utils.read_params_2D("cfg/rt2d_iri_2024_iri_hamsci_SCurve.json")
-    h = HamSci(cfg, dparser.isoparse(cfg.event), [dt.datetime(2024, 4, 8), dt.datetime(2024, 4, 9)])
+    h = HamSci(
+        cfg,
+        dparser.isoparse(cfg.event),
+        [dt.datetime(2024, 4, 8), dt.datetime(2024, 4, 9)],
+    )
     h.setup_pandas_dataset()
     h.generate_fov(dparser.isoparse(cfg.event))

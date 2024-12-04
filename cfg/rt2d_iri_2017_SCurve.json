@@ -1,7 +1,7 @@
 {
     "verbose": true,
     "model": "iri",
-    "rad": "cvw",
+    "rad": "bks",
     "beam": 7,
     "project_name": "Aug2017_iri_eclipse",
     "event": "2017-08-21T16:00",
@@ -35,7 +35,7 @@
     "iri_param": {
         "iri_version": 20,
         "start_mask_time": "2017-08-21T16:00",
-        "eclipse_shadow_multiplier": 1.6
+        "eclipse_shadow_multiplier": 3
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",

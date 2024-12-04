@@ -103,7 +103,7 @@ def create_rtis_by_radars(cfg, beam, rads=["fhe", "fhw", "bks"]):
         [start, end],
         cfg.rad,
         fig_title="",
-        num_subplots=len(rads),
+        num_subplots=len(rads)+1,
         srange_type="srange",
     )
     for rad in rads:
@@ -113,9 +113,20 @@ def create_rtis_by_radars(cfg, beam, rads=["fhe", "fhw", "bks"]):
             radr.df.copy(),
             beam,
             title=f"Observation / {fig_title}",
-            xlabel="",
+            xlabel="Time, (UT)" if rad == "bks" else "",
             lay_eclipse=None,
         )
+        if rad == "fhw":
+            rtint.addParamPlot(
+                radr.df.copy(),
+                beam,
+                zparam="p_l",
+                title=f"Observation / {fig_title}",
+                label = r"Power, (dB)", p_max=18, p_min=3, 
+                cmap="jet",
+                xlabel="",
+                lay_eclipse=None,
+            )
     file = os.path.join(CD_STEPS, _DIR_, f"{cfg.rad}.{start.strftime('%Y%m%d')}.png")
     logger.info(f"Save to file: {file}")
     rtint.save(file)

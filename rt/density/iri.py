@@ -37,7 +37,10 @@ class IRI2d(object):
         oclt[oclt >= 0.96] = 1.0
         logger.info(f"Min/max value O: {np.nanmax(oclt)}/{np.nanmin(oclt)}")
         oclt = np.nan_to_num(oclt)
-        p = (1.0 - oclt) * self.cfg.iri_param.eclipse_shadow_multiplier
+        oclt = oclt * self.cfg.iri_param.eclipse_shadow_multiplier
+        p = 1.0 - oclt
+        # if np.nanmax(oclt) >= 0.8:
+        #     p = (1.0 - oclt) * self.cfg.iri_param.eclipse_shadow_multiplier
         logger.info(f"Min/max value P: {np.nanmax(p)}/{np.nanmin(p)}")
         self.param = self.param * p
         return

@@ -94,7 +94,7 @@ def plot_ls(beam, cfg):
     return
 
 
-def create_rtis_by_radars(cfg, beam, rads=["fhe"]):
+def create_rtis_by_radars(cfg, beam, rads=["fhe", "fhw", "bks"]):
     global CD_STEPS, ELV_RANGE, _DIR_
     start = dt.datetime(2017, 5, 27, 14)
     end = dt.datetime(2017, 5, 28)
@@ -108,7 +108,7 @@ def create_rtis_by_radars(cfg, beam, rads=["fhe"]):
     )
     for rad in rads:
         radr = radar.Radar(rad, [start, end], cfg)
-        fig_title = f"{cfg.rad.upper()}-{'%02d'%beam}, {cfg.frequency} MHz /\t {start.strftime('%d %b, %Y')}"
+        fig_title = f"{rad.upper()}-{'%02d'%beam}, {radr.df.tfreq.median()} MHz /\t {start.strftime('%d %b, %Y')}"
         rtint.addParamPlot(
             radr.df.copy(),
             beam,

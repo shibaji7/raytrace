@@ -134,9 +134,10 @@ class RadarSimulation(object):
         logger.info(f"Inside {self.model.upper()} Simulation...")
         from gemini import GEMINI2d
         from gitm import GITM2d
-        from iri import IRI2d
         from waccm import WACCMX2d
         from wamipe import WAMIPE2d
+
+        from iri import IRI2d
 
         if self.model == "iri":
             self.eden_model = IRI2d(self.cfg, self.start_time)

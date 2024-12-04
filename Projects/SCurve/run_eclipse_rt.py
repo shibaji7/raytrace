@@ -34,11 +34,11 @@ def run_eclipse_rt(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--beam", default=11, help="Radar beam number", type=int)
+    parser.add_argument("-b", "--beam", default=7, help="Radar beam number", type=int)
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/rt2d_iri_2024_SCurve.json",
+        default="cfg/rt2d_iri_2017_SCurve.json",
         help="Configuration file",
         type=str,
     )

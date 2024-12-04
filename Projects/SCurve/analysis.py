@@ -52,9 +52,10 @@ def load_files():
 
 
 def plot_ls(beam, cfg):
-    from iri import IRI2d
     from rays import PlotRays
     from rt2d import RadarBeam2dTrace
+
+    from iri import IRI2d
 
     base_output_folder = os.path.join(
         CD_STEPS,
@@ -91,7 +92,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/rt2d_iri_2024_SCurve.json",
+        default="cfg/rt2d_iri_2017_SCurve.json",
         help="Configuration file",
         type=str,
     )

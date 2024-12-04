@@ -116,7 +116,7 @@ def create_rtis_by_radars(cfg, beam, rads=["fhe", "fhw", "bks"]):
             xlabel="Time, (UT)" if rad == "bks" else "",
             lay_eclipse=None,
         )
-        if rad == "fhw":
+        if rad == "fhe":
             rtint.addParamPlot(
                 radr.df.copy(),
                 beam,

@@ -25,42 +25,11 @@ from rays import Rays2D
 from scipy.io import loadmat, savemat
 
 
-class RadarBeam2dTrace(object):
-    """
-    Ray trace class to trace all the points
-    """
+class Trace(object):
 
-    def __init__(
-        self,
-        event,
-        rad,
-        beam,
-        cfg,
-        model,
-        base_output_folder,
-    ):
-        self.beam = beam
-        self.event = event
-        self.model = model
-        self.rad = rad
-        self.base_output_folder = base_output_folder
-        self.folder = utils.get_folder(rad, beam, event, model, base_output_folder)
-        os.makedirs(self.folder, exist_ok=True)
-        self.cfg = cfg
-        self.radar = Radar(self.rad, [event, event + dt.timedelta(minutes=5)], cfg)
-        self.fig_name = self.folder + "/{time}.png".format(
-            time=self.event.strftime("%H%M")
-        )
-        self.edensity_file = self.folder + "/{dn}.mat".format(
-            dn=self.event.strftime("%H.%M")
-        )
-        self.sim_fname = self.folder + "/{date}_rt.mat".format(
-            date=self.event.strftime("%H%M")
-        )
-        self._estimate_bearing_()
-        self._eclipse()
+    def __init__(self):
         return
-
+    
     def _eclipse(self):
         self.p = (
             np.zeros((len(self.bearing_object["lat"]), len(self.bearing_object["ht"])))
@@ -78,24 +47,65 @@ class RadarBeam2dTrace(object):
                 p = np.nan
             self.p[i, :] = p
         return
+    
+    def read_density_rays(self, fname):
+        self.density = loadmat(fname)["ne"]
+        self.sim_fname = self.folder + "{date}.{bm}_rt.mat".format(
+            bm="%02d" % self.beam, date=self.event.strftime("%H%M")
+        )
+        logger.info("Data-Model comparison: reading rays....")
+        self.rays = Rays2D.read_rays(
+            self.event, self.rad, self.beam, self.cfg, self.folder, self.sim_fname
+        )
+        return
 
-    def _estimate_bearing_(self):
+    def compile(self, density):
+        """Compute RT using Pharlap"""
+        self.density = density
+        print(self.folder, os.getcwd() + "/pharlap/pharlap_4.5.3/dat")
+        pwd = os.getcwd() + "/pharlap/pharlap_4.5.3/dat"
+        cmd = "export DIR_MODELS_REF_DAT={pwd};\
+                cd pharlap/;\
+                matlab -softwareopengl -nodisplay -nodesktop -nosplash -nojvm -r \"UT=[{ut}];dic='{dic}';fname='{fname}';\
+                rt_2D;exit;\"".format(
+            pwd=pwd,
+            ut=self.event.strftime("%Y %m %d %H %M"),
+            dic=self.folder,
+            fname=self.sim_fname,
+        )
+        logger.info(f"Running command: {cmd}")
+        os.system(cmd)
+        logger.info("Data-Model comparison: reading rays....")
+        self.rays = Rays2D.read_rays(
+            self.event, self.cfg, self.folder, self.sim_fname
+        )
+        return
+
+    def load_rto(self, density):
+        self.density = density
+        logger.info("Data-Model comparison: reading rays....")
+        self.rays = Rays2D.read_rays(
+            self.event, self.cfg, self.folder, self.sim_fname
+        )
+        return
+    
+    def _estimate_bearing_(self, source_loc, target_loc):
         """Estimate laitude and logitude bearings"""
         fname = self.folder + f"/bearing.mat"
-        lat, lon = (self.radar.hdw.geographic.lat, self.radar.hdw.geographic.lon)
+        lat, lon = source_loc[0], source_loc[1]
         p = (lat, lon)
         _, bearing = utils.calculate_bearing(
             lat,
             lon,
-            self.radar.fov[0][self.beam, 0],
-            self.radar.fov[1][self.beam, 0],
+            target_loc[0],
+            target_loc[1],
         )
-        logger.info(f"Bearing angle of beam {self.beam} is {bearing} deg")
+        logger.info(f"Bearing angle is {bearing} deg")
         bearing_object = {}
 
-        # Create resolution along the beam
+        # Create resolution along the bearing direction
         if self.cfg.run_radar_beam_resolution:
-            ## This produce a 45 km range resulution path
+            ## This produce a 45 km range resulution path only based on Radar
             lats, lons = (
                 self.radar.fov[0][: self.cfg.slant_gate_of_radar, self.beam],
                 self.radar.fov[1][: self.cfg.slant_gate_of_radar, self.beam],
@@ -184,45 +194,86 @@ class RadarBeam2dTrace(object):
         self.bearing_object = copy.copy(bearing_object)
         return
 
-    def read_density_rays(self, fname):
-        self.density = loadmat(fname)["ne"]
-        self.sim_fname = self.folder + "{date}.{bm}_rt.mat".format(
-            bm="%02d" % self.beam, date=self.event.strftime("%H%M")
+class RadarBeam2dTrace(Trace):
+    """
+    Ray trace class to trace all the points
+    """
+
+    def __init__(
+        self,
+        event,
+        rad,
+        beam,
+        cfg,
+        model,
+        base_output_folder,
+    ):
+        super().__init__()
+        self.beam = beam
+        self.event = event
+        self.model = model
+        self.rad = rad
+        self.base_output_folder = base_output_folder
+        self.folder = utils.get_folder(rad, beam, event, model, base_output_folder)
+        os.makedirs(self.folder, exist_ok=True)
+        self.cfg = cfg
+        self.radar = Radar(self.rad, [event, event + dt.timedelta(minutes=5)], cfg)
+        self.fig_name = self.folder + "/{time}.png".format(
+            time=self.event.strftime("%H%M")
         )
-        logger.info("Data-Model comparison: reading rays....")
-        self.rays = Rays2D.read_rays(
-            self.event, self.rad, self.beam, self.cfg, self.folder, self.sim_fname
+        self.edensity_file = self.folder + "/{dn}.mat".format(
+            dn=self.event.strftime("%H.%M")
         )
+        self.sim_fname = self.folder + "/{date}_rt.mat".format(
+            date=self.event.strftime("%H%M")
+        )
+        logger.info(f"Bearing angle towards {self.rad}-{self.beam}")
+        self._estimate_bearing_(
+            (self.radar.hdw.geographic.lat, self.radar.hdw.geographic.lon),
+            (self.radar.fov[0][self.beam, 0], self.radar.fov[1][self.beam, 0])
+        )
+        self._eclipse()
         return
 
-    def compile(self, density):
-        """Compute RT using Pharlap"""
-        self.density = density
-        print(self.folder, os.getcwd() + "/pharlap/pharlap_4.5.3/dat")
-        pwd = os.getcwd() + "/pharlap/pharlap_4.5.3/dat"
-        cmd = "export DIR_MODELS_REF_DAT={pwd};\
-                cd pharlap/;\
-                matlab -softwareopengl -nodisplay -nodesktop -nosplash -nojvm -r \"UT=[{ut}];rad='{rad}';dic='{dic}';fname='{fname}';bm={bm};\
-                rt_2D;exit;\"".format(
-            pwd=pwd,
-            ut=self.event.strftime("%Y %m %d %H %M"),
-            rad=self.rad,
-            dic=self.folder,
-            bm=self.beam,
-            fname=self.sim_fname,
-        )
-        logger.info(f"Running command: {cmd}")
-        os.system(cmd)
-        logger.info("Data-Model comparison: reading rays....")
-        self.rays = Rays2D.read_rays(
-            self.event, self.rad, self.beam, self.cfg, self.folder, self.sim_fname
-        )
-        return
 
-    def load_rto(self, density):
-        self.density = density
-        logger.info("Data-Model comparison: reading rays....")
-        self.rays = Rays2D.read_rays(
-            self.event, self.rad, self.beam, self.cfg, self.folder, self.sim_fname
+class HamSCI2dTrace(Trace):
+    """
+    Ray trace class to trace all the points
+    """
+
+    def __init__(
+        self,
+        event:dt.datetime,
+        source:dict,
+        target:dict,
+        cfg,
+        model:str,
+        base_output_folder:str,
+    ):  
+        super().__init__()
+        self.source = source
+        self.target = target
+        self.event = event
+        self.model = model
+        self.base_output_folder = base_output_folder
+        self.folder = utils.get_hamsci_folder(source["call_sign"], event, model, base_output_folder, target["call_sign"])
+        logger.info(f"Store files {self.folder}")
+        os.makedirs(self.folder, exist_ok=True)
+        self.cfg = cfg
+        self.fig_name = self.folder + "/{time}.png".format(
+            time=self.event.strftime("%H%M")
         )
+        self.edensity_file = self.folder + "/{dn}.mat".format(
+            dn=self.event.strftime("%H.%M")
+        )
+        self.sim_fname = self.folder + "/{date}_rt.mat".format(
+            date=self.event.strftime("%H%M")
+        )
+        logger.info(f"Bearing angle towards {self.source['call_sign']}-{self.target['call_sign']}")
+        self._estimate_bearing_(
+            (self.source["lat"], self.source["lon"]),
+            (self.target["lat"], self.target["lon"])
+        )
+        self._eclipse()
         return
+    

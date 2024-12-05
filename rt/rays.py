@@ -20,13 +20,11 @@ from scipy.io import loadmat
 
 class Rays2D(object):
 
-    def __init__(self, date, rad, beam, elvs, folder, sim_fname):
+    def __init__(self, date, elvs, folder, sim_fname):
         """
         Read files by dates and elevation angles
         """
         self.date = date
-        self.rad = rad
-        self.beam = beam
         self.elvs = elvs
         self.folder = (folder,)
         self.sim_fname = sim_fname
@@ -120,7 +118,7 @@ class Rays2D(object):
         return
 
     @staticmethod
-    def read_rays(event, rad, beam, cfg, folder, sim_fname):
+    def read_rays(event, cfg, folder, sim_fname):
         """
         Static method to read all rays
         """
@@ -130,7 +128,7 @@ class Rays2D(object):
             int((cfg.end_elevation - cfg.start_elevation) / cfg.elevation_inctiment)
             + 1,
         )
-        rays = Rays2D(event, rad, beam, elvs, folder, sim_fname)
+        rays = Rays2D(event, elvs, folder, sim_fname)
         return rays
 
 

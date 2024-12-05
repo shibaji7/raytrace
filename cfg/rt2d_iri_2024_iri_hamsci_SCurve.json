@@ -2,6 +2,8 @@
     "verbose": true,
     "model": "iri",
     "ray_source": {
+        "lat": 40.6776,
+        "lon": -105.0461,
         "station_name": "wwv"
     },
     "ray_target": {
@@ -39,7 +41,7 @@
     "iri_param": {
         "iri_version": 20,
         "start_mask_time": "2024-04-08T17:00",
-        "eclipse_shadow_multiplier": 3
+        "eclipse_shadow_multiplier": 1.0
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_hamsci_folder": "/home/shibaji/OneDrive/trace/hamsci/",

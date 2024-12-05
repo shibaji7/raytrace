@@ -10,9 +10,9 @@
         "station_name": "w2naf"
     },
     "project_name": "Aug2024_iri_eclipse_hamsci_SCurve",
-    "event": "2024-04-08T19:00",
-    "time_window": 240,
-    "time_gaps": 10,
+    "event": "2024-04-08T15:00",
+    "time_window": 480,
+    "time_gaps": 1,
     "event_type":{
         "eclipse": true,
         "tid": false

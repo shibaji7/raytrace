@@ -134,12 +134,13 @@ class RangeTimeIntervalPlot(object):
             o.dates.tolist(),
             srange,
             p.T,
-            cmap="gray_r",
+            cmap="Blues",
             zorder=3,
             alpha=0.3,
             levels=[0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0],
         )
         ax.set_xlim([self.dates[0], self.dates[-1]])
+        self._add_colorbar(im, self.fig, ax, label="Obscuration", dx=0.15)
         return
 
     def addGSIS(self, df, beam, title, xlabel="", ylabel="Range gate", zparam="gflg"):
@@ -274,14 +275,14 @@ class RangeTimeIntervalPlot(object):
             )
         return ax
 
-    def _add_colorbar(self, im, fig, ax, label=""):
+    def _add_colorbar(self, im, fig, ax, label="", dx=0.025):
         """
         Add a colorbar to the right of an axis.
         """
 
         pos = ax.get_position()
         cpos = [
-            pos.x1 + 0.025,
+            pos.x1 + dx,
             pos.y0 + 0.0125,
             0.015,
             pos.height * 0.9,
@@ -299,3 +300,84 @@ class RangeTimeIntervalPlot(object):
         self.fig.clf()
         plt.close()
         return
+
+
+class TimeSeriesPlot(object):
+    """
+    Create TS plots for velocity, power, etc.
+    """
+
+    def __init__(
+        self, dates, fig_title="", num_subplots=2
+    ):
+        self.dates = dates
+        self.num_subplots = num_subplots
+        self._num_subplots_created = 0
+        self.fig = plt.figure(
+            figsize=(8, 3 * num_subplots), dpi=300
+        )  # Size for website
+        self.fig_title = fig_title
+        utils.setsize(12)
+        return
+
+    def _add_axis(self):
+        self._num_subplots_created += 1
+        ax = self.fig.add_subplot(self.num_subplots, 1, self._num_subplots_created)
+        if self._num_subplots_created == 1:
+            ax.text(
+                0.01,
+                1.05,
+                self.fig_title,
+                ha="left",
+                va="center",
+                transform=ax.transAxes,
+            )
+        ax.xaxis.set_major_formatter(DateFormatter(r"%H^{%M}"))
+        hours = mdates.HourLocator(byhour=range(0, 24, 2))
+        ax.xaxis.set_major_locator(hours)
+        dtime = (
+            pd.Timestamp(self.dates[-1]).to_pydatetime()
+            - pd.Timestamp(self.dates[0]).to_pydatetime()
+        ).total_seconds() / 3600.0
+        if dtime > 2.0 and dtime < 4.0:
+            hours = mdates.HourLocator(byhour=range(0, 24, 1))
+            ax.xaxis.set_minor_locator(hours)
+            ax.xaxis.set_minor_formatter(DateFormatter(r"%H^{%M}"))
+        elif dtime < 2.0:
+            minutes = mdates.MinuteLocator(byminute=range(0, 60, 10))
+            ax.xaxis.set_minor_locator(minutes)
+            ax.xaxis.set_minor_formatter(DateFormatter(r"%H^{%M}"))
+        ax.set_xlim([self.dates[0], self.dates[-1]])
+        return ax
+    
+    def save(self, filepath):
+        self.fig.savefig(filepath, bbox_inches="tight")
+        return
+
+    def close(self):
+        self.fig.clf()
+        plt.close()
+        return
+    
+    def addParamPlot(
+        self,
+        time,
+        data,
+        ylim: list=[],
+        ylabel: str = r"Doppler ($f_0$), Hz",
+        xlabel: str = "Time, UT",
+        title: str="",
+        ls: str="-",
+        lw: float=1.0,
+        lcolor: str ="r",
+        ax = None,
+    ):
+        ax = ax if ax else self._add_axis()
+        # Configure axes
+        if len(ylim) == 2:
+            ax.set_ylim(ylim)
+        if len(xlabel): ax.set_xlabel(xlabel)
+        if len(ylabel): ax.set_ylabel(ylabel)
+        if len(title): ax.text(0.01, 0.95, title, ha="left", va="center", transform=ax.transAxes)
+        ax.plot(time.tolist(), data.tolist(), ls=ls, color=lcolor, lw=lw)
+        return ax

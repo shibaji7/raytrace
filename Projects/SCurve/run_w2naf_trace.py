@@ -13,6 +13,7 @@ __status__ = "Research"
 
 import argparse
 import datetime as dt
+import pandas as pd
 import os
 import sys
 import concurrent.futures
@@ -43,7 +44,7 @@ class HamSCISimulation(object):
             minutes=self.cfg.time_window
         )
         self.model = self.cfg.model
-        target_call_sign = self.cfg.ray_target.station_name
+        self.target_call_sign = self.cfg.ray_target.station_name
         self.source = dict(
             call_sign=self.cfg.ray_source.station_name,
             lat=self.cfg.ray_source.lat,
@@ -63,9 +64,9 @@ class HamSCISimulation(object):
             self.cfg.project_save_location, self.cfg.project_name
         )
         self.target = dict(
-            lat=self.hamsci.gds[target_call_sign.upper()].meta["lat"],
-            lon=self.hamsci.gds[target_call_sign.upper()].meta["lon"],
-            call_sign=target_call_sign,
+            lat=self.hamsci.gds[self.target_call_sign.upper()].meta["lat"],
+            lon=self.hamsci.gds[self.target_call_sign.upper()].meta["lon"],
+            call_sign=self.target_call_sign,
         )
         return
     
@@ -180,16 +181,39 @@ class HamSCISimulation(object):
         return
     
     def generate_ls(self):
-        import utils
         from doppler import HamSCIDoppler
-
+        from rti import TimeSeriesPlot
+        
         records = HamSCIDoppler.fetch_records(
             self.source, self.target,
             self.start_time,
             self.model,
             self.base_output_folder,
         )
-        print(records.head())
+        events = self.get_event_dates()
+        fig_title = f"Model: {self.model.upper()} / {self.source['call_sign']}-{self.target['call_sign']}, {self.cfg.frequency} MHz \t {self.start_time.strftime('%d %b, %Y')}"
+        ts = TimeSeriesPlot([events[0], events[-1]], fig_title, num_subplots=1)
+        records = records.groupby(by="time").median().reset_index()
+        records.time = pd.to_datetime(records.time)
+        ax = ts.addParamPlot(records.time, records.frq_dne+records.frq_dh)
+        data = self.hamsci.gds[self.target_call_sign.upper()].data["filtered"]["df"]
+        from scipy.signal import detrend
+        ts.addParamPlot(
+            data.UTC, detrend(data.Freq), 
+            lcolor="k", ax=ax, xlabel="", ylabel=""
+        )
+        filepath = (
+            utils.get_hamsci_folder(
+                self.source["call_sign"], 
+                self.start_time, self.model, 
+                self.base_output_folder, 
+                self.target["call_sign"]
+            )
+            + "/TS.png"
+        )
+        logger.info(f"File: {filepath}")
+        ts.save(filepath)
+        ts.close()
         return
 
 
@@ -208,6 +232,6 @@ if __name__ == "__main__":
         print("     ", k, "->", str(vars(args)[k]))
 
     sim = HamSCISimulation(args.cfg_file)
-    sim.run_2d_simulation()
-    sim.compute_doppler()
+    # sim.run_2d_simulation()
+    # sim.compute_doppler()
     sim.generate_ls()

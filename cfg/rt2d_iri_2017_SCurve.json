@@ -1,7 +1,7 @@
 {
     "verbose": true,
     "model": "iri",
-    "rad": "fhw",
+    "rad": "bks",
     "beam": 7,
     "project_name": "Aug2017_iri_eclipse",
     "event": "2017-08-21T16:00",

@@ -180,6 +180,15 @@ class HamSCISimulation(object):
             self.dop._compute_doppler_from_prev_time_(now, prev)
         return
     
+    def bandpass_filter(self, data, lowcut=0.00015, highcut=0.001, fs=1, order=5):
+        from scipy.signal import butter, filtfilt
+        nyquist = 0.5 * fs  # Nyquist frequency
+        low = lowcut / nyquist
+        high = highcut / nyquist
+        b, a = butter(order, [low, high], btype="band")
+        filtered_data = filtfilt(b, a, data)
+        return filtered_data
+    
     def generate_ls(self):
         from doppler import HamSCIDoppler
         from rti import TimeSeriesPlot
@@ -192,16 +201,26 @@ class HamSCISimulation(object):
         )
         events = self.get_event_dates()
         fig_title = f"Model: {self.model.upper()} / {self.source['call_sign']}-{self.target['call_sign']}, {self.cfg.frequency} MHz \t {self.start_time.strftime('%d %b, %Y')}"
-        ts = TimeSeriesPlot([events[0], events[-1]], fig_title, num_subplots=1)
+        ts = TimeSeriesPlot([events[0], events[-1]], fig_title, num_subplots=2)
         records = records.groupby(by="time").median().reset_index()
         records.time = pd.to_datetime(records.time)
-        ax = ts.addParamPlot(records.time, records.frq_dne+records.frq_dh)
+        records = records.set_index("time").resample("1S").asfreq().interpolate(method="cubic").reset_index()
+
+        ax = ts.addParamPlot(records.time, records.frq_dne+records.frq_dh, kind="scatter")
         data = self.hamsci.gds[self.target_call_sign.upper()].data["filtered"]["df"]
         from scipy.signal import detrend
         ts.addParamPlot(
-            data.UTC, detrend(data.Freq), 
-            lcolor="k", ax=ax, xlabel="", ylabel=""
+            data.UTC, self.highpass_filter(detrend(data.Freq)), 
+            lcolor="k", ax=ax, xlabel="", ylabel="", 
+            kind="scatter"
         )
+        # ax = ts.addParamPlot(
+        #     records.time, records.frq_dne, lcolor="k", kind="scatter"
+        # )
+        # ts.addParamPlot(
+        #     records.time, records.frq_dh, lcolor="r", ls="--",
+        #     ax=ax, xlabel="", ylabel="", kind="scatter"
+        # )
         filepath = (
             utils.get_hamsci_folder(
                 self.source["call_sign"], 
@@ -214,6 +233,7 @@ class HamSCISimulation(object):
         logger.info(f"File: {filepath}")
         ts.save(filepath)
         ts.close()
+        print(records.time)
         return
 
 

@@ -371,6 +371,9 @@ class TimeSeriesPlot(object):
         lw: float=1.0,
         lcolor: str ="r",
         ax = None,
+        kind="line",
+        ms=0.8,
+        marker=".",
     ):
         ax = ax if ax else self._add_axis()
         # Configure axes
@@ -379,5 +382,9 @@ class TimeSeriesPlot(object):
         if len(xlabel): ax.set_xlabel(xlabel)
         if len(ylabel): ax.set_ylabel(ylabel)
         if len(title): ax.text(0.01, 0.95, title, ha="left", va="center", transform=ax.transAxes)
-        ax.plot(time.tolist(), data.tolist(), ls=ls, color=lcolor, lw=lw)
+        if kind == "line":
+            ax.plot(time.tolist(), data.tolist(), ls=ls, color=lcolor, lw=lw)
+        else:
+            ax.scatter(
+                time.tolist(), data.tolist(), marker=marker, ls="None", color=lcolor, s=ms)
         return ax

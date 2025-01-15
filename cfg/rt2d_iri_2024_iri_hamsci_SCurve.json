@@ -29,7 +29,7 @@
     "height_incriment_km": 1,
     "scale": "log",
     "kind": "linear",
-    "frequency": 5,
+    "frequency": 20,
     "start_elevation": 5,
     "end_elevation": 60,
     "elevation_inctiment": 0.1,

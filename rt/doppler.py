@@ -224,9 +224,7 @@ class Doppler(object):
             float(bearing["elev_e"]),
             int((bearing["elev_e"] - bearing["elev_s"]) / bearing["elev_i"]) + 1,
         )
-        rays = Rays2D(
-            date, bearing["elvs"], self.folder, rfile
-        )
+        rays = Rays2D(date, bearing["elvs"], self.folder, rfile)
         density = np.ma.masked_invalid(loadmat(efile)["ne"] * 1e6)
         fun = RectBivariateSpline(grange, height, np.log10(density).T)
         return SimpleNamespace(
@@ -375,8 +373,11 @@ class HamSCIDoppler(object):
 
     def _get_folder_(self):
         folder = utils.get_hamsci_folder(
-            self.source["call_sign"], self.start_time, 
-            self.model, self.base, self.target["call_sign"]
+            self.source["call_sign"],
+            self.start_time,
+            self.model,
+            self.base,
+            self.target["call_sign"],
         )
         dop_folder = os.path.join(folder, "Doppler")
         os.system(f"rm -rf {dop_folder}")
@@ -550,9 +551,7 @@ class HamSCIDoppler(object):
             float(bearing["elev_e"]),
             int((bearing["elev_e"] - bearing["elev_s"]) / bearing["elev_i"]) + 1,
         )
-        rays = Rays2D(
-            date, bearing["elvs"], self.folder, rfile
-        )
+        rays = Rays2D(date, bearing["elvs"], self.folder, rfile)
         density = np.ma.masked_invalid(loadmat(efile)["ne"] * 1e6)
         fun = RectBivariateSpline(grange, height, np.log10(density).T)
         return SimpleNamespace(
@@ -563,17 +562,17 @@ class HamSCIDoppler(object):
                 bearing=bearing,
             )
         )
-    
+
     @staticmethod
     def fetch_records(
-        source, target,
+        source,
+        target,
         event,
         model,
         base,
     ):
         folder = utils.get_hamsci_folder(
-            source["call_sign"], event, 
-            model, base, target["call_sign"]
+            source["call_sign"], event, model, base, target["call_sign"]
         )
         folder = os.path.join(folder, "Doppler")
         files = glob.glob(folder + "/*.mat")

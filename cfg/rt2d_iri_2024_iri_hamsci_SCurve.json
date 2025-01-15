@@ -9,7 +9,7 @@
     "ray_target": {
         "station_name": "w2naf"
     },
-    "project_name": "Apr2024_iri_eclipse_hamsci_SCurve",
+    "project_name": "April2024_iri_eclipse_hamsci_SCurve",
     "event": "2024-04-08T15:00",
     "time_window": 480,
     "time_gaps": 1,
@@ -29,7 +29,7 @@
     "height_incriment_km": 1,
     "scale": "log",
     "kind": "linear",
-    "frequency": 10,
+    "frequency": 5,
     "start_elevation": 5,
     "end_elevation": 60,
     "elevation_inctiment": 0.1,

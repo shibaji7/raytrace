@@ -29,7 +29,7 @@ class Trace(object):
 
     def __init__(self):
         return
-    
+
     def _eclipse(self):
         self.p = (
             np.zeros((len(self.bearing_object["lat"]), len(self.bearing_object["ht"])))
@@ -47,7 +47,7 @@ class Trace(object):
                 p = np.nan
             self.p[i, :] = p
         return
-    
+
     def read_density_rays(self, fname):
         self.density = loadmat(fname)["ne"]
         self.sim_fname = self.folder + "{date}.{bm}_rt.mat".format(
@@ -76,19 +76,15 @@ class Trace(object):
         logger.info(f"Running command: {cmd}")
         os.system(cmd)
         logger.info("Data-Model comparison: reading rays....")
-        self.rays = Rays2D.read_rays(
-            self.event, self.cfg, self.folder, self.sim_fname
-        )
+        self.rays = Rays2D.read_rays(self.event, self.cfg, self.folder, self.sim_fname)
         return
 
     def load_rto(self, density):
         self.density = density
         logger.info("Data-Model comparison: reading rays....")
-        self.rays = Rays2D.read_rays(
-            self.event, self.cfg, self.folder, self.sim_fname
-        )
+        self.rays = Rays2D.read_rays(self.event, self.cfg, self.folder, self.sim_fname)
         return
-    
+
     def _estimate_bearing_(self, source_loc, target_loc):
         """Estimate laitude and logitude bearings"""
         fname = self.folder + f"/bearing.mat"
@@ -194,6 +190,7 @@ class Trace(object):
         self.bearing_object = copy.copy(bearing_object)
         return
 
+
 class RadarBeam2dTrace(Trace):
     """
     Ray trace class to trace all the points
@@ -230,7 +227,7 @@ class RadarBeam2dTrace(Trace):
         logger.info(f"Bearing angle towards {self.rad}-{self.beam}")
         self._estimate_bearing_(
             (self.radar.hdw.geographic.lat, self.radar.hdw.geographic.lon),
-            (self.radar.fov[0][self.beam, 0], self.radar.fov[1][self.beam, 0])
+            (self.radar.fov[0][self.beam, 0], self.radar.fov[1][self.beam, 0]),
         )
         self._eclipse()
         return
@@ -243,20 +240,22 @@ class HamSCI2dTrace(Trace):
 
     def __init__(
         self,
-        event:dt.datetime,
-        source:dict,
-        target:dict,
+        event: dt.datetime,
+        source: dict,
+        target: dict,
         cfg,
-        model:str,
-        base_output_folder:str,
-    ):  
+        model: str,
+        base_output_folder: str,
+    ):
         super().__init__()
         self.source = source
         self.target = target
         self.event = event
         self.model = model
         self.base_output_folder = base_output_folder
-        self.folder = utils.get_hamsci_folder(source["call_sign"], event, model, base_output_folder, target["call_sign"])
+        self.folder = utils.get_hamsci_folder(
+            source["call_sign"], event, model, base_output_folder, target["call_sign"]
+        )
         logger.info(f"Store files {self.folder}")
         os.makedirs(self.folder, exist_ok=True)
         self.cfg = cfg
@@ -269,11 +268,12 @@ class HamSCI2dTrace(Trace):
         self.sim_fname = self.folder + "/{date}_rt.mat".format(
             date=self.event.strftime("%H%M")
         )
-        logger.info(f"Bearing angle towards {self.source['call_sign']}-{self.target['call_sign']}")
+        logger.info(
+            f"Bearing angle towards {self.source['call_sign']}-{self.target['call_sign']}"
+        )
         self._estimate_bearing_(
             (self.source["lat"], self.source["lon"]),
-            (self.target["lat"], self.target["lon"])
+            (self.target["lat"], self.target["lon"]),
         )
         self._eclipse()
         return
-    

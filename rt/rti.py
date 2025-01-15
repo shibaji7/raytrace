@@ -307,9 +307,7 @@ class TimeSeriesPlot(object):
     Create TS plots for velocity, power, etc.
     """
 
-    def __init__(
-        self, dates, fig_title="", num_subplots=2
-    ):
+    def __init__(self, dates, fig_title="", num_subplots=2):
         self.dates = dates
         self.num_subplots = num_subplots
         self._num_subplots_created = 0
@@ -349,7 +347,7 @@ class TimeSeriesPlot(object):
             ax.xaxis.set_minor_formatter(DateFormatter(r"%H^{%M}"))
         ax.set_xlim([self.dates[0], self.dates[-1]])
         return ax
-    
+
     def save(self, filepath):
         self.fig.savefig(filepath, bbox_inches="tight")
         return
@@ -358,19 +356,19 @@ class TimeSeriesPlot(object):
         self.fig.clf()
         plt.close()
         return
-    
+
     def addParamPlot(
         self,
         time,
         data,
-        ylim: list=[],
+        ylim: list = [],
         ylabel: str = r"Doppler ($f_0$), Hz",
         xlabel: str = "Time, UT",
-        title: str="",
-        ls: str="-",
-        lw: float=1.0,
-        lcolor: str ="r",
-        ax = None,
+        title: str = "",
+        ls: str = "-",
+        lw: float = 1.0,
+        lcolor: str = "r",
+        ax=None,
         kind="line",
         ms=0.8,
         marker=".",
@@ -379,12 +377,21 @@ class TimeSeriesPlot(object):
         # Configure axes
         if len(ylim) == 2:
             ax.set_ylim(ylim)
-        if len(xlabel): ax.set_xlabel(xlabel)
-        if len(ylabel): ax.set_ylabel(ylabel)
-        if len(title): ax.text(0.01, 0.95, title, ha="left", va="center", transform=ax.transAxes)
+        if len(xlabel):
+            ax.set_xlabel(xlabel)
+        if len(ylabel):
+            ax.set_ylabel(ylabel)
+        if len(title):
+            ax.text(0.01, 0.95, title, ha="left", va="center", transform=ax.transAxes)
         if kind == "line":
             ax.plot(time.tolist(), data.tolist(), ls=ls, color=lcolor, lw=lw)
         else:
             ax.scatter(
-                time.tolist(), data.tolist(), marker=marker, ls="None", color=lcolor, s=ms)
+                time.tolist(),
+                data.tolist(),
+                marker=marker,
+                ls="None",
+                color=lcolor,
+                s=ms,
+            )
         return ax

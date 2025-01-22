@@ -221,9 +221,9 @@ class HamSCISimulation(object):
             .reset_index()
         )
 
-        ax = ts.addParamPlot(
-            records.time, records.frq_dne + records.frq_dh, kind="scatter"
-        )
+        # ax = ts.addParamPlot(
+        #     records.time, records.frq_dne, kind="scatter"
+        # )
         data = self.hamsci.gds[self.target_call_sign.upper()].data["filtered"]["df"]
         from scipy.signal import detrend
 
@@ -231,18 +231,22 @@ class HamSCISimulation(object):
             data.UTC,
             self.bandpass_filter(detrend(data.Freq)),
             lcolor="k",
+            # ax=ax,
+            xlabel="",
+            ylabel="",
+            kind="scatter",
+        )
+        ax = ts.addParamPlot(records.time, records.frq_dne, lcolor="k", kind="scatter")
+        ts.addParamPlot(
+            records.time,
+            records.frq_dh,
+            lcolor="r",
+            ls="--",
             ax=ax,
             xlabel="",
             ylabel="",
             kind="scatter",
         )
-        # ax = ts.addParamPlot(
-        #     records.time, records.frq_dne, lcolor="k", kind="scatter"
-        # )
-        # ts.addParamPlot(
-        #     records.time, records.frq_dh, lcolor="r", ls="--",
-        #     ax=ax, xlabel="", ylabel="", kind="scatter"
-        # )
         filepath = (
             utils.get_hamsci_folder(
                 self.source["call_sign"],
@@ -258,7 +262,7 @@ class HamSCISimulation(object):
         ts.close()
         self.save_simulation_TS(records)
         return
-    
+
     def save_simulation_TS(self, records):
         o = pd.DataFrame()
         o = records[["time"]]
@@ -271,7 +275,8 @@ class HamSCISimulation(object):
                 self.model,
                 self.base_output_folder,
                 self.target["call_sign"],
-            ) + f"/LoS_doppler_{self.cfg.frequency}.csv",
+            )
+            + f"/LoS_doppler_{self.cfg.frequency}.csv",
             index=False,
             header=True,
         )

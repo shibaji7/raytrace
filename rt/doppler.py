@@ -57,155 +57,155 @@ class Doppler(object):
         os.makedirs(dop_folder, exist_ok=True)
         return folder, dop_folder
 
-    def _compute_doppler_from_prev_time_(
-        self, now: dt.datetime, prev: dt.datetime
-    ) -> None:
-        delt = self.del_time * self.cfg.rise_time_sec
-        self.now, self.prev = (now, prev)
-        logger.info(
-            f"Run Doppler compute for {self.radar.rad}/{self.beam}, on {self.now}, Model:{self.model}"
-        )
-        # Fetch bearing and simulation data files
-        event, baseline = (
-            self._fetch_bearing_rays_(self.now),
-            self._fetch_bearing_rays_(self.prev),
-        )
-        elvs, frequency = (event.bearing["elvs"], event.bearing["freq"])
+    # def _compute_doppler_from_prev_time_(
+    #     self, now: dt.datetime, prev: dt.datetime
+    # ) -> None:
+    #     delt = self.del_time * self.cfg.rise_time_sec
+    #     self.now, self.prev = (now, prev)
+    #     logger.info(
+    #         f"Run Doppler compute for {self.radar.rad}/{self.beam}, on {self.now}, Model:{self.model}"
+    #     )
+    #     # Fetch bearing and simulation data files
+    #     event, baseline = (
+    #         self._fetch_bearing_rays_(self.now),
+    #         self._fetch_bearing_rays_(self.prev),
+    #     )
+    #     elvs, frequency = (event.bearing["elvs"], event.bearing["freq"])
 
-        doppler = dict(time=now.strftime("%Y-%m-%dT%H:%M"), rays=[])
-        base_ne_fn, event_ne_fn = (event.density, baseline.density)
-        event_ray, base_ray = event.rays, baseline.rays
+    #     doppler = dict(time=now.strftime("%Y-%m-%dT%H:%M"), rays=[])
+    #     base_ne_fn, event_ne_fn = (event.density, baseline.density)
+    #     event_ray, base_ray = event.rays, baseline.rays
 
-        dop_file = os.path.join(self.dop_folder, f"{now.strftime('%H%M')}.mat")
-        if not os.path.exists(dop_file):
-            for _, elv in enumerate(elvs):  # Loop for each rays
-                event_ray_path = event_ray.simulation[elv][
-                    "path_data"
-                ]  # Extract ray associated to elv
-                base_ray_path = base_ray.simulation[elv][
-                    "path_data"
-                ]  # Extract baseline ray associated to elv
+    #     dop_file = os.path.join(self.dop_folder, f"{now.strftime('%H%M')}.mat")
+    #     if not os.path.exists(dop_file):
+    #         for _, elv in enumerate(elvs):  # Loop for each rays
+    #             event_ray_path = event_ray.simulation[elv][
+    #                 "path_data"
+    #             ]  # Extract ray associated to elv
+    #             base_ray_path = base_ray.simulation[elv][
+    #                 "path_data"
+    #             ]  # Extract baseline ray associated to elv
 
-                event_ray_label, base_ray_label = (
-                    event_ray.simulation[elv]["ray_data"]["ray_label"],
-                    base_ray.simulation[elv]["ray_data"]["ray_label"],
-                )
-                # Compute change in electron density along the modified ray
-                # Need to rethnik about how rays experiance change in Doppler
-                # now we implemented as if modified rays observed a difference from
-                # baseline. We can also apply difference between old and modified
-                # rays, that will need to intepolate height and both rays equal points.
+    #             event_ray_label, base_ray_label = (
+    #                 event_ray.simulation[elv]["ray_data"]["ray_label"],
+    #                 base_ray.simulation[elv]["ray_data"]["ray_label"],
+    #             )
+    #             # Compute change in electron density along the modified ray
+    #             # Need to rethnik about how rays experiance change in Doppler
+    #             # now we implemented as if modified rays observed a difference from
+    #             # baseline. We can also apply difference between old and modified
+    #             # rays, that will need to intepolate height and both rays equal points.
 
-                # Note that we do that only for rays reaching ground i.e., ray_label == 1
-                if (event_ray_label == 1) and (base_ray_label == 1):
-                    ray_dop = self._solve_doppler_equation_(
-                        elv,
-                        event_ne_fn,
-                        event_ray_path,
-                        base_ne_fn,
-                        base_ray_path,
-                        frequency,
-                    )
-                    # Doppler shift and velocity calculated from .phase_path
-                    dp = (
-                        event_ray.simulation[elv]["ray_data"]["phase_path"]
-                        - base_ray.simulation[elv]["ray_data"]["phase_path"]
-                    ) * 1e3  # convert to meters
-                    dop_shift = (
-                        (-2.0 * frequency * 1e6 / utils.pconst["c"]) * (dp / (delt))
-                    ).ravel()[0] * self.cfg.doppler_multiplier
-                    dop_vel = (
-                        0.5 * dop_shift * utils.pconst["c"] / (frequency * 1e6)
-                    ).ravel()[0]
-                    setattr(ray_dop, "pharlap_doppler_shift", dop_shift)
-                    setattr(ray_dop, "pharlap_doppler_vel", dop_vel)
-                    doppler["rays"].append(ray_dop)
-            savemat(
-                dop_file,
-                dict(
-                    doppler=doppler,
-                ),
-            )
-        return
+    #             # Note that we do that only for rays reaching ground i.e., ray_label == 1
+    #             if (event_ray_label == 1) and (base_ray_label == 1):
+    #                 ray_dop = self._solve_doppler_equation_(
+    #                     elv,
+    #                     event_ne_fn,
+    #                     event_ray_path,
+    #                     base_ne_fn,
+    #                     base_ray_path,
+    #                     frequency,
+    #                 )
+    #                 # Doppler shift and velocity calculated from .phase_path
+    #                 dp = (
+    #                     event_ray.simulation[elv]["ray_data"]["phase_path"]
+    #                     - base_ray.simulation[elv]["ray_data"]["phase_path"]
+    #                 ) * 1e3  # convert to meters
+    #                 dop_shift = (
+    #                     (-2.0 * frequency * 1e6 / utils.pconst["c"]) * (dp / (delt))
+    #                 ).ravel()[0] * self.cfg.doppler_multiplier
+    #                 dop_vel = (
+    #                     0.5 * dop_shift * utils.pconst["c"] / (frequency * 1e6)
+    #                 ).ravel()[0]
+    #                 setattr(ray_dop, "pharlap_doppler_shift", dop_shift)
+    #                 setattr(ray_dop, "pharlap_doppler_vel", dop_vel)
+    #                 doppler["rays"].append(ray_dop)
+    #         savemat(
+    #             dop_file,
+    #             dict(
+    #                 doppler=doppler,
+    #             ),
+    #         )
+    #     return
 
-    def _solve_doppler_equation_(
-        self,
-        elv,
-        event_ne_fn,
-        event_ray_path,
-        base_ne_fn,
-        base_ray_path,
-        frequency,
-    ):
-        delt = self.del_time * self.cfg.rise_time_sec
-        # Compute change in height for event ray
-        d_height = np.diff(
-            event_ray_path["height"], prepend=event_ray_path["height"][0]
-        )
-        # Compute change in electron density along the modified ray
-        # Need to rethnik about how rays experiance change in Doppler
-        # now we implemented as if modified rays observed a difference from
-        # baseline.
-        d_ne = (
-            10
-            ** event_ne_fn(
-                event_ray_path["ground_range"], event_ray_path["height"], grid=False
-            )
-            - 10
-            ** base_ne_fn(
-                event_ray_path["ground_range"], event_ray_path["height"], grid=False
-            )
-        ) * self.cfg.doppler_multiplier
-        # Delete all interaction below 50 km (parameterize by config)
-        d_ne[event_ray_path["height"] <= 50] = 0.0
-        # Compute change in Doppler freqency due to change in refractive index along the ray
-        d_frq_dne = (
-            (utils.pconst["kconst"] / (utils.pconst["c"] * frequency * 1e6))
-            * (d_ne / delt)
-            * d_height
-            / np.cos(np.deg2rad(90.0 - elv))
-        )
-        # Compute total change in Doppler frequency for change in refractive index
-        frq_dne = np.trapz(
-            np.array(d_frq_dne), np.array(event_ray_path["ground_range"])
-        )
-        # Compute total change in Doppler frequency due to change in reflection height
-        dh = (
-            (event_ray_path["height"].max() - base_ray_path["height"].max())
-            * 1e3
-            * self.cfg.doppler_multiplier
-        )
-        frq_dh = (
-            (-2.0 * frequency * 1e6 / utils.pconst["c"])
-            * (dh / (delt))
-            * np.cos(np.deg2rad(elv))
-        )
-        vel_dne = 0.5 * frq_dne * utils.pconst["c"] / (frequency * 1e6)
-        vel_dh = 0.5 * frq_dh * utils.pconst["c"] / (frequency * 1e6)
-        ray_dop = dict(
-            elv=elv,  # Elevation
-            d_height=d_height.ravel(),  # Differential height
-            event_ray_path_height=event_ray_path["height"].ravel(),  # Event ray height
-            event_ray_path_ground_range=event_ray_path[
-                "ground_range"
-            ].ravel(),  # Event ray ground range
-            d_frq_dne=d_frq_dne.ravel()[
-                0
-            ],  # Doppler along the ray path due to refraction
-            frq_dne=frq_dne.ravel()[
-                0
-            ],  # Total doppler along the ray path due to refraction
-            vel_dne=vel_dne.ravel()[
-                0
-            ],  # Total velocity along the ray path due to refraction
-            frq_dh=frq_dh.ravel()[0],  # Total doppler at the peak due to reflection
-            vel_dh=vel_dh.ravel()[0],  # Total velocity at the peak due to reflection
-            geometric_distance=event_ray_path["geometric_distance"].tolist()[
-                -1
-            ],  # Slant range distance
-            vel_tot=(vel_dh + vel_dne).ravel()[0],  # Total cumulative velocity
-        )
-        return SimpleNamespace(**ray_dop)
+    # def _solve_doppler_equation_(
+    #     self,
+    #     elv,
+    #     event_ne_fn,
+    #     event_ray_path,
+    #     base_ne_fn,
+    #     base_ray_path,
+    #     frequency,
+    # ):
+    #     delt = self.del_time * self.cfg.rise_time_sec
+    #     # Compute change in height for event ray
+    #     d_height = np.diff(
+    #         event_ray_path["height"], prepend=event_ray_path["height"][0]
+    #     )
+    #     # Compute change in electron density along the modified ray
+    #     # Need to rethnik about how rays experiance change in Doppler
+    #     # now we implemented as if modified rays observed a difference from
+    #     # baseline.
+    #     d_ne = (
+    #         10
+    #         ** event_ne_fn(
+    #             event_ray_path["ground_range"], event_ray_path["height"], grid=False
+    #         )
+    #         - 10
+    #         ** base_ne_fn(
+    #             event_ray_path["ground_range"], event_ray_path["height"], grid=False
+    #         )
+    #     ) * self.cfg.doppler_multiplier
+    #     # Delete all interaction below 50 km (parameterize by config)
+    #     d_ne[event_ray_path["height"] <= 50] = 0.0
+    #     # Compute change in Doppler freqency due to change in refractive index along the ray
+    #     d_frq_dne = (
+    #         (utils.pconst["kconst"] / (utils.pconst["c"] * frequency * 1e6))
+    #         * (d_ne / delt)
+    #         * d_height
+    #         / np.cos(np.deg2rad(90.0 - elv))
+    #     )
+    #     # Compute total change in Doppler frequency for change in refractive index
+    #     frq_dne = np.trapz(
+    #         np.array(d_frq_dne), np.array(event_ray_path["ground_range"])
+    #     )
+    #     # Compute total change in Doppler frequency due to change in reflection height
+    #     dh = (
+    #         (event_ray_path["height"].max() - base_ray_path["height"].max())
+    #         * 1e3
+    #         * self.cfg.doppler_multiplier
+    #     )
+    #     frq_dh = (
+    #         (-2.0 * frequency * 1e6 / utils.pconst["c"])
+    #         * (dh / (delt))
+    #         * np.cos(np.deg2rad(elv))
+    #     )
+    #     vel_dne = 0.5 * frq_dne * utils.pconst["c"] / (frequency * 1e6)
+    #     vel_dh = 0.5 * frq_dh * utils.pconst["c"] / (frequency * 1e6)
+    #     ray_dop = dict(
+    #         elv=elv,  # Elevation
+    #         d_height=d_height.ravel(),  # Differential height
+    #         event_ray_path_height=event_ray_path["height"].ravel(),  # Event ray height
+    #         event_ray_path_ground_range=event_ray_path[
+    #             "ground_range"
+    #         ].ravel(),  # Event ray ground range
+    #         d_frq_dne=d_frq_dne.ravel()[
+    #             0
+    #         ],  # Doppler along the ray path due to refraction
+    #         frq_dne=frq_dne.ravel()[
+    #             0
+    #         ],  # Total doppler along the ray path due to refraction
+    #         vel_dne=vel_dne.ravel()[
+    #             0
+    #         ],  # Total velocity along the ray path due to refraction
+    #         frq_dh=frq_dh.ravel()[0],  # Total doppler at the peak due to reflection
+    #         vel_dh=vel_dh.ravel()[0],  # Total velocity at the peak due to reflection
+    #         geometric_distance=event_ray_path["geometric_distance"].tolist()[
+    #             -1
+    #         ],  # Slant range distance
+    #         vel_tot=(vel_dh + vel_dne).ravel()[0],  # Total cumulative velocity
+    #     )
+    #     return SimpleNamespace(**ray_dop)
 
     def _fetch_bearing_rays_(self, date: dt.datetime):
         # Load bearing
@@ -401,6 +401,7 @@ class HamSCIDoppler(object):
 
         doppler = dict(time=now.strftime("%Y-%m-%dT%H:%M"), rays=[])
         base_ne_fn, event_ne_fn = (event.density, baseline.density)
+        print()
         event_ray, base_ray = event.rays, baseline.rays
 
         dop_file = os.path.join(self.dop_folder, f"{now.strftime('%H%M')}.mat")
@@ -432,7 +433,7 @@ class HamSCIDoppler(object):
                         base_ne_fn,
                         base_ray_path,
                         frequency,
-                    )
+                    )                    
                     # Doppler shift and velocity calculated from .phase_path
                     dp = (
                         event_ray.simulation[elv]["ray_data"]["phase_path"]
@@ -466,19 +467,19 @@ class HamSCIDoppler(object):
     ):
         delt = self.del_time * self.cfg.rise_time_sec
         # Compute change in height for event ray
-        d_height = np.diff(
+        d_height = np.abs(np.diff(
             event_ray_path["height"], prepend=event_ray_path["height"][0]
-        )
+        )) * 1e3 # Convert to meters
         # Compute change in electron density along the modified ray
         # Need to rethnik about how rays experiance change in Doppler
         # now we implemented as if modified rays observed a difference from
         # baseline.
         d_ne = (
-            10
+            - 10
             ** event_ne_fn(
                 event_ray_path["ground_range"], event_ray_path["height"], grid=False
             )
-            - 10
+            + 10
             ** base_ne_fn(
                 event_ray_path["ground_range"], event_ray_path["height"], grid=False
             )
@@ -486,6 +487,7 @@ class HamSCIDoppler(object):
         # Delete all interaction below 50 km (parameterize by config)
         d_ne[event_ray_path["height"] <= 50] = 0.0
         # Compute change in Doppler freqency due to change in refractive index along the ray
+        # print((utils.pconst["kconst"] / (utils.pconst["c"] * frequency * 1e6)), d_ne, d_height)
         d_frq_dne = (
             (utils.pconst["kconst"] / (utils.pconst["c"] * frequency * 1e6))
             * (d_ne / delt)

@@ -10,9 +10,9 @@
         "station_name": "w2naf"
     },
     "project_name": "April2024_iri_eclipse_hamsci_SCurve",
-    "event": "2024-04-08T15:00",
-    "time_window": 480,
-    "time_gaps": 1,
+    "event": "2024-04-08T17:00",
+    "time_window": 360,
+    "time_gaps": 5,
     "event_type":{
         "eclipse": true,
         "tid": false
@@ -29,7 +29,7 @@
     "height_incriment_km": 1,
     "scale": "log",
     "kind": "linear",
-    "frequency": 20,
+    "frequency": 10,
     "start_elevation": 5,
     "end_elevation": 60,
     "elevation_inctiment": 0.1,
@@ -37,7 +37,7 @@
     "rise_time_sec": 60,
     "threshold": 1e-5,
     "radius_earth": 6371,
-    "doppler_multiplier": 1,
+    "doppler_multiplier": 0.3,
     "iri_param": {
         "iri_version": 20,
         "start_mask_time": "2024-04-08T17:00",

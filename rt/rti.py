@@ -4,6 +4,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scienceplots
 import utils as utils
 from loguru import logger
 from matplotlib.dates import DateFormatter

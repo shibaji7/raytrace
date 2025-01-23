@@ -184,7 +184,7 @@ class HamSCISimulation(object):
             logger.info(
                 f"Compute doppler for, {now.strftime('%H:%M')}/{prev.strftime('%H:%M')}"
             )
-            self.dop._compute_doppler_from_prev_time_(now, prev)
+            self.dop._compute_doppler_from_prev_time_(now, prev, to_meters=1e3)
         return
 
     def bandpass_filter(self, data, lowcut=0.00015, highcut=0.001, fs=1, order=5):

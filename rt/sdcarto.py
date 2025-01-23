@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import numpy
 import numpy as np
 import pydarn
+import scienceplots
 import utils
 from cartopy.mpl.geoaxes import GeoAxes
 from descartes import PolygonPatch

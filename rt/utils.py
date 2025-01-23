@@ -18,7 +18,6 @@ import os
 from pathlib import Path
 from types import SimpleNamespace
 
-import cv2
 import numpy as np
 import scipy.io as spio
 from loguru import logger

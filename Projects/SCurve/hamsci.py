@@ -72,6 +72,9 @@ class HamSci(object):
         Load files using grape1 library
         """
         freq = freq if freq else self.freq
+        if self.hamsci_file_loc.startswith("~/"):
+            self.hamsci_file_loc = self.hamsci_file_loc.replace("~", os.getenv("HOME"))
+        logger.info(f"Searching inside: {self.hamsci_file_loc}*.csv")
         files = glob.glob(f"{self.hamsci_file_loc}*.csv")
         logger.info(f"Load files from {self.hamsci_file_loc}; N-files:{len(files)}")
         if len(files) > 0:

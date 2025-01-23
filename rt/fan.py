@@ -16,6 +16,7 @@ __status__ = "Research"
 
 import matplotlib.pyplot as plt
 import numpy as np
+import scienceplots
 
 plt.style.use(["science", "ieee"])
 plt.rcParams["font.family"] = "sans-serif"
@@ -26,6 +27,7 @@ import matplotlib.ticker as mticker
 import utils
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 from sdcarto import SDCarto
+
 ## from sdcarto import SDCarto
 
 

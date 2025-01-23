@@ -133,6 +133,7 @@ class Rays2D(object):
 
 
 import matplotlib.pyplot as plt
+import scienceplots
 
 plt.style.use(["science", "ieee"])
 plt.rcParams["font.family"] = "sans-serif"

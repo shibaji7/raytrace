@@ -262,6 +262,20 @@ class Doppler(object):
         )
         return SimpleNamespace(**ray_dop)
 
+    def fetch_ray_dop(self, time: dt.datetime, calculate_dop_stats: bool = True):
+        event = self._fetch_bearing_rays_(time)
+        folder = os.path.join(self.folder, "Doppler")
+        files = glob.glob(folder + f"/{time.strftime('%H%M')}.mat")
+        if len(files) > 0:
+            files.sort()
+            doppler = utils.loadmatlabfiles(files[0])
+            setattr(event, "doppler", SimpleNamespace(**doppler))
+            if calculate_dop_stats:
+                pass
+        else:
+            setattr(event, "doppler", None)
+        return event
+
 
 class SuperDARNDoppler(Doppler):
 

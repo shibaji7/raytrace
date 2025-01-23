@@ -34,6 +34,8 @@ class Doppler(object):
         start_time: dt.datetime,
         model: str,
         radar: Radar,
+        source: dict,
+        target: dict,
         beam: int = 0,
         del_time: int = 1,  # Normalized based on this time inteval in minutes
         base: str = "",
@@ -45,12 +47,24 @@ class Doppler(object):
         self.beam = beam
         self.del_time = del_time
         self.base = base
+        self.source = source
+        self.target = target
         self.folder, self.dop_folder = self._get_folder_()
         return
 
     def _get_folder_(self):
-        folder = utils.get_folder(
-            self.radar.rad, self.beam, self.start_time, self.model, self.base
+        folder = (
+            utils.get_folder(
+                self.radar.rad, self.beam, self.start_time, self.model, self.base
+            )
+            if self.radar
+            else utils.get_hamsci_folder(
+                self.source["call_sign"],
+                self.start_time,
+                self.model,
+                self.base,
+                call_sign=self.target["call_sign"],
+            )
         )
         dop_folder = os.path.join(folder, "Doppler")
         os.system(f"rm -rf {dop_folder}")
@@ -91,8 +105,13 @@ class Doppler(object):
     ) -> None:
         delt = self.del_time * self.cfg.rise_time_sec
         self.now, self.prev = (now, prev)
+        along = (
+            f"{self.radar.rad}/{self.beam}"
+            if self.radar
+            else f"{self.source['call_sign']}/{self.target['call_sign']}"
+        )
         logger.info(
-            f"Run Doppler compute for {self.radar.rad}/{self.beam}, on {self.now}, Model:{self.model}"
+            f"Run Doppler compute for {along}, on {self.now}, Model:{self.model}"
         )
         # Fetch bearing and simulation data files
         event, baseline = (
@@ -179,15 +198,17 @@ class Doppler(object):
         # now we implemented as if modified rays observed a difference from
         # baseline.
         d_ne = (
-            -(
+            (
                 10
                 ** event_ne_fn(
                     event_ray_path["ground_range"], event_ray_path["height"], grid=False
                 )
             )
-            + 10
-            ** base_ne_fn(
-                event_ray_path["ground_range"], event_ray_path["height"], grid=False
+            - (
+                10
+                ** base_ne_fn(
+                    event_ray_path["ground_range"], event_ray_path["height"], grid=False
+                )
             )
         ) * self.cfg.doppler_multiplier
         # Delete all interaction below 50 km (parameterize by config)
@@ -255,7 +276,15 @@ class SuperDARNDoppler(Doppler):
         base: str = "",
     ) -> None:
         super(SuperDARNDoppler, self).__init__(
-            cfg, start_time, model, radar, beam, del_time, base
+            cfg,
+            start_time,
+            model,
+            radar=radar,
+            beam=beam,
+            source=None,
+            target=None,
+            del_time=del_time,
+            base=base,
         )
         return
 
@@ -384,8 +413,16 @@ class HamSCIDoppler(Doppler):
         del_time: int = 1,  # Normalized based on this time inteval in minutes
         base: str = "",
     ) -> None:
-        super(SuperDARNDoppler, self).__init__(
-            cfg, start_time, model, radar, beam, del_time, base
+        super(HamSCIDoppler, self).__init__(
+            cfg,
+            start_time,
+            model,
+            radar=None,
+            beam=None,
+            source=source,
+            target=target,
+            del_time=del_time,
+            base=base,
         )
         return
 

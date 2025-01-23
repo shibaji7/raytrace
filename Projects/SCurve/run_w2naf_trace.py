@@ -220,22 +220,18 @@ class HamSCISimulation(object):
             .interpolate(method="cubic")
             .reset_index()
         )
-
-        # ax = ts.addParamPlot(
-        #     records.time, records.frq_dne, kind="scatter"
-        # )
         data = self.hamsci.gds[self.target_call_sign.upper()].data["filtered"]["df"]
         from scipy.signal import detrend
 
-        ts.addParamPlot(
-            data.UTC,
-            self.bandpass_filter(detrend(data.Freq)),
-            lcolor="k",
-            # ax=ax,
-            xlabel="",
-            ylabel="",
-            kind="scatter",
-        )
+        # ts.addParamPlot(
+        #     data.UTC,
+        #     self.bandpass_filter(detrend(data.Freq)),
+        #     lcolor="k",
+        #     # ax=ax,
+        #     xlabel="",
+        #     ylabel="",
+        #     kind="scatter",
+        # )
         ax = ts.addParamPlot(records.time, records.frq_dne, lcolor="k", kind="scatter")
         ts.addParamPlot(
             records.time,

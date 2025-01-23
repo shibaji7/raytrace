@@ -429,6 +429,9 @@ class PlotRays(object):
                 ),
             )
         return o, cmap, label, norm
+    
+    def lay_rays_by_frequency_deviations(self, ):
+        return
 
     def lay_rays(self, kind="pf", zoomed_in=[], elv_range=[]):
         self.create_figure_pane()

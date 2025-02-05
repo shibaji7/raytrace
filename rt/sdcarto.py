@@ -20,11 +20,12 @@ import numpy
 import numpy as np
 import pydarn
 import scienceplots
-import utils
 from cartopy.mpl.geoaxes import GeoAxes
 from descartes import PolygonPatch
 from matplotlib.projections import register_projection
 from shapely.geometry import LineString, MultiLineString, Polygon, mapping
+
+import rt.utils as utils
 
 
 class SDCarto(GeoAxes):

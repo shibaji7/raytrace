@@ -5,3 +5,5 @@ isort -rc -sl .
 autoflake --remove-all-unused-imports --imports=SDCarto,scienceplots .
 isort -rc -m 3 .
 black .
+
+pip install .

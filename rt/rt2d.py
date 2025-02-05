@@ -15,14 +15,15 @@ import copy
 import datetime as dt
 import os
 
-import eclipse
 import numpy as np
-import utils
 from geopy.distance import great_circle as GC
-from loguru import logger
-from radar import Radar
-from rays import Rays2D
 from scipy.io import loadmat, savemat
+
+import rt.eclipse
+import rt.utils
+from rt.loguru import logger
+from rt.radar import Radar
+from rt.rays import Rays2D
 
 
 class Trace(object):

@@ -9,13 +9,14 @@ import glob
 import os
 from types import SimpleNamespace
 
-import eclipse
 import numpy as np
 import pandas as pd
 import pydarn
 from loguru import logger
 from netCDF4 import Dataset
 from tqdm import tqdm
+
+import rt.eclipse
 
 
 def get_beams(rad):

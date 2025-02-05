@@ -4,8 +4,9 @@ import os
 import ephem
 import numpy as np
 import pandas as pd
-import utils
 from tqdm import tqdm
+
+import rt.utils as utils
 
 
 def read_eclispe_path(year, cfg_file, path=None):

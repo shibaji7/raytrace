@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scienceplots
-import utils as utils
 from loguru import logger
 from matplotlib.dates import DateFormatter
+
+import rt.utils as utils
 
 plt.style.use(["science", "ieee"])
 plt.rcParams["font.family"] = "sans-serif"

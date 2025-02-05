@@ -18,12 +18,13 @@ from types import SimpleNamespace
 
 import numpy as np
 import pandas as pd
-import utils
 from loguru import logger
-from radar import Radar
-from rays import Rays2D
 from scipy.interpolate import RectBivariateSpline
 from scipy.io import loadmat, savemat
+
+import rt.utils as utils
+from rt.radar import Radar
+from rt.rays import Rays2D
 
 
 class Doppler(object):

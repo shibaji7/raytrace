@@ -17,11 +17,11 @@ import os
 
 import numpy as np
 from geopy.distance import great_circle as GC
+from loguru import logger
 from scipy.io import loadmat, savemat
 
-import rt.eclipse
-import rt.utils
-from rt.loguru import logger
+import rt.eclipse as eclipse
+import rt.utils as utils
 from rt.radar import Radar
 from rt.rays import Rays2D
 

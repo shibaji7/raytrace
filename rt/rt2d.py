@@ -51,8 +51,8 @@ class Trace(object):
 
     def read_density_rays(self, fname):
         self.density = loadmat(fname)["ne"]
-        self.sim_fname = self.folder + "{date}.{bm}_rt.mat".format(
-            bm="%02d" % self.beam, date=self.event.strftime("%H%M")
+        self.sim_fname = self.folder + "{date}_rt.mat".format(
+            date=self.event.strftime("%H%M")
         )
         logger.info("Data-Model comparison: reading rays....")
         self.rays = Rays2D.read_rays(

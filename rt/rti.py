@@ -44,6 +44,7 @@ class RangeTimeIntervalPlot(object):
         title: str,
         p_max: float = 30,
         p_min: float = -30,
+        xparam: str = "time",
         xlabel: str = "Time, UT",
         zparam: str = "v",
         label: str = r"Velocity, ($ms^{-1}$)",
@@ -55,12 +56,12 @@ class RangeTimeIntervalPlot(object):
         ax = self._add_axis()
         df = df[df.bmnum == beam]
         X, Y, Z = utils.get_gridded_parameters(
-            df, xparam="time", yparam=self.srange_type, zparam=zparam, rounding=False
+            df, xparam=xparam, yparam=self.srange_type, zparam=zparam, rounding=False
         )
         cmap = mpl.cm.get_cmap(cmap)
         # Configure axes
         ax.xaxis.set_major_formatter(DateFormatter(r"%H^{%M}"))
-        hours = mdates.HourLocator(byhour=range(0, 24, 3))
+        hours = mdates.HourLocator(byhour=range(0, 24, 2))
         ax.xaxis.set_major_locator(hours)
         dtime = (
             pd.Timestamp(self.dates[-1]).to_pydatetime()
@@ -75,10 +76,8 @@ class RangeTimeIntervalPlot(object):
             ax.xaxis.set_minor_locator(minutes)
             ax.xaxis.set_minor_formatter(DateFormatter(r"%H^{%M}"))
         ax.set_xlabel(xlabel, fontdict={"size": 12, "fontweight": "bold"})
-        ax.set_xlim([self.dates[0], self.dates[-1]])
-        ax.set_ylim(
-            [0, self.nrang if self.srange_type == "slist" else 180 + self.nrang * 45]
-        )
+        ax.set_xlim(self.dates[0], self.dates[-1])
+        ax.set_ylim(0, self.nrang)
         ax.set_ylabel(
             "Range gate" if self.srange_type == "slist" else "Slant Range, km",
             fontdict={"size": 12, "fontweight": "bold"},
@@ -97,7 +96,7 @@ class RangeTimeIntervalPlot(object):
             )
         else:
             im = ax.scatter(
-                df.time,
+                df[xparam],
                 df[self.srange_type],
                 c=df[zparam],
                 marker="s",

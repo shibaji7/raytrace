@@ -201,10 +201,10 @@ class RadarSimulation(object):
         return
 
     def compute_doppler(self):
-        from doppler import Doppler
+        from doppler import SuperDARNDoppler
 
         # Initialize Doppler object
-        self.dop = Doppler(
+        self.dop = SuperDARNDoppler(
             cfg=self.cfg,
             start_time=self.start_time,
             model=self.model,
@@ -236,7 +236,7 @@ class RadarSimulation(object):
 
     def generate_rti(self):
         import rt.utils as utils
-        from rt.doppler import Doppler
+        from rt.doppler import SuperDARNDoppler
         from rt.rti import RangeTimeIntervalPlot
 
         events = self.get_event_dates()
@@ -256,7 +256,7 @@ class RadarSimulation(object):
             xlabel="",
             lay_eclipse=self.cfg.event_type.eclipse,
         )
-        records = Doppler.fetch_by_beam(
+        records = SuperDARNDoppler.fetch_by_beam(
             self.start_time,
             self.rad,
             self.model,

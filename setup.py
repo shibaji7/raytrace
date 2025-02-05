@@ -3,15 +3,20 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
+print("I'm here")
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="raytrace",
     version="0.1",
-    packages=["rt"],
+    packages=find_packages(),
     package_dir={"rt": "rt"},
     package_data={"rt": []},
+    data_files=[("rt", [])],
+    include_package_data=True,
+    use_scm_version=True,
+    setup_requires=["setuptools_scm"],
     author="Shibaji Chakraborty",
     author_email="chakras4@erau.edu",
     maintainer="Shibaji Chakraborty",

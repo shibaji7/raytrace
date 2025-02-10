@@ -312,3 +312,10 @@ if __name__ == "__main__":
     sim.run_2d_simulation()
     sim.compute_doppler()
     sim.generate_ls()
+
+    # TODO
+    # 0. Send the movie/.pngs to groups
+    # 1. Check & plot where W2NAF is with respect to WWV
+    # 2. May need 2-hop GS
+    # 3. Plot / work on Simulated Data TS plots
+    # 4. Check a how dh vs dn works out.

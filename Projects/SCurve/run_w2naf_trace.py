@@ -250,7 +250,7 @@ class HamSCISimulation(object):
         )
         ts.addParamPlot(
             records.time,
-            records.frq_dh+records.frq_dne,
+            records.frq_dh + records.frq_dne,
             lcolor="k",
             ls="--",
             ax=ax,

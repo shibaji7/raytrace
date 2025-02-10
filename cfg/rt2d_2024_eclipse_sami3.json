@@ -11,8 +11,8 @@
     },
     "project_name": "April2024_SAMI3_eclipse_hamsci_SCurve",
     "event": "2024-04-08T17:00",
-    "time_window": 240,
-    "time_gaps": 10,
+    "time_window": 360,
+    "time_gaps": 2,
     "event_type":{
         "eclipse": true,
         "tid": false
@@ -57,7 +57,7 @@
     "ray_trace_plot_kind": "edens",
     "ray_trace_plot_lim": {
         "pf": [4, 6],
-        "edens": [1e4, 1e6],
+        "edens": [1e5, 1e6],
         "ref_indx": [0.6, 0.95]
     },
     "to_netcdf": false

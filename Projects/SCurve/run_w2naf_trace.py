@@ -22,8 +22,9 @@ from dateutil import parser as dparser
 from loguru import logger
 
 sys.path.extend([".", "rt/", "rt/density/", "Projects/SCurve/"])
-import utils
 from hamsci import HamSci
+
+import rt.utils as utils
 
 
 class HamSCISimulation(object):
@@ -89,11 +90,12 @@ class HamSCISimulation(object):
 
     def run_2d_simulation(self):
         logger.info(f"Inside {self.model.upper()} Simulation...")
-        from gemini import GEMINI2d
-        from gitm import GITM2d
-        from iri import IRI2d
-        from waccm import WACCMX2d
-        from wamipe import WAMIPE2d
+        from rt.density.gemini import GEMINI2d
+        from rt.density.gitm import GITM2d
+        from rt.density.iri import IRI2d
+        from rt.density.sami3 import SAMI3
+        from rt.density.waccm import WACCMX2d
+        from rt.density.wamipe import WAMIPE2d
 
         if self.model == "iri":
             self.eden_model = IRI2d(self.cfg, self.start_time)
@@ -105,6 +107,8 @@ class HamSCISimulation(object):
             self.eden_model = GEMINI2d(self.cfg, self.start_time)
         elif self.model == "wamipe":
             self.eden_model = WAMIPE2d(self.cfg, self.start_time)
+        elif self.model == "sami3":
+            self.eden_model = SAMI3(self.cfg, self.start_time)
         else:
             raise ValueError(
                 f"Currently supporting following methods: iri, gitm, waccm-x, and wamipe, and you provided '{self.model}'"
@@ -119,11 +123,12 @@ class HamSCISimulation(object):
             for event in events:
                 logger.info(f"Load e-Density for, {event}")
                 self._run_rt_(event)
+                # break
         return
 
     def _run_rt_(self, event):
-        from rays import PlotRays
-        from rt2d import HamSCI2dTrace
+        from rt.rays import PlotRays
+        from rt.rt2d import HamSCI2dTrace
 
         rto = HamSCI2dTrace(
             event,
@@ -167,7 +172,7 @@ class HamSCISimulation(object):
         return
 
     def compute_doppler(self):
-        from doppler import HamSCIDoppler
+        from rt.doppler import HamSCIDoppler
 
         # Initialize Doppler object
         self.dop = HamSCIDoppler(
@@ -198,8 +203,8 @@ class HamSCISimulation(object):
         return filtered_data
 
     def generate_ls(self):
-        from doppler import HamSCIDoppler
-        from rti import TimeSeriesPlot
+        from rt.doppler import HamSCIDoppler
+        from rt.rti import TimeSeriesPlot
 
         records = HamSCIDoppler.fetch_records(
             self.source,
@@ -211,15 +216,15 @@ class HamSCISimulation(object):
         events = self.get_event_dates()
         fig_title = f"Model: {self.model.upper()} / {self.source['call_sign']}-{self.target['call_sign']}, {self.cfg.frequency} MHz \t {self.start_time.strftime('%d %b, %Y')}"
         ts = TimeSeriesPlot([events[0], events[-1]], fig_title, num_subplots=2)
-        records = records.groupby(by="time").median().reset_index()
+        records = records.groupby(by="time").mean().reset_index()
         records.time = pd.to_datetime(records.time)
-        records = (
-            records.set_index("time")
-            .resample("1S")
-            .asfreq()
-            .interpolate(method="cubic")
-            .reset_index()
-        )
+        # records = (
+        #     records.set_index("time")
+        #     .resample("300S")
+        #     .asfreq()
+        #     .interpolate(method="cubic")
+        #     .reset_index()
+        # )
         data = self.hamsci.gds[self.target_call_sign.upper()].data["filtered"]["df"]
         from scipy.signal import detrend
 
@@ -232,11 +237,21 @@ class HamSCISimulation(object):
         #     ylabel="",
         #     kind="scatter",
         # )
-        ax = ts.addParamPlot(records.time, records.frq_dne, lcolor="k", kind="scatter")
+        ax = ts.addParamPlot(records.time, records.frq_dne, lcolor="b", kind="scatter")
         ts.addParamPlot(
             records.time,
             records.frq_dh,
             lcolor="r",
+            ls="--",
+            ax=ax,
+            xlabel="",
+            ylabel="",
+            kind="scatter",
+        )
+        ts.addParamPlot(
+            records.time,
+            records.frq_dh+records.frq_dne,
+            lcolor="k",
             ls="--",
             ax=ax,
             xlabel="",
@@ -284,7 +299,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/rt2d_iri_2024_iri_hamsci_SCurve.json",
+        default="cfg/rt2d_2024_eclipse_sami3.json",
         help="Configuration file",
         type=str,
     )

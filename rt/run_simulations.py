@@ -132,6 +132,7 @@ class RadarSimulation(object):
         from rt.density.gemini import GEMINI2d
         from rt.density.gitm import GITM2d
         from rt.density.iri import IRI2d
+        from rt.density.sami3 import SAMI3
         from rt.density.waccm import WACCMX2d
         from rt.density.wamipe import WAMIPE2d
 
@@ -145,6 +146,8 @@ class RadarSimulation(object):
             self.eden_model = GEMINI2d(self.cfg, self.start_time)
         elif self.model == "wamipe":
             self.eden_model = WAMIPE2d(self.cfg, self.start_time)
+        elif self.model == "sami3":
+            self.eden_model = SAMI3(self.cfg, self.start_time)
         else:
             raise ValueError(
                 f"Currently supporting following methods: iri, gitm, waccm-x, and wamipe, and you provided '{self.model}'"

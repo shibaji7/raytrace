@@ -187,6 +187,11 @@ class Trace(object):
             float(self.cfg.end_elevation),
         )
         bearing_object["radius_earth"] = self.cfg.radius_earth
+        if hasattr(self.cfg, "pharlap_params"):
+            bearing_object["R12"] = self.cfg.pharlap_params.R12
+            bearing_object["doppler_flag"] = self.cfg.pharlap_params.doppler_flag
+            bearing_object["irregs_flag"] = self.cfg.pharlap_params.irregs_flag
+            bearing_object["kp"] = self.cfg.pharlap_params.kp
         savemat(fname, bearing_object)
         self.bearing_object = copy.copy(bearing_object)
         return

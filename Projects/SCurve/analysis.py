@@ -18,7 +18,6 @@ import sys
 from dateutil import parser as dparser
 from loguru import logger
 
-
 if __name__ == "__main__":
     # 3. Plot / work on Simulated Data TS plots,
     #   a. Angle, Slant range relatated stats

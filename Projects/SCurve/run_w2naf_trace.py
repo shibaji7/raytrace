@@ -253,7 +253,7 @@ class HamSCISimulation(object):
             xlabel="",
             ylabel="",
             kind="scatter",
-            ylim=[-5,5]
+            ylim=[-5, 5],
         )
         # ts.addParamPlot(
         #     records.time,

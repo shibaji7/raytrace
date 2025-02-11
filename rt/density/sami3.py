@@ -15,6 +15,7 @@ class SAMI3(object):
         self,
         cfg,
         event,
+        round_to=-1,
     ):
         self.cfg = cfg
         self.event = event
@@ -24,6 +25,7 @@ class SAMI3(object):
         self.cfg.density_simulated_datetime = dparser.isoparse(
             self.cfg.density_simulated_datetime
         )
+        self.round_to = round_to
         self.load_nc_dataset()
         return
 
@@ -35,6 +37,9 @@ class SAMI3(object):
             self.cfg.density_simulated_datetime + dt.timedelta(hours=float(d))
             for d in ds.variables["time"][:]
         ]
+        if self.round_to > 0:
+            logger.info("Round to nearest minutes!!!!!!!!!!!!")
+            self.store["time"] = [self.round_time(e) for e in self.store["time"]]
         self.dates = self.store["time"]
         self.store["alt"] = ds.variables["alt0"].values  # in km
         self.store["glat"] = ds.variables["lat0"].values  # in deg
@@ -46,6 +51,14 @@ class SAMI3(object):
         ds.close()
         del ds
         return
+
+    def round_time(self, t):
+        """Round a datetime object to any time lapse in seconds
+        t : datetime.datetime object, default now.
+        """
+        seconds = (t.replace(tzinfo=None) - t.min).seconds
+        rounding = (seconds + self.round_to / 2) // self.round_to * self.round_to
+        return t + dt.timedelta(0, rounding - seconds, -t.microsecond)
 
     def find_time_index(self, t):
         """Finds the index of the interval in the array where the number falls.

@@ -9,9 +9,9 @@
     "ray_target": {
         "station_name": "w2naf"
     },
-    "project_name": "April2024_SAMI3_eclipse_hamsci_SCurve",
+    "project_name": "April2024_SAMI3_eclipse_hamsci_20MHz_SCurve",
     "event": "2024-04-08T17:00",
-    "time_window": 360,
+    "time_window": 300,
     "time_gaps": -1,
     "event_type":{
         "eclipse": true,
@@ -30,11 +30,11 @@
     "height_incriment_km": 1,
     "scale": "log",
     "kind": "linear",
-    "frequency": 10,
+    "frequency": 20,
     "start_elevation": 5,
     "end_elevation": 60,
     "elevation_inctiment": 0.5,
-    "nhops": 3,
+    "nhops": 2,
     "rise_time_sec": 60,
     "threshold": 1e-5,
     "radius_earth": 6371,

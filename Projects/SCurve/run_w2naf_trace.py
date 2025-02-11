@@ -80,6 +80,7 @@ class HamSCISimulation(object):
             events = self.eden_model.dates
             end_time = self.start_time + dt.timedelta(minutes=self.cfg.time_window)
             events = [e for e in events if e >= self.start_time and e <= end_time]
+            self.cfg.time_gaps = (events[1] - events[0]).total_seconds() / 60
         else:
             events = (
                 self.eden_model.dates
@@ -113,7 +114,7 @@ class HamSCISimulation(object):
         elif self.model == "wamipe":
             self.eden_model = WAMIPE2d(self.cfg, self.start_time)
         elif self.model == "sami3":
-            self.eden_model = SAMI3(self.cfg, self.start_time)
+            self.eden_model = SAMI3(self.cfg, self.start_time, 60)
         else:
             raise ValueError(
                 f"Currently supporting following methods: iri, gitm, waccm-x, and wamipe, and you provided '{self.model}'"
@@ -125,7 +126,7 @@ class HamSCISimulation(object):
             ) as executor:
                 _ = list(executor.map(self._run_rt_, events))
         else:
-            for event in events:
+            for i, event in enumerate(events):
                 logger.info(f"Load e-Density for, {event}")
                 self._run_rt_(event)
         return
@@ -244,16 +245,16 @@ class HamSCISimulation(object):
         #     kind="scatter",
         # )
         ax = ts.addParamPlot(records.time, records.frq_dne, lcolor="b", kind="scatter")
-        # ts.addParamPlot(
-        #     records.time,
-        #     records.frq_dh,
-        #     lcolor="r",
-        #     ls="--",
-        #     ax=ax,
-        #     xlabel="",
-        #     ylabel="",
-        #     kind="scatter",
-        # )
+        ts.addParamPlot(
+            records.time,
+            records.frq_dh,
+            lcolor="r",
+            ls="--",
+            xlabel="",
+            ylabel="",
+            kind="scatter",
+            ylim=[-5,5]
+        )
         # ts.addParamPlot(
         #     records.time,
         #     records.frq_dh + records.frq_dne,
@@ -323,7 +324,7 @@ if __name__ == "__main__":
     # 0. Send the movie/.pngs to groups [D]
     # 1. Check & plot where W2NAF is with respect to WWV [D]
     # 2. May need 2-hop GS [D]
-    # 3. Plot / work on Simulated Data TS plots, 
+    # 3. Plot / work on Simulated Data TS plots,
     #   a. Angle, Slant range relatated stats
     #   b. Run for 5 and 15 MHz
     # 4. Check a how dh vs dn works out. Need E field values.

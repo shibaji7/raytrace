@@ -281,5 +281,11 @@ class HamSCI2dTrace(Trace):
             (self.source["lat"], self.source["lon"]),
             (self.target["lat"], self.target["lon"]),
         )
+        self.gc_distance = utils.great_circle_distance(
+            self.source["lat"],
+            self.source["lon"],
+            self.target["lat"],
+            self.target["lon"],
+        )  # in km
         self._eclipse()
         return

@@ -230,7 +230,7 @@ def _todict_(matobj):
     }
 
 
-def setsize(size=8):
+def setsize(size: float = 8):
     import matplotlib as mpl
 
     mpl.rcParams.update(
@@ -239,7 +239,7 @@ def setsize(size=8):
     return
 
 
-def calculate_bearing(lat1, lon1, lat2, lon2):
+def calculate_bearing(lat1: float, lon1: float, lat2: float, lon2: float):
     lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
 
     dlon = lon2 - lon1
@@ -250,3 +250,42 @@ def calculate_bearing(lat1, lon1, lat2, lon2):
     bearing = math.atan2(y, x)
 
     return (math.degrees(bearing) + 360) % 360, math.degrees(bearing)
+
+
+def great_circle_distance(
+    lat1: float,
+    lon1: float,
+    lat2: float,
+    lon2: float,
+    R=6371,  # Radius of the Earth in kilometers
+):
+    """
+    Calculate the great-circle distance between two points on Earth.
+
+    Args:
+        lat1 (float): Latitude of the first point in degrees.
+        lon1 (float): Longitude of the first point in degrees.
+        lat2 (float): Latitude of the second point in degrees.
+        lon2 (float): Longitude of the second point in degrees.
+
+    Returns:
+        float: The great-circle distance in kilometers.
+    """
+
+    # Convert degrees to radians
+    lat1 = math.radians(lat1)
+    lon1 = math.radians(lon1)
+    lat2 = math.radians(lat2)
+    lon2 = math.radians(lon2)
+
+    # Haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    )
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    distance = R * c
+
+    return distance

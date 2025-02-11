@@ -76,14 +76,19 @@ class HamSCISimulation(object):
         return
 
     def get_event_dates(self):
-        events = (
-            self.eden_model.dates
-            if self.model == "gemini"
-            else [
-                self.start_time + dt.timedelta(minutes=d * self.cfg.time_gaps)
-                for d in range(int(self.cfg.time_window / self.cfg.time_gaps))
-            ]
-        )
+        if self.cfg.time_gaps <= 0:
+            events = self.eden_model.dates
+            end_time = self.start_time + dt.timedelta(minutes=self.cfg.time_window)
+            events = [e for e in events if e >= self.start_time and e <= end_time]
+        else:
+            events = (
+                self.eden_model.dates
+                if self.model == "gemini"
+                else [
+                    self.start_time + dt.timedelta(minutes=d * self.cfg.time_gaps)
+                    for d in range(int(self.cfg.time_window / self.cfg.time_gaps))
+                ]
+            )
         if self.model == "gemini":
             events = events[: self.cfg.time_window]
         return events
@@ -123,7 +128,6 @@ class HamSCISimulation(object):
             for event in events:
                 logger.info(f"Load e-Density for, {event}")
                 self._run_rt_(event)
-                # break
         return
 
     def _run_rt_(self, event):
@@ -166,7 +170,9 @@ class HamSCISimulation(object):
                 f"{self.source['call_sign']}-{self.target['call_sign']}",
                 0,
             )
-            plot.lay_rays(kind=self.cfg.ray_trace_plot_kind)
+            plot.lay_rays(
+                kind=self.cfg.ray_trace_plot_kind, tag_distance=rto.gc_distance
+            )
             plot.save(rto.fig_name)
             plot.close()
         return
@@ -216,7 +222,7 @@ class HamSCISimulation(object):
         events = self.get_event_dates()
         fig_title = f"Model: {self.model.upper()} / {self.source['call_sign']}-{self.target['call_sign']}, {self.cfg.frequency} MHz \t {self.start_time.strftime('%d %b, %Y')}"
         ts = TimeSeriesPlot([events[0], events[-1]], fig_title, num_subplots=2)
-        records = records.groupby(by="time").mean().reset_index()
+        # records = records.groupby(by="time").mean().reset_index()
         records.time = pd.to_datetime(records.time)
         # records = (
         #     records.set_index("time")
@@ -238,26 +244,26 @@ class HamSCISimulation(object):
         #     kind="scatter",
         # )
         ax = ts.addParamPlot(records.time, records.frq_dne, lcolor="b", kind="scatter")
-        ts.addParamPlot(
-            records.time,
-            records.frq_dh,
-            lcolor="r",
-            ls="--",
-            ax=ax,
-            xlabel="",
-            ylabel="",
-            kind="scatter",
-        )
-        ts.addParamPlot(
-            records.time,
-            records.frq_dh + records.frq_dne,
-            lcolor="k",
-            ls="--",
-            ax=ax,
-            xlabel="",
-            ylabel="",
-            kind="scatter",
-        )
+        # ts.addParamPlot(
+        #     records.time,
+        #     records.frq_dh,
+        #     lcolor="r",
+        #     ls="--",
+        #     ax=ax,
+        #     xlabel="",
+        #     ylabel="",
+        #     kind="scatter",
+        # )
+        # ts.addParamPlot(
+        #     records.time,
+        #     records.frq_dh + records.frq_dne,
+        #     lcolor="k",
+        #     ls="--",
+        #     ax=ax,
+        #     xlabel="",
+        #     ylabel="",
+        #     kind="scatter",
+        # )
         filepath = (
             utils.get_hamsci_folder(
                 self.source["call_sign"],
@@ -314,8 +320,10 @@ if __name__ == "__main__":
     sim.generate_ls()
 
     # TODO
-    # 0. Send the movie/.pngs to groups
-    # 1. Check & plot where W2NAF is with respect to WWV
-    # 2. May need 2-hop GS
-    # 3. Plot / work on Simulated Data TS plots
-    # 4. Check a how dh vs dn works out.
+    # 0. Send the movie/.pngs to groups [D]
+    # 1. Check & plot where W2NAF is with respect to WWV [D]
+    # 2. May need 2-hop GS [D]
+    # 3. Plot / work on Simulated Data TS plots, 
+    #   a. Angle, Slant range relatated stats
+    #   b. Run for 5 and 15 MHz
+    # 4. Check a how dh vs dn works out. Need E field values.

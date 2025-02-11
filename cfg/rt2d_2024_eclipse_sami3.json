@@ -12,7 +12,7 @@
     "project_name": "April2024_SAMI3_eclipse_hamsci_SCurve",
     "event": "2024-04-08T17:00",
     "time_window": 360,
-    "time_gaps": 2,
+    "time_gaps": -1,
     "event_type":{
         "eclipse": true,
         "tid": false
@@ -22,7 +22,7 @@
     "density_simulated_datetime": "2024-04-07",
     "grid_coordinate_file": null,
     "run_radar_beam_resolution": false,
-    "max_ground_range_km": 2000,
+    "max_ground_range_km": 4000,
     "number_of_ground_step_km": 100,
     "slant_gate_of_radar": 100,
     "start_height_km": 100,
@@ -33,8 +33,8 @@
     "frequency": 10,
     "start_elevation": 5,
     "end_elevation": 60,
-    "elevation_inctiment": 0.1,
-    "nhops": 1,
+    "elevation_inctiment": 0.5,
+    "nhops": 3,
     "rise_time_sec": 60,
     "threshold": 1e-5,
     "radius_earth": 6371,

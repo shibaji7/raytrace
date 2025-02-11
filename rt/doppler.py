@@ -234,7 +234,7 @@ class Doppler(object):
         frq_dh = (
             (-2.0 * frequency * 1e6 / utils.pconst["c"])
             * (dh / (delt))
-            * np.cos(np.deg2rad(elv))
+            * np.cos(np.deg2rad(90 - elv))
         )
         vel_dne = 0.5 * frq_dne * utils.pconst["c"] / (frequency * 1e6)
         vel_dh = 0.5 * frq_dh * utils.pconst["c"] / (frequency * 1e6)

@@ -435,7 +435,7 @@ class PlotRays(object):
     ):
         return
 
-    def lay_rays(self, kind="pf", zoomed_in=[], elv_range=[]):
+    def lay_rays(self, kind="pf", zoomed_in=[], elv_range=[], tag_distance: float = -1):
         self.create_figure_pane()
 
         o, cmap, label, norm = self.get_parameter(kind)
@@ -466,6 +466,16 @@ class PlotRays(object):
             if (elv_range is None) or (len(elv_range) < 2)
             else self.elvs[(self.elvs >= elv_range[0]) & (self.elvs <= elv_range[1])]
         )
+        if tag_distance > 100:
+            self.ax.plot(
+                [tag_distance, tag_distance],
+                [0, 100],
+                c="m",
+                zorder=4,
+                alpha=0.7,
+                ls="--",
+                lw=0.8,
+            )
         for i, elv in enumerate(self.elvs):
             ray_path_data, ray_data = (
                 rays.ray_path_data[elv],

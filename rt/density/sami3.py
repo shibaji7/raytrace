@@ -35,6 +35,7 @@ class SAMI3(object):
             self.cfg.density_simulated_datetime + dt.timedelta(hours=float(d))
             for d in ds.variables["time"][:]
         ]
+        self.dates = self.store["time"]
         self.store["alt"] = ds.variables["alt0"].values  # in km
         self.store["glat"] = ds.variables["lat0"].values  # in deg
         self.store["glon"] = ds.variables["lon0"].values  # in 0-360 deg

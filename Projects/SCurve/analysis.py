@@ -96,7 +96,7 @@ def compute_statistics(folders):
         records = load_rt_files(f)
         dop = records["dop_records"]
         dop = dop[
-            dop.elv<40
+            dop.elv<30
         ]
         plot_ts(
             dop, 
@@ -112,8 +112,8 @@ def compute_statistics(folders):
 if __name__ == "__main__":
     folders = [
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_05MHz_SCurve/",
-        "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_10MHz_SCurve/",
-        # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_15MHz_SCurve/",
+        # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_10MHz_SCurve/",
+        "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_15MHz_SCurve/",
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_20MHz_SCurve/"
     ]
     compute_statistics(folders)

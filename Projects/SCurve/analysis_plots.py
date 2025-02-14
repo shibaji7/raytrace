@@ -16,10 +16,21 @@ def plot_ts(dop, events, fig_title="",filepath=""):
     import pandas as pd
     from loguru import logger
 
-    ts = TimeSeriesPlot([events[0], events[-1]], fig_title, num_subplots=2)
+    ylim = [-3,3]
+    ts = TimeSeriesPlot([events[0], events[-1]], fig_title, num_subplots=3)
     dop.time = pd.to_datetime(dop.time)
-    ax = ts.addParamPlot(dop.time, dop.frq_dne+dop.frq_dh, lcolor="b", kind="scatter")
-    ax.set_ylim(-3,3)
+    ax = ts.addParamPlot(
+        dop.time, dop.frq_dne+dop.frq_dh, lcolor="b", kind="scatter",
+        title=r"(a) Total $\Delta$ f", ylim=ylim
+    )
+    ax = ts.addParamPlot(
+        dop.time, dop.frq_dne, lcolor="r", kind="scatter",
+        title=r"(b) Total $\Delta$ f($\eta$)", ylim=ylim
+    )
+    ax = ts.addParamPlot(
+        dop.time, dop.frq_dh, lcolor="k", kind="scatter",
+        title=r"(c) Total $\Delta$ f($h$)", ylim=ylim
+    )
     logger.info(f"File: {filepath}")
     ts.save(filepath)
     ts.close()

@@ -23,8 +23,25 @@ import glob
 import datetime as dt
 
 from rt.rt2d import Rays2D
+from rt import eclipse
 from rt import utils
 import pandas as pd
+from geopy.distance import great_circle as GC
+
+
+def get_eclipse_along_path(dates):
+    source = (40.0150,-105.2705)
+    target = (41.335116,-75.600692)
+    lats, lons = [], []
+    gc = GC(source, source)
+    dist = np.linspace(0, 4000, 101)
+    _, bearing = utils.calculate_bearing(source[0], source[1], target[0], target[1])
+    for d in dist:
+        x = gc.destination(source, bearing, distance=d)
+        lats.append(x[0])
+        lons.append(x[1])
+    shadow = eclipse.get_rti_eclipse(dates, lats, lons)
+    return shadow
 
 def load_doppler(base):
     records = []
@@ -86,8 +103,10 @@ def load_rt_files(folder):
         ray = Rays2D.read_rays(event, cfg, base, rt)
         rays.append(ray)
     dop_records = load_doppler(base=base)
+    dates = pd.to_datetime(dop_records.time.unique())
+    shadow = get_eclipse_along_path(dates)
     return dict(
-        rays = rays, dop_records=dop_records
+        rays = rays, dop_records=dop_records, shadow=shadow
     )
 
 def compute_statistics(folders):
@@ -96,7 +115,7 @@ def compute_statistics(folders):
         records = load_rt_files(f)
         dop = records["dop_records"]
         dop = dop[
-            dop.elv<30
+            dop.elv<40
         ]
         plot_ts(
             dop, 
@@ -104,6 +123,7 @@ def compute_statistics(folders):
                 dt.datetime(2024, 4, 8, 17), 
                 dt.datetime(2024, 4, 8, 22)
             ], 
+            shadow=records["shadow"],
             filepath="TS.png"
         )
         break
@@ -112,8 +132,8 @@ def compute_statistics(folders):
 if __name__ == "__main__":
     folders = [
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_05MHz_SCurve/",
-        # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_10MHz_SCurve/",
-        "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_15MHz_SCurve/",
+        "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_10MHz_SCurve/",
+        # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_15MHz_SCurve/",
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_20MHz_SCurve/"
     ]
     compute_statistics(folders)

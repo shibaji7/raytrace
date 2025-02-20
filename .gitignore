@@ -7,10 +7,11 @@ __pycache__/
 *.so
 
 tmp/
-outputs/
+output*
 figures/
 *.png
 *nohup*
+data/
 
 # Distribution / packaging
 .Python

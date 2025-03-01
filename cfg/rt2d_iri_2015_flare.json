@@ -19,7 +19,7 @@
     "max_ground_range_km": 2000,
     "number_of_ground_step_km": 100,
     "slant_gate_of_radar": 100,
-    "start_height_km": 100,
+    "start_height_km": 60,
     "end_height_km": 400,
     "height_incriment_km": 1,
     "scale": "log",
@@ -36,7 +36,7 @@
     "iri_param": {
         "iri_version": 20,
         "start_flare_time": "2015-03-11T16:15",
-        "flare_multipliers": [5, 1.8, 1.2]
+        "flare_multipliers": [1, 1, 1]
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",
@@ -49,7 +49,7 @@
     "ray_trace_plot_kind": "edens",
     "ray_trace_plot_lim": {
         "pf": [4, 6],
-        "edens": [1e4, 1e6],
+        "edens": [1e5, 1e6],
         "ref_indx": [0.6, 0.95]
     },
     "to_netcdf": false

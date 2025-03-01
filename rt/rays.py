@@ -409,7 +409,7 @@ class PlotRays(object):
             o, cmap, label, norm = (
                 getattr(self, kind),
                 "plasma",
-                r"$N_e$ [$/m^{-3}$]",
+                r"$N_e$ [$/cm^{-3}$]",
                 colors.LogNorm(
                     self.cfg.ray_trace_plot_lim.edens[0],
                     self.cfg.ray_trace_plot_lim.edens[1],

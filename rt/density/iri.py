@@ -53,6 +53,15 @@ class IRI2d(object):
         Create Flare in the system
         """
         flare_multipliers = self.cfg.iri_param.flare_multipliers
+        self.param[self.alts <= 100, :] = (
+            self.param[self.alts <= 100, :] * flare_multipliers[0]
+        )
+        self.param[(self.alts > 100) & (self.alts <= 130), :] = (
+            self.param[(self.alts > 100) & (self.alts <= 130), :] * flare_multipliers[1]
+        )
+        self.param[self.alts > 130, :] = (
+            self.param[self.alts > 130, :] * flare_multipliers[2]
+        )
         return
 
     def fetch_dataset(

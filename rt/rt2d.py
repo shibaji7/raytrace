@@ -27,7 +27,6 @@ from rt.rays import Rays2D
 
 
 class Trace(object):
-
     def __init__(self):
         return
 

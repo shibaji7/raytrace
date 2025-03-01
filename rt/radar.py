@@ -25,7 +25,6 @@ def get_beams(rad):
 
 
 class Radar(object):
-
     def __init__(
         self,
         rad: str,
@@ -125,8 +124,8 @@ class Radar(object):
     def __latlon__(self, row):
         lat, lon = self.fov[0].T, self.fov[1].T
         row["lat"], row["lon"] = (lat[row.bmnum, row.slist], lon[row.bmnum, row.slist])
-        p = eclipse.get_eclipse(row.time, [300], [row.lat], [row.lon])[0]
-        row["occul"] = p[0, 0, 0, 0]
+        # p = eclipse.get_eclipse(row.time, [300], [row.lat], [row.lon])[0]
+        # row["occul"] = p[0, 0, 0, 0]
         return row
 
     def check_the_sounding_mode(self):

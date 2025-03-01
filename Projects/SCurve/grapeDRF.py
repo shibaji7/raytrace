@@ -100,7 +100,6 @@ class GrapeDRF(object):
     def __init__(
         self, sDate, eDate, station, output_dir=os.path.join("output", "grapeDRF")
     ):
-
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -175,7 +174,6 @@ class GrapeDRF(object):
         overlaySolarElevation=False,
         overlayEclipse=False,
     ):
-
         sDate = self.sDate
         eDate = self.eDate
 

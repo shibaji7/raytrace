@@ -9,7 +9,6 @@ from scipy.io import loadmat, savemat
 
 
 class WACCMX2d(object):
-
     def __init__(
         self,
         cfg,

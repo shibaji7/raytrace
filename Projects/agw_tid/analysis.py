@@ -56,7 +56,6 @@ if __name__ == "__main__":
             rsim.compute_doppler()
             rsim.generate_rti()
     if args.method == "rti":
-
         radar = radar.Radar(
             cfg.rad,
             [cfg.event, cfg.event + dt.timedelta(minutes=cfg.time_window)],

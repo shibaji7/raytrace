@@ -9,7 +9,6 @@ from scipy.io import loadmat, savemat
 
 
 class IRI2d(object):
-
     def __init__(
         self,
         cfg,
@@ -20,6 +19,10 @@ class IRI2d(object):
         self.iri_version = self.cfg.iri_param.iri_version
         if self.cfg.event_type.eclipse:
             self.start_mask_time = dparser.isoparse(self.cfg.iri_param.start_mask_time)
+        if hasattr(self.cfg.event_type, "flare") and self.cfg.event_type.flare:
+            self.start_flare_time = dparser.isoparse(
+                self.cfg.iri_param.start_flare_time
+            )
         return
 
     def load_eclipse(self):
@@ -45,6 +48,13 @@ class IRI2d(object):
         self.param = self.param * p
         return
 
+    def load_flare(self):
+        """
+        Create Flare in the system
+        """
+        flare_multipliers = self.cfg.iri_param.flare_multipliers
+        return
+
     def fetch_dataset(
         self,
         time: dt.datetime,
@@ -68,6 +78,8 @@ class IRI2d(object):
             self.param[:, i] = iriout.edens * 1e-6
         if self.cfg.event_type.eclipse and self.time >= self.start_mask_time:
             self.load_eclipse()
+        if self.cfg.event_type.flare and self.time >= self.start_flare_time:
+            self.load_flare()
         if to_file:
             savemat(to_file, dict(ne=self.param))
         return self.param, self.alts

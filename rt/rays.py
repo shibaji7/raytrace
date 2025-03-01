@@ -19,7 +19,6 @@ from scipy.io import loadmat
 
 
 class Rays2D(object):
-
     def __init__(self, date, elvs, folder, sim_fname):
         """
         Read files by dates and elevation angles
@@ -146,7 +145,6 @@ from mpl_toolkits.axisartist.grid_finder import DictFormatter, FixedLocator
 
 
 class Plots(object):
-
     def __init__(self, event, cfg, trace_obj, rad, beam, Re=6371.0):
         self.event = event
         self.cfg = cfg
@@ -373,7 +371,6 @@ class Plots(object):
 
 
 class PlotRays(object):
-
     def __init__(self, event, cfg, trace_obj, rad, beam, ylim=[], xlim=[]):
         self.event = event
         self.cfg = cfg

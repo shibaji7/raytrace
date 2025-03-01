@@ -28,12 +28,10 @@ import rt.utils as utils
 
 
 class HamSCISimulation(object):
-
     def __init__(
         self,
         cfg_file: str,
     ) -> None:
-
         ## Kill all Matlab Server Hosts for this run
         os.system("killall MathWorksServiceHost.")
         os.system("rm -rf ~/matlab_crash_dump.*")

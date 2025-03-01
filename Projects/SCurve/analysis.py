@@ -157,12 +157,8 @@ def overlay_data_models():
         ax.set_xlim([sDate.replace(hour=16), eDate])
         # Overlay estimated Doppler
         dop.time = pd.to_datetime(dop.time)
-        ax.plot(
-            dop.time,
-            dop.frq_dne + dop.frq_dh,
-            "b.", ms=1.5
-        )
-        ax.set_ylim(-3,3)
+        ax.plot(dop.time, dop.frq_dne + dop.frq_dh, "b.", ms=1.5)
+        ax.set_ylim(-3, 3)
         # Plot shadow
         axt = ax.twinx()
         # utime = [dt.datetime.strptime(t, "%Y-%m-%dT%H:%M") for t in dop.time.unique()]

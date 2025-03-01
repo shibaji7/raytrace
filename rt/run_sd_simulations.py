@@ -21,7 +21,6 @@ from loguru import logger
 
 
 class RadarSimulation(object):
-
     def __init__(
         self,
         cfg_file: str,
@@ -198,7 +197,7 @@ class RadarSimulation(object):
         # Create RT figures
         if not os.path.exists(rto.fig_name):
             plot = PlotRays(event, self.cfg, rto, self.rad, self.beam)
-            plot.lay_rays(kind=self.cfg.ray_trace_plot_kind, zoomed_in=zoomed_in)
+            plot.lay_rays(kind=self.cfg.ray_trace_plot_kind, zoomed_in=[])
             plot.save(rto.fig_name)
             plot.close()
         return

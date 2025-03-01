@@ -28,7 +28,6 @@ from rt.rays import Rays2D
 
 
 class Doppler(object):
-
     def __init__(
         self,
         cfg: SimpleNamespace,
@@ -279,7 +278,6 @@ class Doppler(object):
 
 
 class SuperDARNDoppler(Doppler):
-
     def __init__(
         self,
         cfg: SimpleNamespace,
@@ -417,7 +415,6 @@ class SuperDARNDoppler(Doppler):
 
 
 class HamSCIDoppler(Doppler):
-
     def __init__(
         self,
         source: dict,

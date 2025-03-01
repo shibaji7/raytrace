@@ -25,7 +25,6 @@ sys.path.extend(["rt/", "rt/density/"])
 
 
 class RadarSimulation(object):
-
     def __init__(
         self,
         cfg_file: str,

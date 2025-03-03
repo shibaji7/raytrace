@@ -212,9 +212,10 @@ class GrapeDRF(object):
         )  # Frequency needs to be in float64 for some reason...
         Sxx = np.fft.fftshift(Sxx, axes=0)
         Sxx_db = 10 * np.log10(Sxx)
+        print(">>>>>>>>>>>>>>>>>>>", np.min(Sxx_db), np.max(Sxx_db))
         if cmap is None:
             cmap = self.cmap
-        mpbl = ax.pcolormesh(self.spectrum_timevec, f, Sxx_db, cmap=cmap)
+        mpbl = ax.pcolormesh(self.spectrum_timevec, f, Sxx_db, cmap=cmap, vmax=40, vmin=0)
 
         if plot_colorbar:
             cbar = fig.colorbar(mpbl, label="PSD [dB]")

@@ -54,10 +54,15 @@ def load_doppler(base):
         for ray in doppler["doppler"]["rays"]:
             try:
                 ray = utils._todict_(ray)
-                srange = ray["geometric_distance"]
+                srange, grange = (
+                    ray["geometric_distance"],
+                    ray["event_ray_path_ground_range"][-1]
+                )
+                # Select rays based on ground range
                 d = dict(
                     time=doppler["doppler"]["time"],
                     srange=srange,
+                    grange=grange,
                     vel_tot=ray["vel_tot"],
                     frq_dne=ray["frq_dne"],
                     vel_dne=ray["vel_dne"],
@@ -134,8 +139,8 @@ def overlay_data_models():
     sDate = dt.datetime(2024, 4, 8)
     eDate = dt.datetime(2024, 4, 9)
     figd = {}
-    figd["cfreqs"] = [20, 15, 10, 5]
-    figd["cfreqs"] = [10]
+    # figd["cfreqs"] = [5, 10, 15, 20]
+    figd["cfreqs"] = [5]
     figd["solar_lat"] = 41.335116
     figd["solar_lon"] = -75.600692
     figd["overlaySolarElevation"] = False
@@ -143,8 +148,8 @@ def overlay_data_models():
     gDRF = GrapeDRF(sDate, eDate, station)
     fig, axes, png_fpath = gDRF.plot_figure(**figd)
     folders = [
-        # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_05MHz_SCurve/",
-        "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_10MHz_SCurve/",
+        "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_05MHz_SCurve/",
+        # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_10MHz_SCurve/",
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_15MHz_SCurve/",
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_20MHz_SCurve/"
     ]
@@ -152,12 +157,23 @@ def overlay_data_models():
     for i, f in enumerate(folders):
         records = load_rt_files(f)
         dop, shadow = records["dop_records"], records["shadow"]
-        dop = dop[dop.elv < 45]
+        ## Add filters based on frequencies for analysis
+        # 1. Add filter on Ground Range (+/- 100 km)
+        # 2. Limit elevation angle 45 deg
+        # 3. Limit based on altitude ranges (F-region heights)
+        print(dop.head(), dop.columns)
+        dop = dop[
+            # (dop.elv < 45) &\
+            # (dop.grange >=2300) &\
+            (dop.grange <=2500)
+        ]
+        
         ax = axes[i]
         ax.set_xlim([sDate.replace(hour=16), eDate])
         # Overlay estimated Doppler
         dop.time = pd.to_datetime(dop.time)
-        ax.plot(dop.time, dop.frq_dne + dop.frq_dh, "b.", ms=1.5)
+        # ax.plot(dop.time, dop.frq_dne + dop.frq_dh, "b.", ms=1.5)
+        ax.plot(dop.time, dop.pharlap_doppler_shift, "b.", ms=1.5)
         ax.set_ylim(-3, 3)
         # Plot shadow
         axt = ax.twinx()

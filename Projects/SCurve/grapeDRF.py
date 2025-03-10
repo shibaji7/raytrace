@@ -194,7 +194,7 @@ class GrapeDRF(object):
         else:
             txt = self.station + f" / $f_0$={cfreq} MHz" + "\n"
             ax.text(0.05, 0.95, txt, ha="left", va="top", transform=ax.transAxes)
-
+        # print(bigarray)
         f, t_spec, Sxx = signal.spectrogram(
             bigarray, fs=self.fs, nfft=1024, window="hann", return_onesided=False
         )

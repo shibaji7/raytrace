@@ -154,34 +154,34 @@ def overlay_data_models():
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_20MHz_SCurve/"
     ]
 
-    for i, f in enumerate(folders):
-        records = load_rt_files(f)
-        dop, shadow = records["dop_records"], records["shadow"]
-        ## Add filters based on frequencies for analysis
-        # 1. Add filter on Ground Range (+/- 100 km)
-        # 2. Limit elevation angle 45 deg
-        # 3. Limit based on altitude ranges (F-region heights)
-        print(dop.head(), dop.columns)
-        dop = dop[
-            # (dop.elv < 45) &\
-            # (dop.grange >=2300) &\
-            (dop.grange <=2500)
-        ]
+    # for i, f in enumerate(folders):
+    #     records = load_rt_files(f)
+    #     dop, shadow = records["dop_records"], records["shadow"]
+    #     ## Add filters based on frequencies for analysis
+    #     # 1. Add filter on Ground Range (+/- 100 km)
+    #     # 2. Limit elevation angle 45 deg
+    #     # 3. Limit based on altitude ranges (F-region heights)
+    #     print(dop.head(), dop.columns)
+    #     dop = dop[
+    #         # (dop.elv < 45) &\
+    #         # (dop.grange >=2300) &\
+    #         (dop.grange <=2500)
+    #     ]
         
-        ax = axes[i]
-        ax.set_xlim([sDate.replace(hour=16), eDate])
-        # Overlay estimated Doppler
-        dop.time = pd.to_datetime(dop.time)
-        # ax.plot(dop.time, dop.frq_dne + dop.frq_dh, "b.", ms=1.5)
-        ax.plot(dop.time, dop.pharlap_doppler_shift, "b.", ms=1.5)
-        ax.set_ylim(-3, 3)
-        # Plot shadow
-        axt = ax.twinx()
-        # utime = [dt.datetime.strptime(t, "%Y-%m-%dT%H:%M") for t in dop.time.unique()]
-        axt.plot(dop.time.unique(), 1 - np.nanmax(shadow, axis=1), color="k", ls="--")
-        axt.plot(dop.time.unique(), 1 - np.nanmin(shadow, axis=1), color="k", ls="--")
-        axt.set_ylim(0, 1)
-        axt.set_yticks([])
+    #     ax = axes[i]
+    #     ax.set_xlim([sDate.replace(hour=16), eDate])
+    #     # Overlay estimated Doppler
+    #     dop.time = pd.to_datetime(dop.time)
+    #     # ax.plot(dop.time, dop.frq_dne + dop.frq_dh, "b.", ms=1.5)
+    #     ax.plot(dop.time, dop.pharlap_doppler_shift, "b.", ms=1.5)
+    #     ax.set_ylim(-3, 3)
+    #     # Plot shadow
+    #     axt = ax.twinx()
+    #     # utime = [dt.datetime.strptime(t, "%Y-%m-%dT%H:%M") for t in dop.time.unique()]
+    #     axt.plot(dop.time.unique(), 1 - np.nanmax(shadow, axis=1), color="k", ls="--")
+    #     axt.plot(dop.time.unique(), 1 - np.nanmin(shadow, axis=1), color="k", ls="--")
+    #     axt.set_ylim(0, 1)
+    #     axt.set_yticks([])
     fig.savefig(png_fpath, bbox_inches="tight")
     return
 

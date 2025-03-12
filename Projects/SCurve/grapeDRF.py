@@ -215,7 +215,9 @@ class GrapeDRF(object):
         print(">>>>>>>>>>>>>>>>>>>", np.min(Sxx_db), np.max(Sxx_db))
         if cmap is None:
             cmap = self.cmap
-        mpbl = ax.pcolormesh(self.spectrum_timevec, f, Sxx_db, cmap=cmap, vmax=40, vmin=0)
+        mpbl = ax.pcolormesh(
+            self.spectrum_timevec, f, Sxx_db, cmap=cmap, vmax=40, vmin=0
+        )
 
         if plot_colorbar:
             cbar = fig.colorbar(mpbl, label="PSD [dB]")

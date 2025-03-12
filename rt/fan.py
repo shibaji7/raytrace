@@ -24,9 +24,9 @@ plt.rcParams["font.sans-serif"] = ["Tahoma", "DejaVu Sans", "Lucida Grande", "Ve
 
 import cartopy
 import matplotlib.ticker as mticker
-import utils
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 
+from rt import utils
 from rt.sdcarto import SDCarto
 
 ## from sdcarto import SDCarto

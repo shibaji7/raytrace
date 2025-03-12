@@ -26,7 +26,7 @@ class RadarSimulation(object):
         cfg_file: str,
         beam: int = 0,
     ) -> None:
-        import utils
+        from rt import utils
 
         ## Kill all Matlab Server Hosts for this run
         os.system("killall MathWorksServiceHost.")
@@ -52,7 +52,7 @@ class RadarSimulation(object):
         return
 
     def load_radar(self) -> None:
-        from radar import Radar
+        from rt.radar import Radar
 
         self.radar = Radar(
             self.rad,
@@ -203,7 +203,7 @@ class RadarSimulation(object):
         return
 
     def compute_doppler(self):
-        from doppler import SuperDARNDoppler
+        from rt.doppler import SuperDARNDoppler
 
         # Initialize Doppler object
         self.dop = SuperDARNDoppler(

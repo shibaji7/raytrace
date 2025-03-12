@@ -22,20 +22,20 @@ from loguru import logger
 
 from rt import radar, utils
 from rt.rti import RangeTimeIntervalPlot
-from rt.run_simulations import RadarSimulation
+from rt.run_sd_simulations import RadarSimulation
 
 if __name__ == "__main__":
-    add_sys_paths()
+    # add_sys_paths()
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--beam", default=11, help="Radar beam number", type=int)
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="../../cfg/rt2d_gemini_May2017_tid.json",
+        default="cfg/rt2d_gemini_May2017_cosmic_ro.json",
         help="Configuration file",
         type=str,
     )
-    parser.add_argument("-md", "--method", default="rti", help="Method rt/fan")
+    parser.add_argument("-md", "--method", default="rt", help="Method rt/rti/fan")
     args = parser.parse_args()
     logger.info("\n Parameter list for simulation ")
     for k in vars(args).keys():

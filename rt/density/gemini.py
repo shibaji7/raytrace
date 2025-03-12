@@ -5,9 +5,10 @@ import os
 import h5py
 import numpy as np
 import pandas as pd
-import utils
 from loguru import logger
 from scipy.io import loadmat, savemat
+
+from rt import utils
 
 
 class GEMINI2d(object):

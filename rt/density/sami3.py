@@ -3,11 +3,12 @@ import os
 
 import numpy as np
 import pandas as pd
-import utils
 import xarray as xr
 from dateutil import parser as dparser
 from loguru import logger
 from scipy.io import loadmat, savemat
+
+from rt import utils
 
 
 class SAMI3(object):

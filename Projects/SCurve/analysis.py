@@ -56,7 +56,7 @@ def load_doppler(base):
                 ray = utils._todict_(ray)
                 srange, grange = (
                     ray["geometric_distance"],
-                    ray["event_ray_path_ground_range"][-1]
+                    ray["event_ray_path_ground_range"][-1],
                 )
                 # Select rays based on ground range
                 d = dict(
@@ -167,7 +167,7 @@ def overlay_data_models():
     #         # (dop.grange >=2300) &\
     #         (dop.grange <=2500)
     #     ]
-        
+
     #     ax = axes[i]
     #     ax.set_xlim([sDate.replace(hour=16), eDate])
     #     # Overlay estimated Doppler

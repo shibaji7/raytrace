@@ -1,11 +1,12 @@
 import datetime as dt
 
-import eclipse
 import iricore
 import numpy as np
 from dateutil import parser as dparser
 from loguru import logger
 from scipy.io import loadmat, savemat
+
+from rt import eclipse
 
 
 class IRI2d(object):

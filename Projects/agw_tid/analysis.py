@@ -16,7 +16,7 @@ import datetime as dt
 import os
 
 import numpy as np
-from agw_utils import add_sys_paths, read_all_rays
+from agw_utils import read_all_rays
 from dateutil import parser as dparser
 from loguru import logger
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/rt2d_gemini_May2017_cosmic_ro.json",
+        default="cfg/rt2d_gemini_May2017_control_cosmic_ro.json",
         help="Configuration file",
         type=str,
     )

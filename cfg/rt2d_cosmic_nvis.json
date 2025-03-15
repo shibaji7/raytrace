@@ -1,22 +1,22 @@
 {
     "verbose": true,
-    "model": "gemini",
+    "model": "COSMIC2",
     "rad": "fhe",
     "beam": 11,
-    "project_name": "May2017_gemini_tid_cosmic2",
+    "project_name": "May2017_gemini_control",
     "event": "2017-05-27T16",
-    "time_window": 300,
+    "time_window": 359,
     "time_gaps": 1,
     "event_type":{
         "eclipse": false,
         "tid": true
     },
-    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/GEMINI3D/20170527-COSMIC2-RO/",
+    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/GEMINI3D/20170527-Control/",
     "density_file_name": null,
-    "grid_coordinate_file": "grid.mat",
+    "grid_coordinate_file": "coordinates.mat",
     "run_radar_beam_resolution": false,
-    "max_ground_range_km": 1800,
-    "number_of_ground_step_km": 200,
+    "max_ground_range_km": 2500,
+    "number_of_ground_step_km": 100,
     "slant_gate_of_radar": 75,
     "start_height_km": 100,
     "end_height_km": 400,
@@ -36,7 +36,7 @@
         "iri_version": 20,
         "start_mask_time": null
     },
-    "base_eclipse_folder": null,
+    "base_eclipse_folder": "datasets/eclipse_path/",
     "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",
     "sd_file_type": "fitacf",
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
@@ -44,11 +44,11 @@
     "frange": 180,
     "rsep": 45,
     "worker": 6,
-    "ray_trace_plot_kind": "pf",
+    "ray_trace_plot_kind": "edens",
     "ray_trace_plot_lim": {
         "pf": [4, 6],
         "edens": [1e4, 1e6],
         "ref_indx": [0.6, 0.95]
     },
-    "to_netcdf": false
+    "to_netcdf": true
 }

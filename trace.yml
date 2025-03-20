@@ -178,8 +178,11 @@ dependencies:
     - click==8.1.7
     - deepdish==0.3.7
     - descartes==1.1.0
+    - digital-rf==2.6.11
     - ephem==4.1.5
+    - ffmpeg-python==0.2.0
     - fortranformat==2.0.0
+    - future==1.0.0
     - geographiclib==2.0
     - geopy==2.4.1
     - hamsci-psws==0.1.3
@@ -193,6 +196,7 @@ dependencies:
     - netcdf4==1.7.1.post1
     - numexpr==2.10.1
     - numpy==1.26.4
+    - opencv-python==4.10.0.84
     - pathlib2==2.3.7.post1
     - pathspec==0.12.1
     - platformdirs==4.2.2
@@ -205,8 +209,10 @@ dependencies:
     - pyproj==3.6.1
     - pyshp==2.3.1
     - pyyaml==6.0.1
+    - raytrace==0.1
     - requests==2.32.3
     - scienceplots==2.1.1
+    - setuptools==75.8.0
     - shapely==2.0.5
     - soupsieve==2.6
     - suntime==1.3.2
@@ -214,4 +220,5 @@ dependencies:
     - tenacity==9.0.0
     - tqdm==4.66.4
     - urllib3==2.2.3
+    - watchdog==6.0.0
     - xarray==2024.7.0

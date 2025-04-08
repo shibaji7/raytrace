@@ -17,6 +17,10 @@ import datetime as dt
 import os
 import sys
 
+import matplotlib.pyplot as plt
+
+plt.rcParams["text.usetex"] = False
+
 import pandas as pd
 from dateutil import parser as dparser
 from loguru import logger
@@ -31,6 +35,7 @@ class HamSCISimulation(object):
     def __init__(
         self,
         cfg_file: str,
+        f0: float,
     ) -> None:
         ## Kill all Matlab Server Hosts for this run
         os.system("killall MathWorksServiceHost.")
@@ -42,6 +47,8 @@ class HamSCISimulation(object):
         self.end_time = dparser.isoparse(self.cfg.event) + dt.timedelta(
             minutes=self.cfg.time_window
         )
+        self.cfg.frequency = f0
+        self.cfg.project_name = self.cfg.project_name%int(f0)
         self.model = self.cfg.model
         self.target_call_sign = self.cfg.ray_target.station_name
         self.source = dict(
@@ -313,7 +320,7 @@ if __name__ == "__main__":
     for k in vars(args).keys():
         print("     ", k, "->", str(vars(args)[k]))
 
-    sim = HamSCISimulation(args.cfg_file)
+    sim = HamSCISimulation(args.cfg_file, f0=5)
     sim.run_2d_simulation()
     sim.compute_doppler()
     sim.generate_ls()

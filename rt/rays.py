@@ -137,6 +137,7 @@ import scienceplots
 plt.style.use(["science", "ieee"])
 plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = ["Tahoma", "DejaVu Sans", "Lucida Grande", "Verdana"]
+plt.rcParams["text.usetex"] = False
 import mpl_toolkits.axisartist.floating_axes as floating_axes
 import numpy as np
 from matplotlib.projections import polar

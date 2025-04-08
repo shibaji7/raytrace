@@ -64,11 +64,13 @@ class Trace(object):
         self.density = density
         print(self.folder, os.getcwd() + "/pharlap/pharlap_4.5.3/dat")
         pwd = os.getcwd() + "/pharlap/pharlap_4.5.3/dat"
+        matlab_loc = "/usr/local/MATLAB/R2023a/bin/matlab"
         cmd = "export DIR_MODELS_REF_DAT={pwd};\
                 cd pharlap/;\
-                matlab -softwareopengl -nodisplay -nodesktop -nosplash -nojvm -r \"UT=[{ut}];dic='{dic}';fname='{fname}';\
+                {matlab_loc} -softwareopengl -nodisplay -nodesktop -nosplash -nojvm -r \"UT=[{ut}];dic='{dic}';fname='{fname}';\
                 rt_2D;exit;\"".format(
             pwd=pwd,
+            matlab_loc=matlab_loc,
             ut=self.event.strftime("%Y %m %d %H %M"),
             dic=self.folder,
             fname=self.sim_fname,

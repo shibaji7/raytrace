@@ -11,9 +11,9 @@ __maintainer__ = "Chakraborty, S."
 __email__ = "chakras4@erau.edu"
 __status__ = "Research"
 
+import xarray as xr
 from dateutil import parser as dparser
 from loguru import logger
-import xarray as xr
 
 if __name__ == "__main__":
     logger.info("Running RO analysis....")

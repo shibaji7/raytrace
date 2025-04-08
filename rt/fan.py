@@ -21,6 +21,7 @@ import scienceplots
 plt.style.use(["science", "ieee"])
 plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = ["Tahoma", "DejaVu Sans", "Lucida Grande", "Verdana"]
+plt.rcParams["text.usetex"] = False
 
 import cartopy
 import matplotlib.ticker as mticker

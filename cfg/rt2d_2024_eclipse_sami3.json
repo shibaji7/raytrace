@@ -9,7 +9,7 @@
     "ray_target": {
         "station_name": "w2naf"
     },
-    "project_name": "April2024_SAMI3_eclipse_hamsci_05MHz_SCurve",
+    "project_name": "April2024_SAMI3_eclipse_hamsci_%02dMHz_SCurve",
     "event": "2024-04-08T17:00",
     "time_window": 300,
     "time_gaps": -1,
@@ -17,7 +17,7 @@
         "eclipse": true,
         "tid": false
     },
-    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/SAMI3/20240408/",
+    "density_file_location": "/home/chakras4/Modeled-Electron-Densities/SAMI3/20240408/",
     "density_file_name": "eclipse_2024_apr78.nc",
     "density_simulated_datetime": "2024-04-07",
     "grid_coordinate_file": null,
@@ -50,8 +50,8 @@
         "kp": 0
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
-    "tmp_hamsci_folder": "/home/shibaji/OneDrive/trace/hamsci/",
-    "project_save_location": "/home/shibaji/OneDrive/trace/outputs/",
+    "tmp_hamsci_folder": "/home/chakras4/OneDrive/trace/hamsci/",
+    "project_save_location": "/home/chakras4/OneDrive/trace/outputs/",
     "psws_node_registry": "cfg/PSWS_Node_Registry.csv",
     "worker": 0,
     "ray_trace_plot_kind": "edens",

@@ -24,8 +24,11 @@ from hamsci_psws import grape1
 from loguru import logger
 
 sys.path.extend([".", "rt/", "rt/density/", "Projects/SCurve/"])
+import matplotlib.pyplot as plt
 import utils
 from fan import Fan
+
+plt.rcParams["text.usetex"] = False
 
 
 class HamSci(object):

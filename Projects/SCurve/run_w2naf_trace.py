@@ -48,7 +48,7 @@ class HamSCISimulation(object):
             minutes=self.cfg.time_window
         )
         self.cfg.frequency = f0
-        self.cfg.project_name = self.cfg.project_name%int(f0)
+        self.cfg.project_name = self.cfg.project_name % int(f0)
         self.model = self.cfg.model
         self.target_call_sign = self.cfg.ray_target.station_name
         self.source = dict(
@@ -320,7 +320,7 @@ if __name__ == "__main__":
     for k in vars(args).keys():
         print("     ", k, "->", str(vars(args)[k]))
 
-    sim = HamSCISimulation(args.cfg_file, f0=20)
+    sim = HamSCISimulation(args.cfg_file, f0=5)
     sim.run_2d_simulation()
     sim.compute_doppler()
     sim.generate_ls()

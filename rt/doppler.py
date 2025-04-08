@@ -244,21 +244,15 @@ class Doppler(object):
             event_ray_path_ground_range=event_ray_path[
                 "ground_range"
             ].ravel(),  # Event ray ground range
-            d_frq_dne=d_frq_dne.ravel()[
-                0
-            ],  # Doppler along the ray path due to refraction
-            frq_dne=frq_dne.ravel()[
-                0
-            ],  # Total doppler along the ray path due to refraction
-            vel_dne=vel_dne.ravel()[
-                0
-            ],  # Total velocity along the ray path due to refraction
-            frq_dh=frq_dh.ravel()[0],  # Total doppler at the peak due to reflection
-            vel_dh=vel_dh.ravel()[0],  # Total velocity at the peak due to reflection
+            d_frq_dne=d_frq_dne.ravel(),  # Doppler along the ray path due to refraction
+            frq_dne=frq_dne.ravel(),  # Total doppler along the ray path due to refraction
+            vel_dne=vel_dne.ravel(),  # Total velocity along the ray path due to refraction
+            frq_dh=frq_dh.ravel(),  # Total doppler at the peak due to reflection
+            vel_dh=vel_dh.ravel(),  # Total velocity at the peak due to reflection
             geometric_distance=event_ray_path["geometric_distance"].tolist()[
                 -1
             ],  # Slant range distance
-            vel_tot=(vel_dh + vel_dne).ravel()[0],  # Total cumulative velocity
+            vel_tot=(vel_dh + vel_dne).ravel(),  # Total cumulative velocity
         )
         return SimpleNamespace(**ray_dop)
 

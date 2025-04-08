@@ -320,7 +320,7 @@ if __name__ == "__main__":
     for k in vars(args).keys():
         print("     ", k, "->", str(vars(args)[k]))
 
-    sim = HamSCISimulation(args.cfg_file, f0=5)
+    sim = HamSCISimulation(args.cfg_file, f0=20)
     sim.run_2d_simulation()
     sim.compute_doppler()
     sim.generate_ls()

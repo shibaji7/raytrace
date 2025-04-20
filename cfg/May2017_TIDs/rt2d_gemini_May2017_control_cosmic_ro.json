@@ -11,7 +11,7 @@
         "eclipse": false,
         "tid": true
     },
-    "density_file_location": "/home/shibaji/Modeled-Electron-Densities/GEMINI3D/20170527-Control-COSMIC2-RO/",
+    "density_file_location": "/home/chakras4/Modeled-Electron-Densities/GEMINI3D/20170527-Control-COSMIC2-RO/",
     "density_file_name": null,
     "grid_coordinate_file": "coords.mat",
     "run_radar_beam_resolution": false,
@@ -37,10 +37,10 @@
         "start_mask_time": null
     },
     "base_eclipse_folder": "datasets/eclipse_path/",
-    "tmp_sd_folder": "/home/shibaji/OneDrive/trace/sd/",
+    "tmp_sd_folder": "/home/chakras4/OneDrive/trace/sd/",
     "sd_file_type": "fitacf",
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
-    "project_save_location": "/home/shibaji/OneDrive/trace/outputs/",
+    "project_save_location": "/home/chakras4/OneDrive/trace/outputs/",
     "frange": 180,
     "rsep": 45,
     "worker": 6,

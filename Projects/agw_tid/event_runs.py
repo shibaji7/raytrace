@@ -27,11 +27,11 @@ from rt.run_sd_simulations import RadarSimulation
 if __name__ == "__main__":
     # add_sys_paths()
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--beam", default=11, help="Radar beam number", type=int)
+    parser.add_argument("-b", "--beam", default=-1, help="Radar beam number", type=int)
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/May2017_TIDs/rt2d_gemini_May2017_control_cosmic_ro.json",
+        default="cfg/May2017_TIDs/rt2d_gemini_May2017_cosmic_ro.json",
         help="Configuration file",
         type=str,
     )

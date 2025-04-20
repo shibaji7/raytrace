@@ -68,7 +68,7 @@ def load_doppler(base):
                     ray["event_ray_path_ground_range"][-1],
                 )
                 # Select all rays that ended within 100 km to the w2naf
-                if np.abs(grange-dist)<100:
+                if np.abs(grange-dist)<100000:
                     print(grange, dist, ray["elv"])
                     # Select rays based on ground range
                     d = dict(
@@ -117,8 +117,32 @@ def load_rt_files(folder):
 
 
 def compute_statistics(folder):
+    from analysis_plots import plot_ts
     records = load_rt_files(folder)
     dop = records["dop_records"]
+    plot_ts(
+        dop,
+        [dt.datetime(2024, 4, 8, 17), dt.datetime(2024, 4, 8, 22)],
+        shadow=records["shadow"],
+        filepath="TS.png",
+    )
+
+    # from grapeDRF import GrapeDRF
+
+    # station = "w2naf"
+    # sDate = dt.datetime(2024, 4, 8)
+    # eDate = dt.datetime(2024, 4, 9)
+    # figd = {}
+    # # figd["cfreqs"] = [5, 10, 15, 20]
+    # figd["cfreqs"] = [5]
+    # figd["solar_lat"] = 41.335116
+    # figd["solar_lon"] = -75.600692
+    # figd["overlaySolarElevation"] = False
+    # figd["overlayEclipse"] = False
+    # gDRF = GrapeDRF(sDate, eDate, station)
+    # fig, axes, png_fpath = gDRF.plot_figure(**figd)
+
+    # fig.savefig(png_fpath, bbox_inches="tight")
     return
 
 

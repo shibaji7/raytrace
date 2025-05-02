@@ -6,7 +6,7 @@
     "project_name": "May2017_gemini_tid_cosmic2",
     "event": "2017-05-27T16",
     "time_window": 300,
-    "time_gaps": 1,
+    "time_gaps": 30,
     "event_type":{
         "eclipse": false,
         "tid": true
@@ -15,7 +15,8 @@
     "density_file_name": null,
     "grid_coordinate_file": "grid.mat",
     "run_radar_beam_resolution": false,
-    "max_ground_range_km": 1800,
+    "max_ground_range_km": 3000,
+    "edens_horizontal_interpolation": 1700,
     "number_of_ground_step_km": 200,
     "slant_gate_of_radar": 75,
     "start_height_km": 100,
@@ -27,6 +28,10 @@
     "start_elevation": 5,
     "end_elevation": 60,
     "elevation_inctiment": 0.1,
+    "pharlap_params":{
+        "R12": 12,
+        "kp": 0
+    },
     "nhops": 1,
     "rise_time_sec": 60,
     "threshold": 1e-5,

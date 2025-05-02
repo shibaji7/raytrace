@@ -184,6 +184,7 @@ class RadarSimulation(object):
                 rto.bearing_object["lon"],
                 rto.bearing_object["ht"],
                 to_file=rto.edensity_file,
+                intp_edens_xlim_index=rto.intp_edens_xlim_index,
             )
         else:
             eden = self.eden_model.load_from_file(rto.edensity_file)
@@ -224,16 +225,20 @@ class RadarSimulation(object):
         return
 
     def get_event_dates(self):
-        events = (
-            self.eden_model.dates
-            if self.model == "gemini"
-            else [
-                self.start_time + dt.timedelta(minutes=d * self.time_gaps)
-                for d in range(int(self.time_window / self.time_gaps))
-            ]
-        )
-        if self.model == "gemini":
-            events = events[: self.cfg.time_window]
+        events = [
+            self.start_time + dt.timedelta(minutes=d * self.time_gaps)
+            for d in range(int(self.time_window / self.time_gaps))
+        ]
+        # events = (
+        #     self.eden_model.dates
+        #     if self.model == "gemini"
+        #     else [
+        #         self.start_time + dt.timedelta(minutes=d * self.time_gaps)
+        #         for d in range(int(self.time_window / self.time_gaps))
+        #     ]
+        # )
+        # if self.model == "gemini":
+        #     events = events[: self.cfg.time_window]
         return events
 
     def generate_rti(self):

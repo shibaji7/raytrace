@@ -31,6 +31,8 @@
     "rise_time_sec": 60,
     "threshold": 1e-5,
     "radius_earth": 6371,
+    "R12": 12,
+    "Kp": 0,
     "doppler_multiplier": 1,
     "iri_param": {
         "iri_version": 20,

@@ -68,6 +68,7 @@ class GEMINI2d(object):
         to_file: str = None,
         dlat: float = 0.2,
         dlon: float = 0.2,
+        intp_edens_xlim_index: float = 0,
     ):
         self.param = np.zeros((len(alts), len(lats)))
         i = np.argmin([np.abs((t - time).total_seconds()) for t in self.dates])
@@ -96,6 +97,10 @@ class GEMINI2d(object):
                     )
                     * 1e-6
                 )
+        logger.info(f"Index: {intp_edens_xlim_index}")
+        if intp_edens_xlim_index:
+            for j in range(intp_edens_xlim_index, len(lats)):
+                self.param[:, j] = self.param[:, intp_edens_xlim_index]
         if to_file:
             savemat(to_file, dict(ne=self.param))
         return self.param, alts

@@ -68,7 +68,7 @@ def load_doppler(base):
                     ray["event_ray_path_ground_range"][-1],
                 )
                 # Select all rays that ended within 100 km to the w2naf
-                if np.abs(grange-dist)<100000:
+                if np.abs(grange - dist) < 100000:
                     print(grange, dist, ray["elv"])
                     # Select rays based on ground range
                     d = dict(
@@ -87,7 +87,7 @@ def load_doppler(base):
                     records.append(d)
             except:
                 logger.error(f"Loading {file} error")
-            
+
     records = pd.DataFrame.from_records(records)
     records.dropna(inplace=True)
     return records
@@ -118,6 +118,7 @@ def load_rt_files(folder):
 
 def compute_statistics(folder):
     from analysis_plots import plot_ts
+
     records = load_rt_files(folder)
     dop = records["dop_records"]
     plot_ts(

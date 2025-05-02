@@ -121,6 +121,8 @@ class Trace(object):
             dist = np.linspace(
                 0, self.cfg.max_ground_range_km, self.cfg.number_of_ground_step_km
             )
+            self.intp_edens_xlim_index = np.abs(dist - 1700).argmin()
+            logger.info(f"Index: {self.intp_edens_xlim_index}")
             for d in dist:
                 x = gc.destination(p, bearing, distance=d)
                 lats.append(x[0])
@@ -189,10 +191,14 @@ class Trace(object):
         )
         bearing_object["radius_earth"] = self.cfg.radius_earth
         if hasattr(self.cfg, "pharlap_params"):
-            bearing_object["R12"] = self.cfg.pharlap_params.R12
-            bearing_object["doppler_flag"] = self.cfg.pharlap_params.doppler_flag
-            bearing_object["irregs_flag"] = self.cfg.pharlap_params.irregs_flag
-            bearing_object["kp"] = self.cfg.pharlap_params.kp
+            if hasattr(self.cfg.pharlap_params, "R12"):
+                bearing_object["R12"] = self.cfg.pharlap_params.R12
+            if hasattr(self.cfg.pharlap_params, "doppler_flag"):
+                bearing_object["doppler_flag"] = self.cfg.pharlap_params.doppler_flag
+            if hasattr(self.cfg.pharlap_params, "irregs_flag"):
+                bearing_object["irregs_flag"] = self.cfg.pharlap_params.irregs_flag
+            if hasattr(self.cfg.pharlap_params, "kp"):
+                bearing_object["kp"] = self.cfg.pharlap_params.kp
         savemat(fname, bearing_object)
         self.bearing_object = copy.copy(bearing_object)
         return

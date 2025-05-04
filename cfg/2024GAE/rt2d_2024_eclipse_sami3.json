@@ -9,7 +9,7 @@
     "ray_target": {
         "station_name": "w2naf"
     },
-    "project_name": "April2024_SAMI3_eclipse_hamsci_%02dMHz_SCurve",
+    "project_name": "GAE2024_SAMI3_w2naf_%02dHop_%02dMHz",
     "event": "2024-04-08T17:00",
     "time_window": 300,
     "time_gaps": -1,
@@ -30,11 +30,11 @@
     "height_incriment_km": 1,
     "scale": "log",
     "kind": "linear",
-    "frequency": 5,
+    "frequency": 15,
     "start_elevation": 5,
     "end_elevation": 60,
     "elevation_inctiment": 0.05,
-    "nhops": 3,
+    "nhops": 2,
     "rise_time_sec": 60,
     "threshold": 1e-5,
     "radius_earth": 6371,
@@ -53,7 +53,7 @@
     "tmp_hamsci_folder": "/home/chakras4/OneDrive/trace/hamsci/",
     "project_save_location": "/home/chakras4/OneDrive/trace/outputs/",
     "psws_node_registry": "cfg/PSWS_Node_Registry.csv",
-    "worker": 0,
+    "worker": 10,
     "ray_trace_plot_kind": "edens",
     "ray_trace_plot_lim": {
         "pf": [4, 6],

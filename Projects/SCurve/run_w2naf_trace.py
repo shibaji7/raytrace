@@ -35,7 +35,6 @@ class HamSCISimulation(object):
     def __init__(
         self,
         cfg_file: str,
-        f0: float,
     ) -> None:
         ## Kill all Matlab Server Hosts for this run
         os.system("killall MathWorksServiceHost.")
@@ -47,8 +46,9 @@ class HamSCISimulation(object):
         self.end_time = dparser.isoparse(self.cfg.event) + dt.timedelta(
             minutes=self.cfg.time_window
         )
-        self.cfg.frequency = f0
-        self.cfg.project_name = self.cfg.project_name % int(f0)
+        self.cfg.project_name = self.cfg.project_name % (
+            int(self.cfg.nhops), int(self.cfg.frequency)
+        )
         self.model = self.cfg.model
         self.target_call_sign = self.cfg.ray_target.station_name
         self.source = dict(
@@ -67,6 +67,7 @@ class HamSCISimulation(object):
             self.start_time,
             call_signs=[self.cfg.ray_target.station_name],
             source=self.source,
+            cfg_file=cfg_file,
         )
         self.worker = self.cfg.worker
         self.parallel = self.cfg.worker > 0
@@ -311,7 +312,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/rt2d_2024_eclipse_sami3.json",
+        default="cfg/2024GAE/rt2d_2024_eclipse_sami3.json",
         help="Configuration file",
         type=str,
     )
@@ -320,7 +321,7 @@ if __name__ == "__main__":
     for k in vars(args).keys():
         print("     ", k, "->", str(vars(args)[k]))
 
-    sim = HamSCISimulation(args.cfg_file, f0=10)
+    sim = HamSCISimulation(args.cfg_file)
     sim.run_2d_simulation()
     sim.compute_doppler()
     sim.generate_ls()

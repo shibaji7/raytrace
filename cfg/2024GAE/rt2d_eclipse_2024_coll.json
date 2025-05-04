@@ -1,0 +1,64 @@
+{
+    "verbose": true,
+    "model": "sami3",
+    "ray_source": {
+        "lat": 40.6776,
+        "lon": -105.0461,
+        "station_name": "wwv"
+    },
+    "ray_target": {
+        "station_name": "w2naf"
+    },
+    "project_name": "April2024_SAMI3_eclipse_hamsci_%02dMHz_SCurve",
+    "event": "2024-04-08T17:00",
+    "time_window": 300,
+    "time_gaps": -1,
+    "event_type":{
+        "eclipse": true,
+        "tid": false
+    },
+    "density_file_location": "/home/chakras4/Modeled-Electron-Densities/SAMI3/20240408/",
+    "density_file_name": "eclipse_2024_apr78.nc",
+    "density_simulated_datetime": "2024-04-07",
+    "grid_coordinate_file": null,
+    "run_radar_beam_resolution": false,
+    "max_ground_range_km": 4000,
+    "number_of_ground_step_km": 200,
+    "slant_gate_of_radar": 100,
+    "start_height_km": 100,
+    "end_height_km": 400,
+    "height_incriment_km": 1,
+    "scale": "log",
+    "kind": "linear",
+    "frequency": 5,
+    "start_elevation": 5,
+    "end_elevation": 60,
+    "elevation_inctiment": 0.05,
+    "nhops": 3,
+    "rise_time_sec": 60,
+    "threshold": 1e-5,
+    "radius_earth": 6371,
+    "doppler_multiplier": 1,
+    "iri_param": {
+        "iri_version": 20,
+        "start_mask_time": null
+    },
+    "pharlap_params": { 
+        "R12": 100,
+        "doppler_flag": 0,
+        "irregs_flag": 0,
+        "kp": 0
+    },
+    "base_eclipse_folder": "datasets/eclipse_path/",
+    "tmp_hamsci_folder": "/home/chakras4/OneDrive/trace/hamsci/",
+    "project_save_location": "/home/chakras4/OneDrive/trace/outputs/",
+    "psws_node_registry": "cfg/PSWS_Node_Registry.csv",
+    "worker": 0,
+    "ray_trace_plot_kind": "edens",
+    "ray_trace_plot_lim": {
+        "pf": [4, 6],
+        "edens": [1e5, 1e6],
+        "ref_indx": [0.6, 0.95]
+    },
+    "to_netcdf": false
+}

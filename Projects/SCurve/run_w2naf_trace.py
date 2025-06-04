@@ -47,7 +47,8 @@ class HamSCISimulation(object):
             minutes=self.cfg.time_window
         )
         self.cfg.project_name = self.cfg.project_name % (
-            int(self.cfg.nhops), int(self.cfg.frequency)
+            int(self.cfg.nhops),
+            int(self.cfg.frequency),
         )
         self.model = self.cfg.model
         self.target_call_sign = self.cfg.ray_target.station_name

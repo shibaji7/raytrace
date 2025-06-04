@@ -16,7 +16,6 @@ from dataclasses import dataclass
 
 import numpy as np
 from loguru import logger
-
 from raidpy.constants import pconst
 
 

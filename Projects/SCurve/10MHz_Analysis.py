@@ -51,6 +51,7 @@ def get_eclipse_along_path(dates):
 
 def load_doppler(base):
     dist = get_w2naf_dist()
+    print(dist)
     records = []
     dop_files = glob.glob(base + "Doppler/*.mat")
     dop_files.sort()
@@ -67,8 +68,8 @@ def load_doppler(base):
                     ray["event_ray_path_ground_range"][-1],
                 )
                 # Select all rays that ended within 100 km to the w2naf
-                if np.abs(grange - dist) < 100:
-                    #print(grange, dist, ray["elv"])
+                if np.abs(grange - dist) < 100000:
+                    print(grange, dist, ray["elv"])
                     # Select rays based on ground range
                     d = dict(
                         time=doppler["doppler"]["time"],
@@ -147,5 +148,5 @@ def compute_statistics(folder):
 
 
 if __name__ == "__main__":
-    folder = "/home/chakras4/OneDrive/trace/outputs/GAE2024_SAMI3_w2naf_05Hop_05MHz/"
+    folder = "/home/chakras4/OneDrive/trace/outputs/GAE2024_SAMI3_w2naf_02Hop_10MHz/"
     compute_statistics(folder)

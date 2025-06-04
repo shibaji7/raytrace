@@ -190,7 +190,7 @@ if __name__ == "__main__":
     overlay_data_models()
     folders = [
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_05MHz_SCurve/",
-        "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_10MHz_SCurve/",
+        "/home/shibaji/OneDrive/trace/outputs/GAE2024_SAMI3_w2naf_10Hop_10MHz/",
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_15MHz_SCurve/",
         # "/home/shibaji/OneDrive/trace/outputs/April2024_SAMI3_eclipse_hamsci_20MHz_SCurve/"
     ]

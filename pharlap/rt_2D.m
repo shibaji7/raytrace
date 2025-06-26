@@ -51,7 +51,7 @@ iono_en_grid = iono_pf_grid.^2 / 80.6164e-6;
 iono_en_grid_5 = iono_pf_grid_5.^2 / 80.6164e-6;
 
 iono_en_grid = ne;
-iono_en_grid_5 = iono_en_grid;
+iono_en_grid_5 = ne;
 
 elevs = elev_s:elev_i:elev_e;
 num_elevs = length(elevs);

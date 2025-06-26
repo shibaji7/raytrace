@@ -68,7 +68,7 @@ def load_doppler(base):
                 )
                 # Select all rays that ended within 100 km to the w2naf
                 if np.abs(grange - dist) < 100:
-                    #print(grange, dist, ray["elv"])
+                    # print(grange, dist, ray["elv"])
                     # Select rays based on ground range
                     d = dict(
                         time=doppler["doppler"]["time"],

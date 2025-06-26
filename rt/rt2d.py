@@ -64,7 +64,7 @@ class Trace(object):
         self.density = density
         print(self.folder, os.getcwd() + "/pharlap/pharlap_4.5.3/dat")
         pwd = os.getcwd() + "/pharlap/pharlap_4.5.3/dat"
-        matlab_loc = "/usr/local/MATLAB/R2023a/bin/matlab"
+        matlab_loc = "matlab"
         cmd = "export DIR_MODELS_REF_DAT={pwd};\
                 cd pharlap/;\
                 {matlab_loc} -softwareopengl -nodisplay -nodesktop -nosplash -nojvm -r \"UT=[{ut}];dic='{dic}';fname='{fname}';\

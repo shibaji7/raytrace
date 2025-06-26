@@ -78,6 +78,7 @@ class GITM2d(object):
         lons,
         alts,
         to_file=None,
+        **kwrds,
     ):
         i = np.argmin([np.abs((t - time).total_seconds()) for t in self.store["time"]])
         n = len(lats)
@@ -86,6 +87,7 @@ class GITM2d(object):
         glon = self.store["glon"]
         galt = self.store["alt"]
         out, ix = np.zeros((len(alts), n)) * np.nan, 0
+
         for lat, lon in zip(lats, lons):
             lon = np.mod(360 + lon, 360)
             idx = np.argmin(np.abs(glon - lon))
@@ -97,11 +99,12 @@ class GITM2d(object):
                 )
                 * 1e-6
             )
+            out[alts < 50, ix] = 0
             ix += 1
         self.param, self.alts = out, galt
         if to_file:
             savemat(to_file, dict(ne=self.param))
-        return out, galt
+        return self.param, self.alts
 
     def load_from_file(self, to_file: str):
         logger.info(f"Load from file {to_file.split('/')[-1]}")

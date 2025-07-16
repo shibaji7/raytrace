@@ -53,8 +53,8 @@ if __name__ == "__main__":
             rsim = RadarSimulation(args.cfg_file, beam=beam)
             rsim.gerenate_fov_plot()
             rsim.run_2d_simulation()
-            rsim.compute_doppler()
-            rsim.generate_rti()
+            # rsim.compute_doppler()
+            # rsim.generate_rti()
     if args.method == "rti":
         radar = radar.Radar(
             cfg.rad,

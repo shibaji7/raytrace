@@ -4,9 +4,9 @@
     "rad": "fhe",
     "beam": 11,
     "project_name": "May2017_gemini_tid_cosmic2",
-    "event": "2017-05-27T16",
-    "time_window": 300,
-    "time_gaps": 1,
+    "event": "2017-05-27T18:40",
+    "time_window": 60,
+    "time_gaps": 10,
     "event_type":{
         "eclipse": false,
         "tid": true
@@ -42,10 +42,10 @@
         "start_mask_time": null
     },
     "base_eclipse_folder": null,
-    "tmp_sd_folder": "/home/chakras4/OneDrive/trace/sd/",
+    "tmp_sd_folder": "/home/chakras4/trace/sd/",
     "sd_file_type": "fitacf",
     "sd_base_file_loc": "/sd-data/{year}/{type}/{rad}/{date}*",
-    "project_save_location": "/home/chakras4/OneDrive/trace/outputs/",
+    "project_save_location": "/home/chakras4/trace/outputs/",
     "frange": 180,
     "rsep": 45,
     "worker": 6,

@@ -4,9 +4,9 @@
     "rad": "fhe",
     "beam": 11,
     "project_name": "May2017_gemini_tid_cosmic2",
-    "event": "2017-05-27T18:40",
-    "time_window": 60,
-    "time_gaps": 10,
+    "event": "2017-05-27T16",
+    "time_window": 300,
+    "time_gaps": 1,
     "event_type":{
         "eclipse": false,
         "tid": true
@@ -48,7 +48,7 @@
     "project_save_location": "/home/chakras4/trace/outputs/",
     "frange": 180,
     "rsep": 45,
-    "worker": 6,
+    "worker": 0,
     "ray_trace_plot_kind": "pf",
     "ray_trace_plot_lim": {
         "pf": [4, 6],

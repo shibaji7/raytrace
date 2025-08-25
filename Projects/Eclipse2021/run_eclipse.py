@@ -31,7 +31,7 @@ from rt.run_sd_simulations import RadarSimulation
 if __name__ == "__main__":
     # add_sys_paths()
     parser = argparse.ArgumentParser()
-    parser.add_argument("-b", "--beam", default=7, help="Radar beam number", type=int)
+    parser.add_argument("-b", "--beam", default=15, help="Radar beam number", type=int)
     parser.add_argument(
         "-f",
         "--cfg_file",

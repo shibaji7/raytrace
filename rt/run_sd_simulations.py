@@ -184,7 +184,7 @@ class RadarSimulation(object):
                 rto.bearing_object["lon"],
                 rto.bearing_object["ht"],
                 to_file=rto.edensity_file,
-                intp_edens_xlim_index=rto.intp_edens_xlim_index,
+                # intp_edens_xlim_index=rto.intp_edens_xlim_index,
             )
         else:
             eden = self.eden_model.load_from_file(rto.edensity_file)

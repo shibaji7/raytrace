@@ -5,8 +5,8 @@
     "beam": 7,
     "project_name": "Dec2021_gitm_eclipse_Modeled",
     "event": "2021-12-04T06",
-    "time_window": 180,
-    "time_gaps": 10,
+    "time_window": 240,
+    "time_gaps": 1,
     "event_type":{
         "eclipse": true,
         "tid": false

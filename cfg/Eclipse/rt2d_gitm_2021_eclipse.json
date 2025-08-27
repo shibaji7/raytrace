@@ -4,9 +4,9 @@
     "rad": "fir",
     "beam": 7,
     "project_name": "Dec2021_gitm_eclipse_Modeled",
-    "event": "2021-12-04T06",
-    "time_window": 240,
-    "time_gaps": 1,
+    "event": "2021-12-04T07",
+    "time_window": 180,
+    "time_gaps": 5,
     "event_type":{
         "eclipse": true,
         "tid": false
@@ -18,8 +18,8 @@
     "max_ground_range_km": 4000,
     "number_of_ground_step_km": 800,
     "slant_gate_of_radar": 110,
-    "start_height_km": 0,
-    "end_height_km": 500,
+    "start_height_km": 100,
+    "end_height_km": 400,
     "height_incriment_km": 1,
     "scale": "log",
     "kind": "linear",

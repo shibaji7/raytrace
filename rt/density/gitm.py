@@ -62,6 +62,8 @@ class GITM2d(object):
             self.store["eden"],
         ) = (
             ds.glat.values,
+            # converted to -180 : 180
+            # np.mod(180 + ds.glon.values, 360) - 180,
             np.mod(360 + ds.glon.values, 360),
             ds.alt.values / 1e3,
             ds.dene.values,
@@ -92,7 +94,7 @@ class GITM2d(object):
             lon = np.mod(360 + lon, 360)
             idx = np.argmin(np.abs(glon - lon))
             idy = np.argmin(np.abs(glat - lat))
-            o = D[:, idx, idy]
+            o = D[:, idy, idx]
             out[:, ix] = (
                 utils.interpolate_by_altitude(
                     galt, alts, o, self.cfg.scale, self.cfg.kind, method="extp"

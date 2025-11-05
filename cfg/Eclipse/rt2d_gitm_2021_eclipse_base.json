@@ -19,7 +19,7 @@
     "number_of_ground_step_km": 800,
     "slant_gate_of_radar": 110,
     "start_height_km": 100,
-    "end_height_km": 400,
+    "end_height_km": 600,
     "height_incriment_km": 1,
     "scale": "log",
     "kind": "linear",

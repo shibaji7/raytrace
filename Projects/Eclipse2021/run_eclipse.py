@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--cfg_file",
-        default="cfg/Eclipse/rt2d_gitm_2021_eclipse.json",
+        default="cfg/Eclipse/rt2d_gitm_2021_eclipse_base.json",
         help="Configuration file",
         type=str,
     )

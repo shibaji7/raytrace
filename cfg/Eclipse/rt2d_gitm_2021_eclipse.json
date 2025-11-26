@@ -49,7 +49,7 @@
     "project_save_location": "/home/chakras4/trace/outputs/",
     "frange": 180,
     "rsep": 45,
-    "worker": 6,
+    "worker": 1,
     "ray_trace_plot_kind": "edens",
     "ray_trace_plot_lim": {
         "pf": [2, 6],
